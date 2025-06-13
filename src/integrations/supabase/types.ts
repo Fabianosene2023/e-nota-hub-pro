@@ -47,6 +47,56 @@ export type Database = {
           },
         ]
       }
+      certificados_digitais: {
+        Row: {
+          ativo: boolean
+          conteudo_criptografado: string
+          created_at: string
+          empresa_id: string
+          id: string
+          nome_arquivo: string
+          senha_hash: string
+          tipo_certificado: string
+          updated_at: string
+          validade_fim: string
+          validade_inicio: string
+        }
+        Insert: {
+          ativo?: boolean
+          conteudo_criptografado: string
+          created_at?: string
+          empresa_id: string
+          id?: string
+          nome_arquivo: string
+          senha_hash: string
+          tipo_certificado?: string
+          updated_at?: string
+          validade_fim: string
+          validade_inicio: string
+        }
+        Update: {
+          ativo?: boolean
+          conteudo_criptografado?: string
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          nome_arquivo?: string
+          senha_hash?: string
+          tipo_certificado?: string
+          updated_at?: string
+          validade_fim?: string
+          validade_inicio?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificados_digitais_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clientes: {
         Row: {
           cep: string
@@ -155,6 +205,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "configuracoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: true
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      configuracoes_sefaz: {
+        Row: {
+          ambiente: string
+          created_at: string
+          csc_id: string | null
+          csc_token: string | null
+          empresa_id: string
+          id: string
+          proximo_numero_nfce: number
+          proximo_numero_nfe: number
+          serie_nfce: number
+          serie_nfe: number
+          tentativas_reenvio: number
+          timeout_sefaz: number
+          updated_at: string
+        }
+        Insert: {
+          ambiente?: string
+          created_at?: string
+          csc_id?: string | null
+          csc_token?: string | null
+          empresa_id: string
+          id?: string
+          proximo_numero_nfce?: number
+          proximo_numero_nfe?: number
+          serie_nfce?: number
+          serie_nfe?: number
+          tentativas_reenvio?: number
+          timeout_sefaz?: number
+          updated_at?: string
+        }
+        Update: {
+          ambiente?: string
+          created_at?: string
+          csc_id?: string | null
+          csc_token?: string | null
+          empresa_id?: string
+          id?: string
+          proximo_numero_nfce?: number
+          proximo_numero_nfe?: number
+          serie_nfce?: number
+          serie_nfe?: number
+          tentativas_reenvio?: number
+          timeout_sefaz?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuracoes_sefaz_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: true
             referencedRelation: "empresas"
@@ -511,6 +617,75 @@ export type Database = {
         }
         Relationships: []
       }
+      logs_sefaz: {
+        Row: {
+          chave_acesso: string | null
+          codigo_retorno: string | null
+          created_at: string
+          empresa_id: string
+          id: string
+          ip_origem: unknown | null
+          mensagem_retorno: string | null
+          nota_fiscal_id: string | null
+          operacao: string
+          protocolo: string | null
+          status_operacao: string
+          tempo_resposta_ms: number | null
+          user_agent: string | null
+          xml_enviado: string | null
+          xml_retorno: string | null
+        }
+        Insert: {
+          chave_acesso?: string | null
+          codigo_retorno?: string | null
+          created_at?: string
+          empresa_id: string
+          id?: string
+          ip_origem?: unknown | null
+          mensagem_retorno?: string | null
+          nota_fiscal_id?: string | null
+          operacao: string
+          protocolo?: string | null
+          status_operacao: string
+          tempo_resposta_ms?: number | null
+          user_agent?: string | null
+          xml_enviado?: string | null
+          xml_retorno?: string | null
+        }
+        Update: {
+          chave_acesso?: string | null
+          codigo_retorno?: string | null
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          ip_origem?: unknown | null
+          mensagem_retorno?: string | null
+          nota_fiscal_id?: string | null
+          operacao?: string
+          protocolo?: string | null
+          status_operacao?: string
+          tempo_resposta_ms?: number | null
+          user_agent?: string | null
+          xml_enviado?: string | null
+          xml_retorno?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_sefaz_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "logs_sefaz_nota_fiscal_id_fkey"
+            columns: ["nota_fiscal_id"]
+            isOneToOne: false
+            referencedRelation: "notas_fiscais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marcas: {
         Row: {
           ativo: boolean | null
@@ -551,13 +726,19 @@ export type Database = {
       }
       notas_fiscais: {
         Row: {
+          ambiente_emissao: string | null
           chave_acesso: string | null
           cliente_id: string
+          codigo_retorno_sefaz: string | null
           created_at: string
           danfe_pdf_url: string | null
+          data_autorizacao: string | null
+          data_cancelamento: string | null
           data_emissao: string
           empresa_id: string
           id: string
+          justificativa_cancelamento: string | null
+          mensagem_retorno_sefaz: string | null
           modalidade_frete: string | null
           natureza_operacao: string | null
           numero: number
@@ -576,13 +757,19 @@ export type Database = {
           xml_url: string | null
         }
         Insert: {
+          ambiente_emissao?: string | null
           chave_acesso?: string | null
           cliente_id: string
+          codigo_retorno_sefaz?: string | null
           created_at?: string
           danfe_pdf_url?: string | null
+          data_autorizacao?: string | null
+          data_cancelamento?: string | null
           data_emissao?: string
           empresa_id: string
           id?: string
+          justificativa_cancelamento?: string | null
+          mensagem_retorno_sefaz?: string | null
           modalidade_frete?: string | null
           natureza_operacao?: string | null
           numero: number
@@ -601,13 +788,19 @@ export type Database = {
           xml_url?: string | null
         }
         Update: {
+          ambiente_emissao?: string | null
           chave_acesso?: string | null
           cliente_id?: string
+          codigo_retorno_sefaz?: string | null
           created_at?: string
           danfe_pdf_url?: string | null
+          data_autorizacao?: string | null
+          data_cancelamento?: string | null
           data_emissao?: string
           empresa_id?: string
           id?: string
+          justificativa_cancelamento?: string | null
+          mensagem_retorno_sefaz?: string | null
           modalidade_frete?: string | null
           natureza_operacao?: string | null
           numero?: number
@@ -930,7 +1123,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      validar_cnpj: {
+        Args: { cnpj: string }
+        Returns: boolean
+      }
+      validar_cpf: {
+        Args: { cpf: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
