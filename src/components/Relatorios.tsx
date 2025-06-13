@@ -22,19 +22,42 @@ export const Relatorios = () => {
     to: endOfMonth(new Date())
   });
 
-  const { data: notas } = useNotasFiscais(empresaSelecionada);
-  const { data: clientes } = useClientesManager(empresaSelecionada);
-  const { data: produtos } = useProdutosManager(empresaSelecionada);
+  const { data: notas } = useNotasFiscais();
+  const { data: clientes } = useClientesManager();
+  const { data: produtos } = useProdutosManager();
 
-  // Filtrar notas por período
+  // Filtrar notas por empresa e período
   const notasFiltradas = useMemo(() => {
-    if (!notas || !dateRange?.from || !dateRange?.to) return notas || [];
+    if (!notas) return [];
     
-    return notas.filter(nota => {
-      const dataEmissao = new Date(nota.data_emissao);
-      return dataEmissao >= dateRange.from! && dataEmissao <= dateRange.to!;
-    });
-  }, [notas, dateRange]);
+    let filtradas = notas;
+    
+    // Filtrar por empresa se selecionada
+    if (empresaSelecionada) {
+      filtradas = filtradas.filter(nota => nota.empresa_id === empresaSelecionada);
+    }
+    
+    // Filtrar por período
+    if (dateRange?.from && dateRange?.to) {
+      filtradas = filtradas.filter(nota => {
+        const dataEmissao = new Date(nota.data_emissao);
+        return dataEmissao >= dateRange.from! && dataEmissao <= dateRange.to!;
+      });
+    }
+    
+    return filtradas;
+  }, [notas, empresaSelecionada, dateRange]);
+
+  // Filtrar clientes e produtos por empresa
+  const clientesFiltrados = useMemo(() => {
+    if (!clientes || !empresaSelecionada) return clientes || [];
+    return clientes.filter(cliente => cliente.empresa_id === empresaSelecionada);
+  }, [clientes, empresaSelecionada]);
+
+  const produtosFiltrados = useMemo(() => {
+    if (!produtos || !empresaSelecionada) return produtos || [];
+    return produtos.filter(produto => produto.empresa_id === empresaSelecionada);
+  }, [produtos, empresaSelecionada]);
 
   // Dados para gráficos
   const dadosVendas = useMemo(() => {
@@ -71,10 +94,10 @@ export const Relatorios = () => {
   }, [notasFiltradas]);
 
   const dadosClientes = useMemo(() => {
-    if (!notasFiltradas.length || !clientes) return [];
+    if (!notasFiltradas.length || !clientesFiltrados) return [];
     
     const vendasPorCliente = notasFiltradas.reduce((acc, nota) => {
-      const cliente = clientes.find(c => c.id === nota.cliente_id);
+      const cliente = clientesFiltrados.find(c => c.id === nota.cliente_id);
       const nomeCliente = cliente?.nome_razao_social || 'Cliente não encontrado';
       
       if (!acc[nomeCliente]) {
@@ -88,7 +111,7 @@ export const Relatorios = () => {
       .map(([cliente, valor]) => ({ cliente, valor }))
       .sort((a, b) => b.valor - a.valor)
       .slice(0, 10);
-  }, [notasFiltradas, clientes]);
+  }, [notasFiltradas, clientesFiltrados]);
 
   // Estatísticas gerais
   const estatisticas = useMemo(() => {
@@ -102,16 +125,16 @@ export const Relatorios = () => {
       totalNotas,
       ticketMedio,
       notasAutorizadas,
-      totalClientes: clientes?.length || 0,
-      totalProdutos: produtos?.length || 0
+      totalClientes: clientesFiltrados?.length || 0,
+      totalProdutos: produtosFiltrados?.length || 0
     };
-  }, [notasFiltradas, clientes, produtos]);
+  }, [notasFiltradas, clientesFiltrados, produtosFiltrados]);
 
   const exportarRelatorio = () => {
     const csvContent = [
       ['Nota', 'Cliente', 'Data', 'Valor', 'Status'],
       ...notasFiltradas.map(nota => {
-        const cliente = clientes?.find(c => c.id === nota.cliente_id);
+        const cliente = clientesFiltrados?.find(c => c.id === nota.cliente_id);
         return [
           nota.numero.toString(),
           cliente?.nome_razao_social || '',
