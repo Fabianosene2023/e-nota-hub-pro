@@ -70,33 +70,48 @@ export type Database = {
       }
       configuracoes: {
         Row: {
+          certificado_a1_data: string | null
+          certificado_a1_senha: string | null
           created_at: string
+          csc_id: string | null
           csc_token: string | null
           email_padrao_envio: string | null
           empresa_id: string
           id: string
           layout_danfe: string | null
           proxima_num_nf: number | null
+          serie_nfce: number | null
+          serie_nfe: number | null
           updated_at: string
         }
         Insert: {
+          certificado_a1_data?: string | null
+          certificado_a1_senha?: string | null
           created_at?: string
+          csc_id?: string | null
           csc_token?: string | null
           email_padrao_envio?: string | null
           empresa_id: string
           id?: string
           layout_danfe?: string | null
           proxima_num_nf?: number | null
+          serie_nfce?: number | null
+          serie_nfe?: number | null
           updated_at?: string
         }
         Update: {
+          certificado_a1_data?: string | null
+          certificado_a1_senha?: string | null
           created_at?: string
+          csc_id?: string | null
           csc_token?: string | null
           email_padrao_envio?: string | null
           empresa_id?: string
           id?: string
           layout_danfe?: string | null
           proxima_num_nf?: number | null
+          serie_nfce?: number | null
+          serie_nfe?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -174,6 +189,39 @@ export type Database = {
           },
         ]
       }
+      documentos_fiscais: {
+        Row: {
+          conteudo_base64: string | null
+          created_at: string
+          id: string
+          nome_arquivo: string
+          nota_fiscal_id: string
+          tamanho_bytes: number | null
+          tipo_documento: string
+          url_arquivo: string | null
+        }
+        Insert: {
+          conteudo_base64?: string | null
+          created_at?: string
+          id?: string
+          nome_arquivo: string
+          nota_fiscal_id: string
+          tamanho_bytes?: number | null
+          tipo_documento: string
+          url_arquivo?: string | null
+        }
+        Update: {
+          conteudo_base64?: string | null
+          created_at?: string
+          id?: string
+          nome_arquivo?: string
+          nota_fiscal_id?: string
+          tamanho_bytes?: number | null
+          tipo_documento?: string
+          url_arquivo?: string | null
+        }
+        Relationships: []
+      }
       empresas: {
         Row: {
           ambiente_sefaz: string | null
@@ -190,6 +238,8 @@ export type Database = {
           inscricao_estadual: string | null
           inscricao_municipal: string | null
           nome_fantasia: string | null
+          proximo_numero_nfce: number | null
+          proximo_numero_nfe: number | null
           razao_social: string
           regime_tributario: string | null
           senha_certificado: string | null
@@ -211,6 +261,8 @@ export type Database = {
           inscricao_estadual?: string | null
           inscricao_municipal?: string | null
           nome_fantasia?: string | null
+          proximo_numero_nfce?: number | null
+          proximo_numero_nfe?: number | null
           razao_social: string
           regime_tributario?: string | null
           senha_certificado?: string | null
@@ -232,11 +284,43 @@ export type Database = {
           inscricao_estadual?: string | null
           inscricao_municipal?: string | null
           nome_fantasia?: string | null
+          proximo_numero_nfce?: number | null
+          proximo_numero_nfe?: number | null
           razao_social?: string
           regime_tributario?: string | null
           senha_certificado?: string | null
           telefone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      historico_notas: {
+        Row: {
+          created_at: string
+          dados_retorno: Json | null
+          id: string
+          nota_fiscal_id: string
+          observacao: string | null
+          status_anterior: string | null
+          status_novo: string
+        }
+        Insert: {
+          created_at?: string
+          dados_retorno?: Json | null
+          id?: string
+          nota_fiscal_id: string
+          observacao?: string | null
+          status_anterior?: string | null
+          status_novo: string
+        }
+        Update: {
+          created_at?: string
+          dados_retorno?: Json | null
+          id?: string
+          nota_fiscal_id?: string
+          observacao?: string | null
+          status_anterior?: string | null
+          status_novo?: string
         }
         Relationships: []
       }
@@ -287,6 +371,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      logs_operacoes: {
+        Row: {
+          created_at: string
+          dados_operacao: Json | null
+          descricao: string
+          empresa_id: string
+          id: string
+          ip_origem: string | null
+          tipo_operacao: string
+          usuario_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          dados_operacao?: Json | null
+          descricao: string
+          empresa_id: string
+          id?: string
+          ip_origem?: string | null
+          tipo_operacao: string
+          usuario_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          dados_operacao?: Json | null
+          descricao?: string
+          empresa_id?: string
+          id?: string
+          ip_origem?: string | null
+          tipo_operacao?: string
+          usuario_id?: string | null
+        }
+        Relationships: []
       }
       notas_fiscais: {
         Row: {
@@ -467,6 +584,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_profiles: {
+        Row: {
+          ativo: boolean | null
+          created_at: string
+          email: string
+          empresa_id: string
+          id: string
+          nome: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string
+          email: string
+          empresa_id: string
+          id?: string
+          nome: string
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string
+          email?: string
+          empresa_id?: string
+          id?: string
+          nome?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
