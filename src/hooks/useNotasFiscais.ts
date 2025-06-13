@@ -15,9 +15,14 @@ export const useNotasFiscais = () => {
             razao_social,
             nome_fantasia
           ),
-          clientes (
+          clientes:contatos!cliente_id (
             nome_razao_social,
             cpf_cnpj
+          ),
+          transportadoras:contatos!transportadora_id (
+            nome_razao_social,
+            cpf_cnpj,
+            placa_veiculo
           )
         `)
         .order('created_at', { ascending: false });

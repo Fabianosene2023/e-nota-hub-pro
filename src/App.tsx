@@ -8,6 +8,8 @@ import { Layout } from "./components/Layout";
 import { Login } from "./components/Login";
 import { Dashboard } from "./components/Dashboard";
 import { Empresas } from "./components/Empresas";
+import { Clientes } from "./components/Clientes";
+import { Produtos } from "./components/Produtos";
 import { TesteApiNfe } from "./components/TesteApiNfe";
 import NotFound from "./pages/NotFound";
 
@@ -48,15 +50,15 @@ const App = () => (
             <Route path="notas/recebidas" element={<PlaceholderPage title="Notas Recebidas (MDF-e)" />} />
             
             {/* Produtos Routes */}
-            <Route path="produtos" element={<PlaceholderPage title="Produtos" />} />
-            <Route path="produtos/lista" element={<PlaceholderPage title="Lista de Produtos" />} />
+            <Route path="produtos" element={<Produtos />} />
+            <Route path="produtos/lista" element={<Produtos />} />
             <Route path="produtos/servicos" element={<PlaceholderPage title="Serviços" />} />
             <Route path="produtos/marcas" element={<PlaceholderPage title="Marcas" />} />
             <Route path="produtos/categorias" element={<PlaceholderPage title="Categorias" />} />
             <Route path="produtos/unidades" element={<PlaceholderPage title="Unidades de Medida" />} />
             <Route path="produtos/fornecedores" element={<PlaceholderPage title="Fornecedores" />} />
             <Route path="produtos/transportadoras" element={<PlaceholderPage title="Transportadoras" />} />
-            <Route path="clientes" element={<PlaceholderPage title="Clientes" />} />
+            <Route path="clientes" element={<Clientes />} />
             
             {/* Configurações Routes */}
             <Route path="configuracoes" element={<PlaceholderPage title="Configurações" />} />
