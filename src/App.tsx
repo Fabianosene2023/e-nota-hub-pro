@@ -21,6 +21,8 @@ const TesteApiNfe = lazy(() => import("./components/TesteApiNfe").then(module =>
 const ConfiguracoesFiscais = lazy(() => import("./components/ConfiguracoesFiscais").then(module => ({ default: module.ConfiguracoesFiscais })));
 const CadastroClientes = lazy(() => import("./pages/CadastroClientes"));
 const CadastroProdutos = lazy(() => import("./pages/CadastroProdutos"));
+const CadastroFornecedores = lazy(() => import("./pages/CadastroFornecedores"));
+const CadastroTransportadoras = lazy(() => import("./pages/CadastroTransportadoras"));
 const Relatorios = lazy(() => import("./components/Relatorios").then(module => ({ default: module.Relatorios })));
 
 const queryClient = new QueryClient({
@@ -83,6 +85,16 @@ function App() {
                 <Route path="produtos/lista" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <CadastroProdutos />
+                  </Suspense>
+                } />
+                <Route path="produtos/fornecedores" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <CadastroFornecedores />
+                  </Suspense>
+                } />
+                <Route path="produtos/transportadoras" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <CadastroTransportadoras />
                   </Suspense>
                 } />
                 
