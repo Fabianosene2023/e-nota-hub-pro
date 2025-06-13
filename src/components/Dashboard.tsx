@@ -167,7 +167,7 @@ export const Dashboard = () => {
                 <div>
                   <p className="font-medium">NF-e Nº {nf.numero}</p>
                   <p className="text-sm text-muted-foreground">
-                    {nf.clientes?.nome_razao_social}
+                    {nf.clientes?.nome_razao_social || 'Cliente não encontrado'}
                   </p>
                 </div>
                 <div className="text-right">
@@ -192,7 +192,7 @@ export const Dashboard = () => {
               </Button>
             </div>
           )}
-        </CardContent>
+        </div>
       </Card>
     </div>
   );
