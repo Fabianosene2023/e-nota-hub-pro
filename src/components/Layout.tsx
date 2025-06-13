@@ -1,174 +1,100 @@
 
-import { useState } from "react";
-import { Outlet, NavLink, useLocation } from "react-router-dom";
-import { 
-  Building, 
-  Users, 
-  Package, 
-  FileText, 
-  BarChart3, 
-  Settings,
-  Menu,
-  X,
-  LogOut,
-  Bell
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Building, Users, Package, FileText, Settings, BarChart3, TestTube } from "lucide-react"
+import { Link, Outlet, useLocation } from "react-router-dom"
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-  { name: 'Empresas', href: '/empresas', icon: Building },
-  { name: 'Clientes', href: '/clientes', icon: Users },
-  { name: 'Produtos', href: '/produtos', icon: Package },
-  { name: 'Notas Fiscais', href: '/notas', icon: FileText },
-  { name: 'Configurações', href: '/configuracoes', icon: Settings },
-];
+  {
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: BarChart3,
+    current: false,
+  },
+  {
+    name: "Empresas",
+    href: "/empresas",
+    icon: Building,
+    current: false,
+  },
+  {
+    name: "Clientes",
+    href: "/clientes",
+    icon: Users,
+    current: false,
+  },
+  {
+    name: "Produtos",
+    href: "/produtos",
+    icon: Package,
+    current: false,
+  },
+  {
+    name: "Notas Fiscais",
+    href: "/notas",
+    icon: FileText,
+    current: false,
+  },
+  {
+    name: "Teste API NFe",
+    href: "/teste-api",
+    icon: TestTube,
+    current: false,
+  },
+  {
+    name: "Configurações", 
+    href: "/configuracoes",
+    icon: Settings,
+    current: false,
+  },
+]
 
-export function Layout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const location = useLocation();
+export const Layout = () => {
+  const location = useLocation()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar Desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-sidebar px-6 pb-4">
-          <div className="flex h-16 shrink-0 items-center">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <FileText className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold text-sidebar-foreground">FiscalPro</span>
-            </div>
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      <div className="hidden border-r bg-muted/40 md:block">
+        <div className="flex h-full max-h-screen flex-col gap-2">
+          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+            <Link to="/" className="flex items-center gap-2 font-semibold">
+              <Building className="h-6 w-6" />
+              <span className="">Sistema Fiscal</span>
+            </Link>
           </div>
-          <nav className="flex flex-1 flex-col">
-            <ul role="list" className="flex flex-1 flex-col gap-y-7">
-              <li>
-                <ul role="list" className="-mx-2 space-y-1">
-                  {navigation.map((item) => {
-                    const isActive = location.pathname === item.href;
-                    return (
-                      <li key={item.name}>
-                        <NavLink
-                          to={item.href}
-                          className={`
-                            group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors
-                            ${isActive 
-                              ? 'bg-sidebar-accent text-sidebar-accent-foreground' 
-                              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                            }
-                          `}
-                        >
-                          <item.icon className="h-6 w-6 shrink-0" />
-                          {item.name}
-                        </NavLink>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </li>
-            </ul>
-          </nav>
+          <div className="flex-1">
+            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+              {navigation.map((item) => {
+                const isActive = location.pathname === item.href
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                      isActive && "bg-muted text-primary"
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
         </div>
       </div>
-
-      {/* Sidebar Mobile */}
-      {sidebarOpen && (
-        <div className="relative z-50 lg:hidden">
-          <div className="fixed inset-0 bg-gray-900/80" onClick={() => setSidebarOpen(false)} />
-          <div className="fixed inset-0 flex">
-            <div className="relative mr-16 flex w-full max-w-xs flex-1">
-              <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                <button type="button" className="-m-2.5 p-2.5" onClick={() => setSidebarOpen(false)}>
-                  <X className="h-6 w-6 text-white" />
-                </button>
-              </div>
-              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-sidebar px-6 pb-4">
-                <div className="flex h-16 shrink-0 items-center">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-primary-foreground" />
-                    </div>
-                    <span className="text-xl font-bold text-sidebar-foreground">FiscalPro</span>
-                  </div>
-                </div>
-                <nav className="flex flex-1 flex-col">
-                  <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                    <li>
-                      <ul role="list" className="-mx-2 space-y-1">
-                        {navigation.map((item) => {
-                          const isActive = location.pathname === item.href;
-                          return (
-                            <li key={item.name}>
-                              <NavLink
-                                to={item.href}
-                                onClick={() => setSidebarOpen(false)}
-                                className={`
-                                  group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors
-                                  ${isActive 
-                                    ? 'bg-sidebar-accent text-sidebar-accent-foreground' 
-                                    : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                                  }
-                                `}
-                              >
-                                <item.icon className="h-6 w-6 shrink-0" />
-                                {item.name}
-                              </NavLink>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-            </div>
+      <div className="flex flex-col">
+        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+          <div className="w-full flex-1">
+            <h1 className="text-lg font-semibold md:text-2xl">Sistema de Gestão Fiscal</h1>
           </div>
-        </div>
-      )}
-
-      {/* Main content */}
-      <div className="lg:pl-72">
-        {/* Top bar */}
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-          <button
-            type="button"
-            className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-
-          <div className="h-6 w-px bg-gray-200 lg:hidden" />
-
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <div className="flex flex-1"></div>
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <Button variant="ghost" size="sm" className="relative">
-                <Bell className="h-5 w-5" />
-                <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs">3</Badge>
-              </Button>
-              
-              <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" />
-
-              <div className="flex items-center gap-x-2">
-                <span className="text-sm font-medium text-gray-700">Admin</span>
-                <Button variant="ghost" size="sm">
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Page content */}
-        <main className="py-6">
-          <div className="px-4 sm:px-6 lg:px-8">
-            <Outlet />
-          </div>
+        </header>
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          <Outlet />
         </main>
       </div>
     </div>
-  );
+  )
 }

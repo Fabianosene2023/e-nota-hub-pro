@@ -8,6 +8,7 @@ import { Layout } from "./components/Layout";
 import { Login } from "./components/Login";
 import { Dashboard } from "./components/Dashboard";
 import { Empresas } from "./components/Empresas";
+import { TesteApiNfe } from "./components/TesteApiNfe";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="clientes" element={<div className="p-8 text-center text-muted-foreground">Página de Clientes em desenvolvimento</div>} />
             <Route path="produtos" element={<div className="p-8 text-center text-muted-foreground">Página de Produtos em desenvolvimento</div>} />
             <Route path="notas" element={<div className="p-8 text-center text-muted-foreground">Página de Notas Fiscais em desenvolvimento</div>} />
+            <Route path="teste-api" element={<TesteApiNfe />} />
             <Route path="configuracoes" element={<div className="p-8 text-center text-muted-foreground">Página de Configurações em desenvolvimento</div>} />
           </Route>
           <Route path="*" element={<NotFound />} />
