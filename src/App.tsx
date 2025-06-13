@@ -19,8 +19,8 @@ const Empresas = lazy(() => import("./components/Empresas").then(module => ({ de
 const EmissaoNFe = lazy(() => import("./components/EmissaoNFe").then(module => ({ default: module.EmissaoNFe })));
 const TesteApiNfe = lazy(() => import("./components/TesteApiNfe").then(module => ({ default: module.TesteApiNfe })));
 const ConfiguracoesFiscais = lazy(() => import("./components/ConfiguracoesFiscais").then(module => ({ default: module.ConfiguracoesFiscais })));
-const CadastroClientes = lazy(() => import("./components/CadastroClientes").then(module => ({ default: module.CadastroClientes })));
-const CadastroProdutos = lazy(() => import("./components/CadastroProdutos").then(module => ({ default: module.CadastroProdutos })));
+const CadastroClientes = lazy(() => import("./pages/CadastroClientes"));
+const CadastroProdutos = lazy(() => import("./pages/CadastroProdutos"));
 const Relatorios = lazy(() => import("./components/Relatorios").then(module => ({ default: module.Relatorios })));
 
 const queryClient = new QueryClient({
