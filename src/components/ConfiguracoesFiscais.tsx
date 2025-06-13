@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useConfiguracoes, useUpdateConfiguracoes } from '@/hooks/useConfiguracoes';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
