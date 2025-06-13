@@ -1,4 +1,3 @@
-
 export interface ConfiguracaoSEFAZ {
   ambiente: 'homologacao' | 'producao';
   uf: string;
@@ -198,7 +197,7 @@ export class SEFAZWebService {
         await this.gravarLog({
           operacao,
           empresa_id: empresaId,
-          chave_acesso,
+          chave_acesso: chaveAcesso,
           xml_enviado: xmlNFe.substring(0, 1000),
           codigo_retorno: erro.codigo_retorno,
           mensagem_retorno: erro.mensagem_retorno,
@@ -226,7 +225,7 @@ export class SEFAZWebService {
         await this.gravarLog({
           operacao,
           empresa_id: empresaId,
-          chave_acesso,
+          chave_acesso: chaveAcesso,
           xml_enviado: xmlNFe.substring(0, 1000),
           codigo_retorno: erro.codigo_retorno,
           mensagem_retorno: erro.mensagem_retorno,
@@ -306,7 +305,7 @@ export class SEFAZWebService {
       await this.gravarLog({
         operacao,
         empresa_id: empresaId,
-        chave_acesso,
+        chave_acesso: chaveAcesso,
         xml_enviado: xmlNFe.substring(0, 1000),
         codigo_retorno: resultado.codigo_retorno,
         mensagem_retorno: resultado.mensagem_retorno,
@@ -341,7 +340,7 @@ export class SEFAZWebService {
         await this.gravarLog({
           operacao,
           empresa_id: empresaId,
-          chave_acesso,
+          chave_acesso: chaveAcesso,
           codigo_retorno: erro.codigo_retorno,
           mensagem_retorno: erro.mensagem_retorno,
           tempo_resposta_ms: erro.tempo_resposta || 0,
@@ -366,7 +365,7 @@ export class SEFAZWebService {
       await this.gravarLog({
         operacao,
         empresa_id: empresaId,
-        chave_acesso,
+        chave_acesso: chaveAcesso,
         xml_retorno: resultado.xml_retorno?.substring(0, 1000),
         codigo_retorno: resultado.codigo_retorno,
         mensagem_retorno: resultado.mensagem_retorno,
@@ -387,7 +386,7 @@ export class SEFAZWebService {
       await this.gravarLog({
         operacao,
         empresa_id: empresaId,
-        chave_acesso,
+        chave_acesso: chaveAcesso,
         codigo_retorno: resultado.codigo_retorno,
         mensagem_retorno: resultado.mensagem_retorno,
         tempo_resposta_ms: resultado.tempo_resposta || 0,
@@ -419,7 +418,7 @@ export class SEFAZWebService {
         await this.gravarLog({
           operacao,
           empresa_id: empresaId,
-          chave_acesso,
+          chave_acesso: chaveAcesso,
           codigo_retorno: erro.codigo_retorno,
           mensagem_retorno: erro.mensagem_retorno,
           tempo_resposta_ms: Date.now() - startTime,
@@ -439,7 +438,7 @@ export class SEFAZWebService {
         await this.gravarLog({
           operacao,
           empresa_id: empresaId,
-          chave_acesso,
+          chave_acesso: chaveAcesso,
           codigo_retorno: erro.codigo_retorno,
           mensagem_retorno: erro.mensagem_retorno,
           tempo_resposta_ms: Date.now() - startTime,
@@ -466,7 +465,7 @@ export class SEFAZWebService {
       await this.gravarLog({
         operacao,
         empresa_id: empresaId,
-        chave_acesso,
+        chave_acesso: chaveAcesso,
         xml_retorno: resultado.xml_retorno?.substring(0, 1000),
         codigo_retorno: resultado.codigo_retorno,
         mensagem_retorno: resultado.mensagem_retorno,
@@ -487,7 +486,7 @@ export class SEFAZWebService {
       await this.gravarLog({
         operacao,
         empresa_id: empresaId,
-        chave_acesso,
+        chave_acesso: chaveAcesso,
         codigo_retorno: resultado.codigo_retorno,
         mensagem_retorno: resultado.mensagem_retorno,
         tempo_resposta_ms: resultado.tempo_resposta || 0,
