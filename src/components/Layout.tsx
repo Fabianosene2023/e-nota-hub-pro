@@ -2,9 +2,11 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Building, Users, Package, FileText, Settings, BarChart3, TestTube, ChevronDown, ChevronRight } from "lucide-react"
+import { Building, Users, Package, FileText, Settings, BarChart3, TestTube, ChevronDown, ChevronRight, LogOut, User } from "lucide-react"
 import { Link, Outlet, useLocation } from "react-router-dom"
 import { useState } from "react"
+import { useAuth } from "@/contexts/AuthContext"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 const navigation = [
   {
@@ -39,17 +41,17 @@ const navigation = [
     ]
   },
   {
-    name: "Produtos",
-    href: "/produtos",
+    name: "Cadastros",
+    href: "/cadastros",
     icon: Package,
     current: false,
     submenu: [
+      { name: "Clientes", href: "/clientes" },
       { name: "Produtos", href: "/produtos/lista" },
       { name: "Serviços", href: "/produtos/servicos" },
       { name: "Marcas", href: "/produtos/marcas" },
       { name: "Categorias", href: "/produtos/categorias" },
       { name: "Unidades de Medida", href: "/produtos/unidades" },
-      { name: "Clientes", href: "/clientes" },
       { name: "Fornecedores", href: "/produtos/fornecedores" },
       { name: "Transportadoras", href: "/produtos/transportadoras" },
     ]
@@ -95,6 +97,7 @@ const navigation = [
 export const Layout = () => {
   const location = useLocation()
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
+  const { user, profile, signOut } = useAuth()
 
   const toggleSubmenu = (menuName: string) => {
     setExpandedMenus(prev => 
@@ -180,6 +183,24 @@ export const Layout = () => {
                 )
               })}
             </nav>
+          </div>
+          
+          {/* User menu at bottom */}
+          <div className="mt-auto p-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="w-full justify-start">
+                  <User className="mr-2 h-4 w-4" />
+                  <span className="truncate">{profile?.nome || user?.email}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={signOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
