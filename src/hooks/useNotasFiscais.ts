@@ -15,7 +15,7 @@ export const useNotasFiscais = () => {
             razao_social,
             nome_fantasia
           ),
-          contatos!cliente_id (
+          clientes (
             nome_razao_social,
             cpf_cnpj
           ),
