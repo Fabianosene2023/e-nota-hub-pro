@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -14,7 +15,7 @@ export const useNotasFiscais = () => {
             razao_social,
             nome_fantasia
           ),
-          clientes:contatos!cliente_id (
+          contatos!cliente_id (
             nome_razao_social,
             cpf_cnpj
           ),
