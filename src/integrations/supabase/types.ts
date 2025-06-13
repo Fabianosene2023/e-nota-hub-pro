@@ -9,6 +9,44 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categorias_produtos: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categorias_produtos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clientes: {
         Row: {
           cep: string
@@ -294,6 +332,74 @@ export type Database = {
         }
         Relationships: []
       }
+      fornecedores: {
+        Row: {
+          ativo: boolean | null
+          cep: string
+          cidade: string
+          cpf_cnpj: string
+          created_at: string | null
+          email: string | null
+          empresa_id: string
+          endereco: string
+          estado: string
+          id: string
+          inscricao_estadual: string | null
+          inscricao_municipal: string | null
+          nome_fantasia: string | null
+          nome_razao_social: string
+          telefone: string | null
+          tipo_pessoa: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          cep: string
+          cidade: string
+          cpf_cnpj: string
+          created_at?: string | null
+          email?: string | null
+          empresa_id: string
+          endereco: string
+          estado: string
+          id?: string
+          inscricao_estadual?: string | null
+          inscricao_municipal?: string | null
+          nome_fantasia?: string | null
+          nome_razao_social: string
+          telefone?: string | null
+          tipo_pessoa: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          cep?: string
+          cidade?: string
+          cpf_cnpj?: string
+          created_at?: string | null
+          email?: string | null
+          empresa_id?: string
+          endereco?: string
+          estado?: string
+          id?: string
+          inscricao_estadual?: string | null
+          inscricao_municipal?: string | null
+          nome_fantasia?: string | null
+          nome_razao_social?: string
+          telefone?: string | null
+          tipo_pessoa?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fornecedores_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historico_notas: {
         Row: {
           created_at: string
@@ -405,6 +511,44 @@ export type Database = {
         }
         Relationships: []
       }
+      marcas: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          descricao: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marcas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notas_fiscais: {
         Row: {
           chave_acesso: string | null
@@ -507,6 +651,7 @@ export type Database = {
       }
       produtos: {
         Row: {
+          categoria_id: string | null
           cfop: string
           codigo: string
           codigo_interno: string | null
@@ -519,9 +664,11 @@ export type Database = {
           empresa_id: string
           estoque_atual: number | null
           estoque_minimo: number | null
+          fornecedor_id: string | null
           icms_aliquota: number | null
           id: string
           ipi_aliquota: number | null
+          marca_id: string | null
           ncm: string | null
           nome: string | null
           pis_aliquota: number | null
@@ -530,6 +677,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          categoria_id?: string | null
           cfop?: string
           codigo: string
           codigo_interno?: string | null
@@ -542,9 +690,11 @@ export type Database = {
           empresa_id: string
           estoque_atual?: number | null
           estoque_minimo?: number | null
+          fornecedor_id?: string | null
           icms_aliquota?: number | null
           id?: string
           ipi_aliquota?: number | null
+          marca_id?: string | null
           ncm?: string | null
           nome?: string | null
           pis_aliquota?: number | null
@@ -553,6 +703,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          categoria_id?: string | null
           cfop?: string
           codigo?: string
           codigo_interno?: string | null
@@ -565,9 +716,11 @@ export type Database = {
           empresa_id?: string
           estoque_atual?: number | null
           estoque_minimo?: number | null
+          fornecedor_id?: string | null
           icms_aliquota?: number | null
           id?: string
           ipi_aliquota?: number | null
+          marca_id?: string | null
           ncm?: string | null
           nome?: string | null
           pis_aliquota?: number | null
@@ -577,10 +730,31 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "produtos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_produtos"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "produtos_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produtos_fornecedor_id_fkey"
+            columns: ["fornecedor_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produtos_marca_id_fkey"
+            columns: ["marca_id"]
+            isOneToOne: false
+            referencedRelation: "marcas"
             referencedColumns: ["id"]
           },
         ]
@@ -622,6 +796,98 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      transportadoras: {
+        Row: {
+          ativo: boolean | null
+          cep: string
+          cidade: string
+          cpf_cnpj: string
+          created_at: string | null
+          email: string | null
+          empresa_id: string
+          endereco: string
+          estado: string
+          id: string
+          inscricao_estadual: string | null
+          nome_fantasia: string | null
+          nome_razao_social: string
+          placa_veiculo: string | null
+          rntrc: string | null
+          telefone: string | null
+          tipo_pessoa: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          cep: string
+          cidade: string
+          cpf_cnpj: string
+          created_at?: string | null
+          email?: string | null
+          empresa_id: string
+          endereco: string
+          estado: string
+          id?: string
+          inscricao_estadual?: string | null
+          nome_fantasia?: string | null
+          nome_razao_social: string
+          placa_veiculo?: string | null
+          rntrc?: string | null
+          telefone?: string | null
+          tipo_pessoa: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          cep?: string
+          cidade?: string
+          cpf_cnpj?: string
+          created_at?: string | null
+          email?: string | null
+          empresa_id?: string
+          endereco?: string
+          estado?: string
+          id?: string
+          inscricao_estadual?: string | null
+          nome_fantasia?: string | null
+          nome_razao_social?: string
+          placa_veiculo?: string | null
+          rntrc?: string | null
+          telefone?: string | null
+          tipo_pessoa?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transportadoras_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      unidades_medida: {
+        Row: {
+          codigo: string
+          created_at: string | null
+          descricao: string
+          id: string
+        }
+        Insert: {
+          codigo: string
+          created_at?: string | null
+          descricao: string
+          id?: string
+        }
+        Update: {
+          codigo?: string
+          created_at?: string | null
+          descricao?: string
+          id?: string
+        }
+        Relationships: []
       }
       user_profiles: {
         Row: {
