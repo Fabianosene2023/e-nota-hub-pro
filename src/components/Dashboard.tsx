@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -192,7 +191,7 @@ export const Dashboard = () => {
               </Button>
             </div>
           )}
-        </div>
+        </CardContent>
       </Card>
     </div>
   );
