@@ -63,7 +63,7 @@ export const useCreateNotaFiscalProducao = () => {
         
         // 5. Emitir NFe com integração real
         const configuracaoSefaz = {
-          ambiente: configs.ambiente,
+          ambiente: configs.ambiente as 'homologacao' | 'producao',
           uf: empresaResult.data.estado,
           certificado: {
             p12Buffer: dadosCertificado.p12Buffer,
@@ -98,8 +98,8 @@ export const useCreateNotaFiscalProducao = () => {
             codigo_retorno_sefaz: resultadoSefaz.codigo_retorno,
             mensagem_retorno_sefaz: resultadoSefaz.mensagem_retorno,
             status: statusNota,
-            xml_assinado: resultadoSefaz.xml_assinado,
-            danfe_url: resultadoSefaz.danfe_url,
+            xml_nfe: resultadoSefaz.xml_assinado,
+            danfe_pdf_url: resultadoSefaz.danfe_url,
             data_autorizacao: resultadoSefaz.success ? new Date().toISOString() : null,
             numero: dadosNFeCompletos.numero
           })
@@ -200,7 +200,7 @@ export const useCancelarNotaFiscalProducao = () => {
       
       // Cancelar na SEFAZ
       const configuracaoSefaz = {
-        ambiente: configs.ambiente,
+        ambiente: configs.ambiente as 'homologacao' | 'producao',
         uf: 'SP', // TODO: Buscar UF da empresa
         certificado: {
           p12Buffer: dadosCertificado.p12Buffer,

@@ -97,6 +97,56 @@ export type Database = {
           },
         ]
       }
+      certificados_vault: {
+        Row: {
+          ativo: boolean
+          cnpj_proprietario: string
+          created_at: string
+          empresa_id: string
+          id: string
+          nome_certificado: string
+          tipo_certificado: string
+          updated_at: string
+          validade_fim: string
+          validade_inicio: string
+          vault_secret_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          cnpj_proprietario: string
+          created_at?: string
+          empresa_id: string
+          id?: string
+          nome_certificado: string
+          tipo_certificado: string
+          updated_at?: string
+          validade_fim: string
+          validade_inicio: string
+          vault_secret_id: string
+        }
+        Update: {
+          ativo?: boolean
+          cnpj_proprietario?: string
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          nome_certificado?: string
+          tipo_certificado?: string
+          updated_at?: string
+          validade_fim?: string
+          validade_inicio?: string
+          vault_secret_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificados_vault_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clientes: {
         Row: {
           cep: string

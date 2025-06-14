@@ -1,5 +1,5 @@
 
-export { DadosNFeCompletos, RetornoNFe } from './types';
+export type { DadosNFeCompletos, RetornoNFe } from './types';
 export { NFEUtils } from './nfeUtils';
 export { XMLGenerator } from './xmlGenerator';
 export { SignatureService } from './signatureService';

@@ -97,7 +97,7 @@ export const useArmazenarCertificadoVault = () => {
           .insert([{
             empresa_id: certificadoData.empresa_id,
             nome_certificado: certificadoData.nome_certificado,
-            vault_secret_i: vaultResult.vault_secret_id,
+            vault_secret_id: vaultResult.vault_secret_id,
             tipo_certificado: certificadoData.tipo_certificado,
             validade_inicio: certificadoData.validade_inicio,
             validade_fim: certificadoData.validade_fim,
