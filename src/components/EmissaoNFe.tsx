@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { useEmpresas } from '@/hooks/useEmpresas';
-import { useContatos } from '@/hooks/useContatos';
+import { useEmpresasManager } from '@/hooks/useEmpresasManager';
+import { useClientesManager } from '@/hooks/useClientesManager';
 import { useProdutos } from '@/hooks/useProdutos';
 import { useCreateNotaFiscal } from '@/hooks/useNotasFiscais';
 import { useCreateLog } from '@/hooks/useLogsOperacoes';
@@ -13,8 +13,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from '@/hooks/use-toast';
-import { Loader2, FileText, Plus, Trash2 } from "lucide-react";
+import { Loader2, FileText, Plus, Trash2, User, Building } from "lucide-react";
 
 interface ItemNFe {
   produto_id: string;
@@ -32,7 +33,8 @@ export const EmissaoNFe = () => {
     numero: '',
     serie: 1,
     natureza_operacao: 'Venda de mercadoria adquirida ou produzida pelo estabelecimento',
-    observacoes: ''
+    observacoes: '',
+    tipo_pessoa: 'juridica' // nova opção para tipo de pessoa
   });
   
   const [itens, setItens] = useState<ItemNFe[]>([]);
@@ -43,11 +45,21 @@ export const EmissaoNFe = () => {
     cfop: '5102'
   });
 
-  const { data: empresas } = useEmpresas();
-  const { data: clientes } = useContatos('cliente');
+  // Hooks para carregar dados
+  const { data: empresas } = useEmpresasManager();
+  const { data: clientes } = useClientesManager(formData.empresa_id);
   const { data: produtos } = useProdutos();
   const createNotaFiscal = useCreateNotaFiscal();
   const createLog = useCreateLog();
+
+  // Filtrar clientes por tipo de pessoa
+  const clientesFiltrados = clientes?.filter(cliente => {
+    if (formData.tipo_pessoa === 'fisica') {
+      return cliente.tipo_pessoa === 'fisica';
+    } else {
+      return cliente.tipo_pessoa === 'juridica';
+    }
+  }) || [];
 
   const adicionarItem = () => {
     if (!itemAtual.produto_id) {
@@ -155,7 +167,8 @@ export const EmissaoNFe = () => {
           numero: '',
           serie: 1,
           natureza_operacao: 'Venda de mercadoria adquirida ou produzida pelo estabelecimento',
-          observacoes: ''
+          observacoes: '',
+          tipo_pessoa: 'juridica'
         });
         setItens([]);
         
@@ -203,10 +216,10 @@ export const EmissaoNFe = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="empresa">Empresa *</Label>
+                <Label htmlFor="empresa">Empresa Emitente *</Label>
                 <Select 
                   value={formData.empresa_id} 
-                  onValueChange={(value) => setFormData({...formData, empresa_id: value})}
+                  onValueChange={(value) => setFormData({...formData, empresa_id: value, cliente_id: ''})}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione a empresa" />
@@ -214,26 +227,10 @@ export const EmissaoNFe = () => {
                   <SelectContent>
                     {empresas?.map((empresa) => (
                       <SelectItem key={empresa.id} value={empresa.id}>
-                        {empresa.nome_fantasia || empresa.razao_social}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="cliente">Cliente *</Label>
-                <Select 
-                  value={formData.cliente_id} 
-                  onValueChange={(value) => setFormData({...formData, cliente_id: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o cliente" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clientes?.map((cliente) => (
-                      <SelectItem key={cliente.id} value={cliente.id}>
-                        {cliente.nome_razao_social}
+                        <div className="flex items-center gap-2">
+                          <Building className="h-4 w-4" />
+                          {empresa.nome_fantasia || empresa.razao_social}
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -260,6 +257,75 @@ export const EmissaoNFe = () => {
                     onChange={(e) => setFormData({...formData, serie: parseInt(e.target.value)})}
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Tipo de Pessoa e Cliente */}
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <Label>Tipo de Cliente *</Label>
+                <RadioGroup
+                  value={formData.tipo_pessoa}
+                  onValueChange={(value) => setFormData({...formData, tipo_pessoa: value, cliente_id: ''})}
+                  className="flex gap-6"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="fisica" id="fisica" />
+                    <Label htmlFor="fisica" className="flex items-center gap-2 cursor-pointer">
+                      <User className="h-4 w-4" />
+                      Pessoa Física
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="juridica" id="juridica" />
+                    <Label htmlFor="juridica" className="flex items-center gap-2 cursor-pointer">
+                      <Building className="h-4 w-4" />
+                      Pessoa Jurídica
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cliente">
+                  {formData.tipo_pessoa === 'fisica' ? 'Cliente (Pessoa Física) *' : 'Cliente (Pessoa Jurídica) *'}
+                </Label>
+                <Select 
+                  value={formData.cliente_id} 
+                  onValueChange={(value) => setFormData({...formData, cliente_id: value})}
+                  disabled={!formData.empresa_id}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={
+                      !formData.empresa_id 
+                        ? "Selecione uma empresa primeiro" 
+                        : `Selecione o cliente (${formData.tipo_pessoa === 'fisica' ? 'PF' : 'PJ'})`
+                    } />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientesFiltrados?.map((cliente) => (
+                      <SelectItem key={cliente.id} value={cliente.id}>
+                        <div className="flex items-center gap-2">
+                          {formData.tipo_pessoa === 'fisica' ? 
+                            <User className="h-4 w-4" /> : 
+                            <Building className="h-4 w-4" />
+                          }
+                          <div className="flex flex-col">
+                            <span>{cliente.nome_razao_social}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {cliente.cpf_cnpj}
+                            </span>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formData.empresa_id && clientesFiltrados?.length === 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum cliente do tipo {formData.tipo_pessoa === 'fisica' ? 'pessoa física' : 'pessoa jurídica'} encontrado para esta empresa.
+                  </p>
+                )}
               </div>
             </div>
 

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,69 +15,133 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEmpresasManager, useCreateEmpresaManager, useUpdateEmpresaManager, useDeleteEmpresaManager } from "@/hooks/useEmpresasManager";
+import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
+import { toast } from "@/hooks/use-toast";
 
 export function Empresas() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingEmpresa, setEditingEmpresa] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    razao_social: "",
+    nome_fantasia: "",
+    cnpj: "",
+    inscricao_estadual: "",
+    regime_tributario: "simples_nacional",
+    endereco: "",
+    cidade: "",
+    estado: "",
+    cep: "",
+    telefone: "",
+    email: ""
+  });
 
-  const empresas = [
-    {
-      id: 1,
-      razaoSocial: "Tech Solutions Inovações Ltda",
-      nomeFantasia: "Tech Solutions",
-      cnpj: "12.345.678/0001-90",
-      ie: "123.456.789.123",
-      regime: "Lucro Presumido",
-      status: "ativa",
-      certificado: "Válido até 12/2025",
-    },
-    {
-      id: 2,
-      razaoSocial: "Consultoria Empresarial Digital SA",
-      nomeFantasia: "ConsultaDigital",
-      cnpj: "98.765.432/0001-10",
-      ie: "987.654.321.098",
-      regime: "Simples Nacional",
-      status: "ativa",
-      certificado: "Válido até 03/2025",
-    },
-    {
-      id: 3,
-      razaoSocial: "Inovação e Desenvolvimento Ltda",
-      nomeFantasia: "InovaDev",
-      cnpj: "11.222.333/0001-44",
-      ie: "111.222.333.444",
-      regime: "Lucro Real",
-      status: "inativa",
-      certificado: "Expirado",
-    },
-  ];
+  const { data: empresas = [], isLoading } = useEmpresasManager();
+  const createEmpresa = useCreateEmpresaManager();
+  const updateEmpresa = useUpdateEmpresaManager();
+  const deleteEmpresa = useDeleteEmpresaManager();
 
   const filteredEmpresas = empresas.filter(empresa =>
-    empresa.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    empresa.cnpj.includes(searchTerm) ||
-    empresa.nomeFantasia.toLowerCase().includes(searchTerm.toLowerCase())
+    empresa.razao_social?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    empresa.cnpj?.includes(searchTerm) ||
+    empresa.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusBadge = (status: string) => {
-    return status === "ativa" 
-      ? <Badge className="fiscal-success">Ativa</Badge>
-      : <Badge className="fiscal-neutral">Inativa</Badge>;
+  const resetForm = () => {
+    setFormData({
+      razao_social: "",
+      nome_fantasia: "",
+      cnpj: "",
+      inscricao_estadual: "",
+      regime_tributario: "simples_nacional",
+      endereco: "",
+      cidade: "",
+      estado: "",
+      cep: "",
+      telefone: "",
+      email: ""
+    });
   };
 
-  const getCertificadoBadge = (certificado: string) => {
-    if (certificado.includes("Expirado")) {
-      return <Badge className="fiscal-error">Expirado</Badge>;
+  const handleCreate = () => {
+    if (!formData.razao_social || !formData.cnpj || !formData.endereco || !formData.cidade || !formData.estado || !formData.cep) {
+      toast({
+        title: "Erro",
+        description: "Preencha todos os campos obrigatórios",
+        variant: "destructive",
+      });
+      return;
     }
-    if (certificado.includes("2025")) {
-      const month = certificado.split(" ")[2].split("/")[0];
-      const isExpiringSoon = parseInt(month) <= 3;
-      return isExpiringSoon 
-        ? <Badge className="fiscal-warning">Expirando</Badge>
-        : <Badge className="fiscal-success">Válido</Badge>;
-    }
-    return <Badge className="fiscal-success">Válido</Badge>;
+
+    createEmpresa.mutate(formData, {
+      onSuccess: () => {
+        setIsDialogOpen(false);
+        resetForm();
+      }
+    });
   };
+
+  const handleEdit = (empresa: any) => {
+    setEditingEmpresa(empresa);
+    setFormData({
+      razao_social: empresa.razao_social || "",
+      nome_fantasia: empresa.nome_fantasia || "",
+      cnpj: empresa.cnpj || "",
+      inscricao_estadual: empresa.inscricao_estadual || "",
+      regime_tributario: empresa.regime_tributario || "simples_nacional",
+      endereco: empresa.endereco || "",
+      cidade: empresa.cidade || "",
+      estado: empresa.estado || "",
+      cep: empresa.cep || "",
+      telefone: empresa.telefone || "",
+      email: empresa.email || ""
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdate = () => {
+    if (!formData.razao_social || !formData.cnpj || !formData.endereco || !formData.cidade || !formData.estado || !formData.cep) {
+      toast({
+        title: "Erro",
+        description: "Preencha todos os campos obrigatórios",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateEmpresa.mutate({
+      id: editingEmpresa.id,
+      updates: formData
+    }, {
+      onSuccess: () => {
+        setIsEditDialogOpen(false);
+        setEditingEmpresa(null);
+        resetForm();
+      }
+    });
+  };
+
+  const handleDelete = (empresaId: string) => {
+    deleteEmpresa.mutate(empresaId);
+  };
+
+  const getStatusBadge = (empresa: any) => {
+    // Verificar se a empresa está ativa (você pode adicionar este campo na tabela se necessário)
+    return <Badge className="fiscal-success">Ativa</Badge>;
+  };
+
+  const getCertificadoBadge = (empresa: any) => {
+    if (empresa.certificado_digital) {
+      return <Badge className="fiscal-success">Válido</Badge>;
+    }
+    return <Badge className="fiscal-error">Não configurado</Badge>;
+  };
+
+  if (isLoading) {
+    return <div>Carregando empresas...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -92,7 +155,7 @@ export function Empresas() {
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button onClick={resetForm}>
               <Plus className="w-4 h-4 mr-2" />
               Nova Empresa
             </Button>
@@ -107,49 +170,197 @@ export function Empresas() {
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="razaoSocial">Razão Social</Label>
-                  <Input id="razaoSocial" placeholder="Digite a razão social" />
+                  <Label htmlFor="razaoSocial">Razão Social *</Label>
+                  <Input 
+                    id="razaoSocial" 
+                    placeholder="Digite a razão social"
+                    value={formData.razao_social}
+                    onChange={(e) => setFormData({...formData, razao_social: e.target.value})}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="nomeFantasia">Nome Fantasia</Label>
-                  <Input id="nomeFantasia" placeholder="Digite o nome fantasia" />
+                  <Input 
+                    id="nomeFantasia" 
+                    placeholder="Digite o nome fantasia"
+                    value={formData.nome_fantasia}
+                    onChange={(e) => setFormData({...formData, nome_fantasia: e.target.value})}
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="cnpj">CNPJ</Label>
-                  <Input id="cnpj" placeholder="00.000.000/0000-00" />
+                  <Label htmlFor="cnpj">CNPJ *</Label>
+                  <Input 
+                    id="cnpj" 
+                    placeholder="00.000.000/0000-00"
+                    value={formData.cnpj}
+                    onChange={(e) => setFormData({...formData, cnpj: e.target.value})}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ie">Inscrição Estadual</Label>
-                  <Input id="ie" placeholder="000.000.000.000" />
+                  <Input 
+                    id="ie" 
+                    placeholder="000.000.000.000"
+                    value={formData.inscricao_estadual}
+                    onChange={(e) => setFormData({...formData, inscricao_estadual: e.target.value})}
+                  />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="regime">Regime Tributário</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o regime tributário" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="simples">Simples Nacional</SelectItem>
-                    <SelectItem value="presumido">Lucro Presumido</SelectItem>
-                    <SelectItem value="real">Lucro Real</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="endereco">Endereço *</Label>
+                  <Input 
+                    id="endereco" 
+                    placeholder="Rua, número, bairro"
+                    value={formData.endereco}
+                    onChange={(e) => setFormData({...formData, endereco: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cidade">Cidade *</Label>
+                  <Input 
+                    id="cidade" 
+                    placeholder="Nome da cidade"
+                    value={formData.cidade}
+                    onChange={(e) => setFormData({...formData, cidade: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="estado">Estado *</Label>
+                  <Input 
+                    id="estado" 
+                    placeholder="UF"
+                    value={formData.estado}
+                    onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cep">CEP *</Label>
+                  <Input 
+                    id="cep" 
+                    placeholder="00000-000"
+                    value={formData.cep}
+                    onChange={(e) => setFormData({...formData, cep: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="telefone">Telefone</Label>
+                  <Input 
+                    id="telefone" 
+                    placeholder="(00) 00000-0000"
+                    value={formData.telefone}
+                    onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">E-mail</Label>
+                  <Input 
+                    id="email" 
+                    placeholder="empresa@exemplo.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="regime">Regime Tributário</Label>
+                  <Select value={formData.regime_tributario} onValueChange={(value) => setFormData({...formData, regime_tributario: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o regime tributário" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="simples_nacional">Simples Nacional</SelectItem>
+                      <SelectItem value="lucro_presumido">Lucro Presumido</SelectItem>
+                      <SelectItem value="lucro_real">Lucro Real</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancelar
               </Button>
-              <Button onClick={() => setIsDialogOpen(false)}>
-                Cadastrar
+              <Button 
+                onClick={handleCreate}
+                disabled={createEmpresa.isPending}
+              >
+                {createEmpresa.isPending ? "Cadastrando..." : "Cadastrar"}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Editar Empresa</DialogTitle>
+            <DialogDescription>
+              Atualize os dados da empresa
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="editRazaoSocial">Razão Social *</Label>
+                <Input 
+                  id="editRazaoSocial" 
+                  placeholder="Digite a razão social"
+                  value={formData.razao_social}
+                  onChange={(e) => setFormData({...formData, razao_social: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editNomeFantasia">Nome Fantasia</Label>
+                <Input 
+                  id="editNomeFantasia" 
+                  placeholder="Digite o nome fantasia"
+                  value={formData.nome_fantasia}
+                  onChange={(e) => setFormData({...formData, nome_fantasia: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="editCnpj">CNPJ *</Label>
+                <Input 
+                  id="editCnpj" 
+                  placeholder="00.000.000/0000-00"
+                  value={formData.cnpj}
+                  onChange={(e) => setFormData({...formData, cnpj: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editIe">Inscrição Estadual</Label>
+                <Input 
+                  id="editIe" 
+                  placeholder="000.000.000.000"
+                  value={formData.inscricao_estadual}
+                  onChange={(e) => setFormData({...formData, inscricao_estadual: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleUpdate}
+              disabled={updateEmpresa.isPending}
+            >
+              {updateEmpresa.isPending ? "Atualizando..." : "Atualizar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Search */}
       <Card>
@@ -177,22 +388,29 @@ export function Empresas() {
                     <Building className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">{empresa.razaoSocial}</CardTitle>
+                    <CardTitle className="text-lg">{empresa.razao_social}</CardTitle>
                     <CardDescription className="flex items-center gap-4 mt-1">
-                      <span>{empresa.nomeFantasia}</span>
+                      <span>{empresa.nome_fantasia || 'Sem nome fantasia'}</span>
                       <span>•</span>
                       <span>{empresa.cnpj}</span>
                     </CardDescription>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {getStatusBadge(empresa.status)}
-                  <Button variant="ghost" size="sm">
+                  {getStatusBadge(empresa)}
+                  <Button variant="ghost" size="sm" onClick={() => handleEdit(empresa)}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <ConfirmationDialog
+                    title="Excluir Empresa"
+                    description="Tem certeza que deseja excluir esta empresa? Esta ação não pode ser desfeita."
+                    onConfirm={() => handleDelete(empresa.id)}
+                    trigger={
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    }
+                  />
                 </div>
               </div>
             </CardHeader>
@@ -200,17 +418,19 @@ export function Empresas() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Inscrição Estadual</p>
-                  <p className="font-medium">{empresa.ie}</p>
+                  <p className="font-medium">{empresa.inscricao_estadual || 'Não informado'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Regime Tributário</p>
-                  <p className="font-medium">{empresa.regime}</p>
+                  <p className="font-medium">{empresa.regime_tributario || 'Não informado'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Certificado Digital</p>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm">{empresa.certificado}</span>
-                    {getCertificadoBadge(empresa.certificado)}
+                    <span className="font-medium text-sm">
+                      {empresa.certificado_digital ? 'Configurado' : 'Não configurado'}
+                    </span>
+                    {getCertificadoBadge(empresa)}
                   </div>
                 </div>
               </div>
