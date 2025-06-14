@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,26 +12,33 @@ import { useClientesManager, useCreateClienteManager, useUpdateClienteManager, u
 import { useEmpresas } from "@/hooks/useEmpresas";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { maskCpfCnpj, maskCep } from "@/utils/maskUtils";
+import { Loader2, Check, AlertCircle } from "lucide-react";
 
-interface ClienteFormData {
-  nome_razao_social: string;
-  cpf_cnpj: string;
-  tipo_pessoa: 'fisica' | 'juridica';
-  inscricao_estadual?: string;
-  endereco: string;
-  cidade: string;
-  estado: string;
-  cep: string;
-  telefone?: string;
-  email?: string;
-}
+const clienteSchema = z.object({
+  nome_razao_social: z.string().min(1, "Nome/Razão Social é obrigatório"),
+  cpf_cnpj: z.string().min(11, "CPF/CNPJ é obrigatório"),
+  tipo_pessoa: z.enum(["fisica", "juridica"]),
+  inscricao_estadual: z.string().optional(),
+  endereco: z.string().min(1, "Endereço é obrigatório"),
+  cidade: z.string().min(1, "Cidade é obrigatória"),
+  estado: z.string().min(2, "Estado é obrigatório"),
+  cep: z.string().min(8, "CEP é obrigatório"),
+  telefone: z.string().optional(),
+  email: z.string().email("E-mail inválido").optional().or(z.literal("")),
+});
+
+type ClienteFormDataSchema = z.infer<typeof clienteSchema>;
 
 export default function CadastroClientes() {
   const { profile } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [formData, setFormData] = useState<ClienteFormData>({
+  const [formData, setFormData] = useState<ClienteFormDataSchema>({
     nome_razao_social: "",
     cpf_cnpj: "",
     tipo_pessoa: "juridica",
@@ -45,6 +51,25 @@ export default function CadastroClientes() {
     email: "",
   });
 
+  // Adapte o formulário para usar RHF + Zod
+  const form = useForm<ClienteFormDataSchema>({
+    resolver: zodResolver(clienteSchema),
+    defaultValues: {
+      nome_razao_social: "",
+      cpf_cnpj: "",
+      tipo_pessoa: "juridica",
+      inscricao_estadual: "",
+      endereco: "",
+      cidade: "",
+      estado: "",
+      cep: "",
+      telefone: "",
+      email: "",
+    }
+  });
+
+  const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
   const { data: empresas } = useEmpresas();
   const empresaId = profile?.empresa_id || empresas?.[0]?.id;
   const { data: clientes, isLoading } = useClientesManager(empresaId);
@@ -52,9 +77,7 @@ export default function CadastroClientes() {
   const updateMutation = useUpdateClienteManager();
   const deleteMutation = useDeleteClienteManager();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async (data: ClienteFormDataSchema) => {
     if (!empresaId) {
       toast({
         title: "Erro",
@@ -64,12 +87,14 @@ export default function CadastroClientes() {
       return;
     }
 
-    const clienteData = {
-      ...formData,
-      empresa_id: empresaId,
-    };
+    setButtonState('loading');
+    console.debug("Salvando cliente:", data);
 
     try {
+      const clienteData = {
+        ...data,
+        empresa_id: empresaId,
+      };
       if (editingCliente) {
         await updateMutation.mutateAsync({
           id: editingCliente.id,
@@ -78,11 +103,26 @@ export default function CadastroClientes() {
       } else {
         await createMutation.mutateAsync(clienteData);
       }
-      
       resetForm();
       setIsDialogOpen(false);
+      setButtonState('success');
+      toast({
+        title: "Sucesso",
+        description: "Cliente salvo com sucesso!",
+        variant: "default",
+      });
     } catch (error) {
-      console.error('Erro ao salvar cliente:', error);
+      setButtonState('error');
+      toast({
+        title: "Erro ao salvar",
+        description: "Verifique os campos e tente novamente.",
+        variant: "destructive",
+      });
+      if (process.env.NODE_ENV === "development") {
+        console.error('Erro ao salvar cliente:', error);
+      }
+    } finally {
+      setTimeout(() => setButtonState('idle'), 2000);
     }
   };
 
@@ -125,6 +165,29 @@ export default function CadastroClientes() {
     }
   };
 
+  // Novo handler para abrir o diálogo
+  const openDialog = (cliente?: any) => {
+    if (cliente) {
+      form.reset({
+        nome_razao_social: cliente.nome_razao_social,
+        cpf_cnpj: cliente.cpf_cnpj,
+        tipo_pessoa: cliente.tipo_pessoa,
+        inscricao_estadual: cliente.inscricao_estadual || "",
+        endereco: cliente.endereco,
+        cidade: cliente.cidade,
+        estado: cliente.estado,
+        cep: cliente.cep,
+        telefone: cliente.telefone || "",
+        email: cliente.email || "",
+      });
+      setEditingCliente(cliente);
+    } else {
+      form.reset();
+      setEditingCliente(null);
+    }
+    setIsDialogOpen(true);
+  };
+
   const filteredClientes = clientes?.filter(cliente =>
     cliente.nome_razao_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
     cliente.cpf_cnpj.includes(searchTerm)
@@ -132,20 +195,21 @@ export default function CadastroClientes() {
 
   return (
     <div className="space-y-6">
+      {/* ... cabeçalho ... */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Cadastro de Clientes</h1>
           <p className="text-muted-foreground">Gerencie os clientes da sua empresa</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) form.reset(); setIsDialogOpen(open); }}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button onClick={() => openDialog()}>
               <Plus className="h-4 w-4 mr-2" />
               Novo Cliente
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
               <DialogHeader>
                 <DialogTitle>
                   {editingCliente ? "Editar Cliente" : "Novo Cliente"}
@@ -157,22 +221,18 @@ export default function CadastroClientes() {
               
               <div className="grid grid-cols-2 gap-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="nome_razao_social">Razão Social/Nome</Label>
+                  <Label htmlFor="nome_razao_social">Razão Social/Nome *</Label>
                   <Input
                     id="nome_razao_social"
-                    value={formData.nome_razao_social}
-                    onChange={(e) => setFormData(prev => ({ ...prev, nome_razao_social: e.target.value }))}
-                    required
+                    {...form.register("nome_razao_social")}
                   />
+                  <span className="text-xs text-red-600">{form.formState.errors.nome_razao_social?.message}</span>
                 </div>
-                
                 <div className="space-y-2">
-                  <Label htmlFor="tipo_pessoa">Tipo Pessoa</Label>
+                  <Label htmlFor="tipo_pessoa">Tipo Pessoa *</Label>
                   <Select
-                    value={formData.tipo_pessoa}
-                    onValueChange={(value: 'fisica' | 'juridica') => 
-                      setFormData(prev => ({ ...prev, tipo_pessoa: value }))
-                    }
+                    value={form.watch('tipo_pessoa')}
+                    onValueChange={(value: 'fisica' | 'juridica') => form.setValue("tipo_pessoa", value)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -182,87 +242,75 @@ export default function CadastroClientes() {
                       <SelectItem value="juridica">Pessoa Jurídica</SelectItem>
                     </SelectContent>
                   </Select>
+                  <span className="text-xs text-red-600">{form.formState.errors.tipo_pessoa?.message}</span>
                 </div>
-
                 <div className="space-y-2">
-                  <Label htmlFor="cpf_cnpj">
-                    {formData.tipo_pessoa === 'fisica' ? 'CPF' : 'CNPJ'}
-                  </Label>
+                  <Label htmlFor="cpf_cnpj">{form.watch('tipo_pessoa') === 'fisica' ? 'CPF *' : 'CNPJ *'}</Label>
                   <Input
                     id="cpf_cnpj"
-                    value={formData.cpf_cnpj}
-                    onChange={(e) => setFormData(prev => ({ ...prev, cpf_cnpj: e.target.value }))}
-                    required
+                    {...form.register("cpf_cnpj")}
+                    value={maskCpfCnpj(form.watch('cpf_cnpj'))}
+                    onChange={e => form.setValue('cpf_cnpj', e.target.value.replace(/\D/g, ""))}
                   />
+                  <span className="text-xs text-red-600">{form.formState.errors.cpf_cnpj?.message}</span>
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="inscricao_estadual">Inscrição Estadual</Label>
                   <Input
                     id="inscricao_estadual"
-                    value={formData.inscricao_estadual}
-                    onChange={(e) => setFormData(prev => ({ ...prev, inscricao_estadual: e.target.value }))}
+                    {...form.register("inscricao_estadual")}
                   />
                 </div>
-
                 <div className="col-span-2 space-y-2">
-                  <Label htmlFor="endereco">Endereço</Label>
+                  <Label htmlFor="endereco">Endereço *</Label>
                   <Input
                     id="endereco"
-                    value={formData.endereco}
-                    onChange={(e) => setFormData(prev => ({ ...prev, endereco: e.target.value }))}
-                    required
+                    {...form.register("endereco")}
                   />
+                  <span className="text-xs text-red-600">{form.formState.errors.endereco?.message}</span>
                 </div>
-
                 <div className="space-y-2">
-                  <Label htmlFor="cidade">Cidade</Label>
+                  <Label htmlFor="cidade">Cidade *</Label>
                   <Input
                     id="cidade"
-                    value={formData.cidade}
-                    onChange={(e) => setFormData(prev => ({ ...prev, cidade: e.target.value }))}
-                    required
+                    {...form.register("cidade")}
                   />
+                  <span className="text-xs text-red-600">{form.formState.errors.cidade?.message}</span>
                 </div>
-
                 <div className="space-y-2">
-                  <Label htmlFor="estado">Estado</Label>
+                  <Label htmlFor="estado">Estado *</Label>
                   <Input
                     id="estado"
-                    value={formData.estado}
-                    onChange={(e) => setFormData(prev => ({ ...prev, estado: e.target.value }))}
-                    required
+                    {...form.register("estado")}
                     maxLength={2}
                   />
+                  <span className="text-xs text-red-600">{form.formState.errors.estado?.message}</span>
                 </div>
-
                 <div className="space-y-2">
-                  <Label htmlFor="cep">CEP</Label>
+                  <Label htmlFor="cep">CEP *</Label>
                   <Input
                     id="cep"
-                    value={formData.cep}
-                    onChange={(e) => setFormData(prev => ({ ...prev, cep: e.target.value }))}
-                    required
+                    {...form.register("cep")}
+                    value={maskCep(form.watch('cep'))}
+                    onChange={e => form.setValue('cep', e.target.value.replace(/\D/g, ""))}
                   />
+                  <span className="text-xs text-red-600">{form.formState.errors.cep?.message}</span>
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="telefone">Telefone</Label>
                   <Input
                     id="telefone"
-                    value={formData.telefone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
+                    {...form.register("telefone")}
                   />
                 </div>
-
                 <div className="col-span-2 space-y-2">
                   <Label htmlFor="email">E-mail</Label>
                   <Input
                     id="email"
                     type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    {...form.register("email")}
                   />
+                  <span className="text-xs text-red-600">{form.formState.errors.email?.message}</span>
                 </div>
               </div>
 
@@ -270,7 +318,22 @@ export default function CadastroClientes() {
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                <Button 
+                  type="submit" 
+                  disabled={buttonState === 'loading' || createMutation.isPending || updateMutation.isPending}
+                  className={
+                    buttonState === 'loading' ? "cursor-wait" : buttonState === "success" ? "bg-green-600" : buttonState === "error" ? "bg-destructive" : ""
+                  }
+                >
+                  {buttonState === 'loading' && (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  )}
+                  {buttonState === 'success' && (
+                    <Check className="w-4 h-4 mr-2" />
+                  )}
+                  {buttonState === 'error' && (
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                  )}
                   {editingCliente ? "Atualizar" : "Criar"}
                 </Button>
               </DialogFooter>
