@@ -91,17 +91,28 @@ export default function CadastroClientes() {
     console.debug("Salvando cliente:", data);
 
     try {
+      // Garanta que clienteData tem todas as chaves obrigatórias do tipo ClienteValidation
       const clienteData = {
-        ...data,
-        empresa_id: empresaId,
+        empresa_id: empresaId as string,
+        nome_razao_social: data.nome_razao_social,
+        cpf_cnpj: data.cpf_cnpj,
+        tipo_pessoa: data.tipo_pessoa,
+        inscricao_estadual: data.inscricao_estadual || "",
+        endereco: data.endereco,
+        cidade: data.cidade,
+        estado: data.estado,
+        cep: data.cep,
+        telefone: data.telefone || "",
+        email: data.email || "",
       };
+
       if (editingCliente) {
         await updateMutation.mutateAsync({
           id: editingCliente.id,
           updates: clienteData
         });
       } else {
-        await createMutation.mutateAsync(clienteData);
+        await createMutation.mutateAsync(clienteData); // Aqui, agora garantido o shape correto
       }
       resetForm();
       setIsDialogOpen(false);
