@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,9 @@ export function Empresas() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingEmpresa, setEditingEmpresa] = useState<any>(null);
+  const [deletingEmpresaId, setDeletingEmpresaId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     razao_social: "",
     nome_fantasia: "",
@@ -123,12 +126,23 @@ export function Empresas() {
     });
   };
 
-  const handleDelete = (empresaId: string) => {
-    deleteEmpresa.mutate(empresaId);
+  const handleDeleteClick = (empresaId: string) => {
+    setDeletingEmpresaId(empresaId);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deletingEmpresaId) {
+      deleteEmpresa.mutate(deletingEmpresaId, {
+        onSuccess: () => {
+          setIsDeleteDialogOpen(false);
+          setDeletingEmpresaId(null);
+        }
+      });
+    }
   };
 
   const getStatusBadge = (empresa: any) => {
-    // Verificar se a empresa está ativa (você pode adicionar este campo na tabela se necessário)
     return <Badge className="fiscal-success">Ativa</Badge>;
   };
 
@@ -362,6 +376,18 @@ export function Empresas() {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Excluir Empresa"
+        description="Tem certeza que deseja excluir esta empresa? Esta ação não pode ser desfeita e pode afetar notas fiscais associadas."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={handleDeleteConfirm}
+        variant="destructive"
+      />
+
       {/* Search */}
       <Card>
         <CardContent className="pt-6">
@@ -401,16 +427,6 @@ export function Empresas() {
                   <Button variant="ghost" size="sm" onClick={() => handleEdit(empresa)}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <ConfirmationDialog
-                    title="Excluir Empresa"
-                    description="Tem certeza que deseja excluir esta empresa? Esta ação não pode ser desfeita."
-                    onConfirm={() => handleDelete(empresa.id)}
-                    trigger={
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    }
-                  />
                 </div>
               </div>
             </CardHeader>
@@ -439,10 +455,20 @@ export function Empresas() {
                   <FileText className="w-4 h-4 mr-2" />
                   Ver Notas
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Configurar
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button variant="outline" size="sm">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Configurar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDeleteClick(empresa.id)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
