@@ -1,5 +1,5 @@
 
-import { validarCPF, validarCNPJ, validarCEP } from './validacoesFiscais';
+import { validarCPF, validarCNPJ } from './validacoesFiscais';
 
 export interface ValidationError {
   field: string;

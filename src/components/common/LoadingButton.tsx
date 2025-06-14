@@ -3,7 +3,7 @@ import React from 'react';
 import { ButtonWithFeedback } from './ButtonWithFeedback';
 import { ButtonProps } from '@/components/ui/button';
 
-interface LoadingButtonProps extends ButtonProps {
+interface LoadingButtonProps extends Omit<ButtonProps, 'onError'> {
   isLoading: boolean;
   loadingText?: string;
 }

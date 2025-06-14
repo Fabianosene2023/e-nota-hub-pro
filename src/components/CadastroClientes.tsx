@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from '@/hooks/use-toast';
 import { Pencil, Trash2, Plus, Users } from "lucide-react";
+import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 
 export const CadastroClientes = () => {
   const { data: empresas } = useEmpresas();
@@ -21,11 +22,13 @@ export const CadastroClientes = () => {
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState<any>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [clienteToDelete, setClienteToDelete] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     nome_razao_social: '',
     cpf_cnpj: '',
-    tipo_pessoa: 'fisica',
+    tipo_pessoa: 'fisica' as 'fisica' | 'juridica',
     inscricao_estadual: '',
     email: '',
     telefone: '',
@@ -89,7 +92,7 @@ export const CadastroClientes = () => {
     setFormData({
       nome_razao_social: cliente.nome_razao_social,
       cpf_cnpj: cliente.cpf_cnpj,
-      tipo_pessoa: cliente.tipo_pessoa,
+      tipo_pessoa: cliente.tipo_pessoa as 'fisica' | 'juridica',
       inscricao_estadual: cliente.inscricao_estadual || '',
       email: cliente.email || '',
       telefone: cliente.telefone || '',
@@ -102,10 +105,17 @@ export const CadastroClientes = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este cliente?')) {
+  const handleDelete = (id: string) => {
+    setClienteToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (clienteToDelete) {
       try {
-        await deleteCliente.mutateAsync(id);
+        await deleteCliente.mutateAsync(clienteToDelete);
+        setDeleteConfirmOpen(false);
+        setClienteToDelete(null);
       } catch (error) {
         console.error('Erro ao excluir cliente:', error);
       }
@@ -204,7 +214,7 @@ export const CadastroClientes = () => {
                         <Label htmlFor="tipo_pessoa">Tipo de Pessoa *</Label>
                         <Select 
                           value={formData.tipo_pessoa} 
-                          onValueChange={(value) => setFormData({...formData, tipo_pessoa: value})}
+                          onValueChange={(value: 'fisica' | 'juridica') => setFormData({...formData, tipo_pessoa: value})}
                         >
                           <SelectTrigger>
                             <SelectValue />
@@ -371,6 +381,17 @@ export const CadastroClientes = () => {
           </CardContent>
         </Card>
       )}
+
+      <ConfirmationDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Confirmar Exclusão"
+        description="Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={confirmDelete}
+        variant="destructive"
+      />
     </div>
   );
 };
