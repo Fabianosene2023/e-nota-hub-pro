@@ -42,7 +42,7 @@ describe('Button Interactions E2E Tests', () => {
       const novoClienteButton = screen.getByText('Novo Cliente');
       await user.click(novoClienteButton);
       
-      const nomeInput = screen.getByLabelText(/Nome\/Razão Social/i);
+      const nomeInput = screen.getByLabelText('Nome/Razão Social');
       await user.type(nomeInput, 'Cliente Teste');
       
       const submitButton = screen.getByText('Criar');
