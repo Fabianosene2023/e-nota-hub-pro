@@ -17,6 +17,14 @@ interface ClienteFormProps {
   onCancel: () => void;
 }
 
+// Função utilitária para extrair mensagem de erro como string
+function getErrorMsg(error: any): string {
+  if (!error) return "";
+  if (typeof error === "string") return error;
+  if (typeof error.message === "string") return error.message;
+  return "";
+}
+
 export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: ClienteFormProps) {
   useEffect(() => {
     form.register("nome_razao_social");
@@ -38,7 +46,7 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
           <Label htmlFor="nome_razao_social">Razão Social/Nome *</Label>
           <Input id="nome_razao_social" {...form.register("nome_razao_social")} />
           <span className="text-xs text-red-600">
-            {form.formState.errors.nome_razao_social?.message ?? ""}
+            {getErrorMsg(form.formState.errors.nome_razao_social)}
           </span>
         </div>
         <div className="space-y-2">
@@ -56,7 +64,7 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
             </SelectContent>
           </Select>
           <span className="text-xs text-red-600">
-            {form.formState.errors.tipo_pessoa?.message ?? ""}
+            {getErrorMsg(form.formState.errors.tipo_pessoa)}
           </span>
         </div>
         <div className="space-y-2">
@@ -68,7 +76,7 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
             onChange={e => form.setValue('cpf_cnpj', e.target.value.replace(/\D/g, ""))}
           />
           <span className="text-xs text-red-600">
-            {form.formState.errors.cpf_cnpj?.message ?? ""}
+            {getErrorMsg(form.formState.errors.cpf_cnpj)}
           </span>
         </div>
         <div className="space-y-2">
@@ -82,21 +90,21 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
           <Label htmlFor="endereco">Endereço *</Label>
           <Input id="endereco" {...form.register("endereco")} />
           <span className="text-xs text-red-600">
-            {form.formState.errors.endereco?.message ?? ""}
+            {getErrorMsg(form.formState.errors.endereco)}
           </span>
         </div>
         <div className="space-y-2">
           <Label htmlFor="cidade">Cidade *</Label>
           <Input id="cidade" {...form.register("cidade")} />
           <span className="text-xs text-red-600">
-            {form.formState.errors.cidade?.message ?? ""}
+            {getErrorMsg(form.formState.errors.cidade)}
           </span>
         </div>
         <div className="space-y-2">
           <Label htmlFor="estado">Estado *</Label>
           <Input id="estado" {...form.register("estado")} maxLength={2} />
           <span className="text-xs text-red-600">
-            {form.formState.errors.estado?.message ?? ""}
+            {getErrorMsg(form.formState.errors.estado)}
           </span>
         </div>
         <div className="space-y-2">
@@ -108,7 +116,7 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
             onChange={e => form.setValue('cep', e.target.value.replace(/\D/g, ""))}
           />
           <span className="text-xs text-red-600">
-            {form.formState.errors.cep?.message ?? ""}
+            {getErrorMsg(form.formState.errors.cep)}
           </span>
         </div>
         <div className="space-y-2">
@@ -119,7 +127,7 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
           <Label htmlFor="email">E-mail</Label>
           <Input id="email" type="email" {...form.register("email")} />
           <span className="text-xs text-red-600">
-            {form.formState.errors.email?.message ?? ""}
+            {getErrorMsg(form.formState.errors.email)}
           </span>
         </div>
       </div>
