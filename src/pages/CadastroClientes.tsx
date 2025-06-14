@@ -20,6 +20,7 @@ import { Loader2, Check, AlertCircle } from "lucide-react";
 
 import { ClienteForm } from "@/components/CadastroClientes/ClienteForm";
 import { ClientesTable } from "@/components/CadastroClientes/ClientesTable";
+import { checkClienteDuplicado } from "@/hooks/useCheckClienteDuplicado";
 
 const clienteSchema = z.object({
   nome_razao_social: z.string().min(1, "Nome/Razão Social é obrigatório"),
@@ -94,7 +95,6 @@ export default function CadastroClientes() {
     console.debug("Salvando cliente:", data);
 
     try {
-      // Garanta que clienteData tem todas as chaves obrigatórias do tipo ClienteValidation
       const clienteData = {
         empresa_id: empresaId as string,
         nome_razao_social: data.nome_razao_social,
@@ -109,13 +109,31 @@ export default function CadastroClientes() {
         email: data.email || "",
       };
 
+      // === Validação extra de duplicidade de CPF/CNPJ ===
+      const isDuplicado = await checkClienteDuplicado({
+        empresaId: clienteData.empresa_id,
+        cpfCnpj: clienteData.cpf_cnpj,
+        ignoreClienteId: editingCliente?.id ?? undefined,
+      });
+      if (isDuplicado) {
+        setButtonState('error');
+        toast({
+          title: "CPF/CNPJ já cadastrado",
+          description: "Já existe um cliente com este CPF ou CNPJ para esta empresa.",
+          variant: "destructive",
+        });
+        setTimeout(() => setButtonState('idle'), 2000);
+        return;
+      }
+      // === Fim validação duplicidade ===
+
       if (editingCliente) {
         await updateMutation.mutateAsync({
           id: editingCliente.id,
           updates: clienteData
         });
       } else {
-        await createMutation.mutateAsync(clienteData); // Aqui, agora garantido o shape correto
+        await createMutation.mutateAsync(clienteData);
       }
       resetForm();
       setIsDialogOpen(false);
