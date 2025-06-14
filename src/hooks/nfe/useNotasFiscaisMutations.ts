@@ -1,52 +1,15 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { NFEMutationService } from '@/utils/nfe/mutations/nfeMutationService';
 
-/**
- * Mutation hooks for NFe operations
- */
 export const useCreateNotaFiscalMutation = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
     mutationFn: async (notaData: any) => {
       console.log('Criando nota fiscal com integração SEFAZ:', notaData);
-      
-      // 1. Save draft note first
-      const { data: notaSalva, error: errorSave } = await supabase
-        .from('notas_fiscais')
-        .insert([{
-          ...notaData,
-          status: 'rascunho'
-        }])
-        .select()
-        .single();
-      
-      if (errorSave) throw errorSave;
-      
-      try {
-        // 2. Call Edge Function for SEFAZ emission
-        const { data: sefazResult, error: sefazError } = await supabase.functions.invoke('sefaz-integration', {
-          body: {
-            operation: 'emitir_nfe',
-            data: {
-              ...notaData,
-              nota_fiscal_id: notaSalva.id
-            }
-          }
-        });
-        
-        if (sefazError) throw sefazError;
-        
-        // 3. Update note with SEFAZ data
-        return await updateNotaWithSefazResult(notaSalva.id, sefazResult, notaData);
-        
-      } catch (error) {
-        console.error('Erro na integração SEFAZ:', error);
-        await markNotaAsError(notaSalva.id, error);
-        throw error;
-      }
+      return await NFEMutationService.createNotaFiscal(notaData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
@@ -73,21 +36,7 @@ export const useCancelarNotaFiscalMutation = () => {
       justificativa: string;
     }) => {
       console.log('Cancelando nota fiscal:', cancelData);
-      
-      const { data: sefazResult, error: sefazError } = await supabase.functions.invoke('sefaz-integration', {
-        body: {
-          operation: 'cancelar_nfe',
-          data: cancelData
-        }
-      });
-      
-      if (sefazError) throw sefazError;
-      
-      if (sefazResult.success) {
-        return await updateNotaAsCancelled(cancelData, sefazResult);
-      } else {
-        throw new Error(sefazResult.mensagem_retorno || sefazResult.error);
-      }
+      return await NFEMutationService.cancelNotaFiscal(cancelData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
@@ -114,16 +63,7 @@ export const useConsultarNotaFiscalMutation = () => {
       empresa_id: string;
     }) => {
       console.log('Consultando nota fiscal:', consultaData);
-      
-      const { data: sefazResult, error: sefazError } = await supabase.functions.invoke('sefaz-integration', {
-        body: {
-          operation: 'consultar_nfe',
-          data: consultaData
-        }
-      });
-      
-      if (sefazError) throw sefazError;
-      return sefazResult;
+      return await NFEMutationService.consultarNotaFiscal(consultaData);
     },
     onSuccess: (data) => {
       toast({
@@ -142,70 +82,3 @@ export const useConsultarNotaFiscalMutation = () => {
     },
   });
 };
-
-// Helper functions
-async function updateNotaWithSefazResult(notaId: string, sefazResult: any, notaData: any) {
-  if (sefazResult.success) {
-    const { data, error } = await supabase
-      .from('notas_fiscais')
-      .update({
-        chave_acesso: sefazResult.chave_acesso,
-        protocolo_autorizacao: sefazResult.protocolo,
-        codigo_retorno_sefaz: sefazResult.codigo_retorno,
-        mensagem_retorno_sefaz: sefazResult.mensagem_retorno,
-        status: 'autorizada',
-        data_autorizacao: new Date().toISOString()
-      })
-      .eq('id', notaId)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    toast({
-      title: "Sucesso!",
-      description: `NFe autorizada - Chave: ${sefazResult.chave_acesso}`,
-    });
-    
-    return { data, sefazResult };
-  } else {
-    await supabase
-      .from('notas_fiscais')
-      .update({
-        status: 'erro',
-        codigo_retorno_sefaz: sefazResult.codigo_retorno,
-        mensagem_retorno_sefaz: sefazResult.mensagem_retorno || sefazResult.error
-      })
-      .eq('id', notaId);
-    
-    throw new Error(sefazResult.mensagem_retorno || sefazResult.error);
-  }
-}
-
-async function markNotaAsError(notaId: string, error: unknown) {
-  await supabase
-    .from('notas_fiscais')
-    .update({
-      status: 'erro',
-      mensagem_retorno_sefaz: error instanceof Error ? error.message : 'Erro desconhecido'
-    })
-    .eq('id', notaId);
-}
-
-async function updateNotaAsCancelled(cancelData: any, sefazResult: any) {
-  const { data, error } = await supabase
-    .from('notas_fiscais')
-    .update({
-      status: 'cancelada',
-      justificativa_cancelamento: cancelData.justificativa,
-      data_cancelamento: new Date().toISOString(),
-      codigo_retorno_sefaz: sefazResult.codigo_retorno,
-      mensagem_retorno_sefaz: sefazResult.mensagem_retorno
-    })
-    .eq('id', cancelData.nota_fiscal_id)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  return { data, sefazResult };
-}
