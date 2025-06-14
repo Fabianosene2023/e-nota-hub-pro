@@ -1,16 +1,60 @@
+
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNotasFiscais } from "@/hooks/useNotasFiscais";
 import { useProdutos } from "@/hooks/useProdutos";
 import { useContatos } from "@/hooks/useContatos";
-import { FileText, Package, Users, AlertTriangle, Plus, TrendingUp } from "lucide-react";
+import { useEmpresas } from "@/hooks/useEmpresas";
+import { useTestarConexaoSefaz } from "@/hooks/useConfiguracoesSefaz";
+import { toast } from "@/hooks/use-toast";
+import {
+  FileText,
+  Package,
+  Users,
+  AlertTriangle,
+  Plus,
+  TrendingUp,
+  Activity,
+} from "lucide-react";
 import { Link } from "react-router-dom";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 export const Dashboard = () => {
   const { data: notasFiscais } = useNotasFiscais();
   const { data: produtos } = useProdutos();
   const { data: clientes } = useContatos('cliente');
+  const { data: empresas } = useEmpresas();
+
+  // Botão de testar conexão SEFAZ
+  const [showEmpresaSelect, setShowEmpresaSelect] = useState(false);
+  const [empresaIdTeste, setEmpresaIdTeste] = useState<string | undefined>(undefined);
+
+  const { mutate: testarConexao, isPending: isTesting } = useTestarConexaoSefaz();
+
+  // Lógica do botão e select
+  const onClickTestConnection = () => {
+    if (!empresas) {
+      toast({
+        title: "Atenção",
+        description: "Nenhuma empresa encontrada",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (empresas.length === 1) {
+      testarConexao(empresas[0].id);
+    } else {
+      setShowEmpresaSelect(true);
+    }
+  };
+
+  const handleSelectEmpresa = (empresaId: string) => {
+    setEmpresaIdTeste(empresaId);
+    setShowEmpresaSelect(false);
+    testarConexao(empresaId);
+  };
 
   // Calcular estatísticas
   const totalNFsDoMes = notasFiscais?.filter(nf => {
@@ -29,7 +73,7 @@ export const Dashboard = () => {
     return dataNF.getMonth() === mesAtual && dataNF.getFullYear() === anoAtual;
   }).reduce((total, nf) => total + Number(nf.valor_total), 0) || 0;
 
-  const produtosEstoqueBaixo = produtos?.filter(p => 
+  const produtosEstoqueBaixo = produtos?.filter(p =>
     (p.estoque_atual || 0) <= (p.estoque_minimo || 0)
   ) || [];
 
@@ -87,6 +131,36 @@ export const Dashboard = () => {
             </Link>
           </Button>
         </div>
+      </div>
+
+      {/* Botão de Testar Conexão SEFAZ */}
+      <div>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="mb-2"
+          onClick={onClickTestConnection}
+          disabled={isTesting}
+        >
+          <Activity className="h-4 w-4 mr-2" />
+          {isTesting ? "Testando conexão..." : "Testar Conexão SEFAZ"}
+        </Button>
+        {showEmpresaSelect && empresas && empresas.length > 1 && (
+          <div className="mt-2 max-w-xs">
+            <Select onValueChange={handleSelectEmpresa}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione a empresa" />
+              </SelectTrigger>
+              <SelectContent>
+                {empresas.map((empresa) => (
+                  <SelectItem key={empresa.id} value={empresa.id}>
+                    {empresa.nome_fantasia || empresa.razao_social}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {/* Cards de Estatísticas */}
