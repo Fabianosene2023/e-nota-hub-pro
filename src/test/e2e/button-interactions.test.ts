@@ -18,13 +18,11 @@ const createTestQueryClient = () => new QueryClient({
 const renderWithProviders = (component: React.ReactElement) => {
   const queryClient = createTestQueryClient();
   return render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          {component}
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    React.createElement(QueryClientProvider, { client: queryClient },
+      React.createElement(BrowserRouter, {},
+        React.createElement(AuthProvider, {}, component)
+      )
+    )
   );
 };
 
@@ -37,7 +35,7 @@ describe('Button Interactions E2E Tests', () => {
 
   describe('Cadastro de Clientes', () => {
     it('should show loading state when creating client', async () => {
-      renderWithProviders(<CadastroClientes />);
+      renderWithProviders(React.createElement(CadastroClientes));
       
       const novoClienteButton = screen.getByText('Novo Cliente');
       await user.click(novoClienteButton);
@@ -50,7 +48,7 @@ describe('Button Interactions E2E Tests', () => {
     });
 
     it('should show success feedback after client creation', async () => {
-      renderWithProviders(<CadastroClientes />);
+      renderWithProviders(React.createElement(CadastroClientes));
       
       const novoClienteButton = screen.getByText('Novo Cliente');
       await user.click(novoClienteButton);
@@ -61,7 +59,7 @@ describe('Button Interactions E2E Tests', () => {
 
   describe('Edit Button Interactions', () => {
     it('should open edit dialog when edit button is clicked', async () => {
-      renderWithProviders(<CadastroClientes />);
+      renderWithProviders(React.createElement(CadastroClientes));
       
       await waitFor(() => {
         const editButtons = screen.queryAllByRole('button');
@@ -72,7 +70,7 @@ describe('Button Interactions E2E Tests', () => {
 
   describe('Delete Button Interactions', () => {
     it('should show confirmation dialog before deletion', async () => {
-      renderWithProviders(<CadastroClientes />);
+      renderWithProviders(React.createElement(CadastroClientes));
       
       await waitFor(() => {
         const deleteButtons = screen.queryAllByRole('button');
@@ -83,7 +81,7 @@ describe('Button Interactions E2E Tests', () => {
 
   describe('Cadastro de Produtos', () => {
     it('should validate required fields before submission', async () => {
-      renderWithProviders(<CadastroProdutos />);
+      renderWithProviders(React.createElement(CadastroProdutos));
       
       const novoProdutoButton = screen.queryByText('Novo Produto');
       if (novoProdutoButton) {
@@ -94,7 +92,7 @@ describe('Button Interactions E2E Tests', () => {
     });
 
     it('should show loading state during product creation', async () => {
-      renderWithProviders(<CadastroProdutos />);
+      renderWithProviders(React.createElement(CadastroProdutos));
       
       expect(screen.getByText('Cadastro de Produtos')).toBeInTheDocument();
     });
@@ -102,7 +100,7 @@ describe('Button Interactions E2E Tests', () => {
 
   describe('Form Validation', () => {
     it('should prevent submission with invalid data', async () => {
-      renderWithProviders(<CadastroClientes />);
+      renderWithProviders(React.createElement(CadastroClientes));
       
       const novoClienteButton = screen.getByText('Novo Cliente');
       await user.click(novoClienteButton);
@@ -114,7 +112,7 @@ describe('Button Interactions E2E Tests', () => {
     });
 
     it('should show validation errors for empty required fields', async () => {
-      renderWithProviders(<CadastroClientes />);
+      renderWithProviders(React.createElement(CadastroClientes));
       
       const novoClienteButton = screen.getByText('Novo Cliente');
       await user.click(novoClienteButton);
