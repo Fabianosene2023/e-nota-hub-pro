@@ -18,8 +18,6 @@ interface ClienteFormProps {
 }
 
 export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: ClienteFormProps) {
-  // Atualizar required dinâmica para campos conforme necessidade
-
   useEffect(() => {
     form.register("nome_razao_social");
     form.register("cpf_cnpj");
@@ -39,7 +37,9 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
         <div className="space-y-2">
           <Label htmlFor="nome_razao_social">Razão Social/Nome *</Label>
           <Input id="nome_razao_social" {...form.register("nome_razao_social")} />
-          <span className="text-xs text-red-600">{form.formState.errors.nome_razao_social?.message}</span>
+          <span className="text-xs text-red-600">
+            {form.formState.errors.nome_razao_social?.message ?? ""}
+          </span>
         </div>
         <div className="space-y-2">
           <Label htmlFor="tipo_pessoa">Tipo Pessoa *</Label>
@@ -55,7 +55,9 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
               <SelectItem value="juridica">Pessoa Jurídica</SelectItem>
             </SelectContent>
           </Select>
-          <span className="text-xs text-red-600">{form.formState.errors.tipo_pessoa?.message}</span>
+          <span className="text-xs text-red-600">
+            {form.formState.errors.tipo_pessoa?.message ?? ""}
+          </span>
         </div>
         <div className="space-y-2">
           <Label htmlFor="cpf_cnpj">{form.watch('tipo_pessoa') === 'fisica' ? 'CPF *' : 'CNPJ *'}</Label>
@@ -65,7 +67,9 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
             value={maskCpfCnpj(form.watch('cpf_cnpj'))}
             onChange={e => form.setValue('cpf_cnpj', e.target.value.replace(/\D/g, ""))}
           />
-          <span className="text-xs text-red-600">{form.formState.errors.cpf_cnpj?.message}</span>
+          <span className="text-xs text-red-600">
+            {form.formState.errors.cpf_cnpj?.message ?? ""}
+          </span>
         </div>
         <div className="space-y-2">
           <Label htmlFor="inscricao_estadual">Inscrição Estadual</Label>
@@ -77,17 +81,23 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
         <div className="col-span-2 space-y-2">
           <Label htmlFor="endereco">Endereço *</Label>
           <Input id="endereco" {...form.register("endereco")} />
-          <span className="text-xs text-red-600">{form.formState.errors.endereco?.message}</span>
+          <span className="text-xs text-red-600">
+            {form.formState.errors.endereco?.message ?? ""}
+          </span>
         </div>
         <div className="space-y-2">
           <Label htmlFor="cidade">Cidade *</Label>
           <Input id="cidade" {...form.register("cidade")} />
-          <span className="text-xs text-red-600">{form.formState.errors.cidade?.message}</span>
+          <span className="text-xs text-red-600">
+            {form.formState.errors.cidade?.message ?? ""}
+          </span>
         </div>
         <div className="space-y-2">
           <Label htmlFor="estado">Estado *</Label>
           <Input id="estado" {...form.register("estado")} maxLength={2} />
-          <span className="text-xs text-red-600">{form.formState.errors.estado?.message}</span>
+          <span className="text-xs text-red-600">
+            {form.formState.errors.estado?.message ?? ""}
+          </span>
         </div>
         <div className="space-y-2">
           <Label htmlFor="cep">CEP *</Label>
@@ -97,7 +107,9 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
             value={maskCep(form.watch('cep'))}
             onChange={e => form.setValue('cep', e.target.value.replace(/\D/g, ""))}
           />
-          <span className="text-xs text-red-600">{form.formState.errors.cep?.message}</span>
+          <span className="text-xs text-red-600">
+            {form.formState.errors.cep?.message ?? ""}
+          </span>
         </div>
         <div className="space-y-2">
           <Label htmlFor="telefone">Telefone</Label>
@@ -106,7 +118,9 @@ export function ClienteForm({ form, onSubmit, buttonState, isEdit, onCancel }: C
         <div className="col-span-2 space-y-2">
           <Label htmlFor="email">E-mail</Label>
           <Input id="email" type="email" {...form.register("email")} />
-          <span className="text-xs text-red-600">{form.formState.errors.email?.message}</span>
+          <span className="text-xs text-red-600">
+            {form.formState.errors.email?.message ?? ""}
+          </span>
         </div>
       </div>
       <DialogFooter>
