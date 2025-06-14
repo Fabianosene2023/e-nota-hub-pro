@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/use-toast";
 import { useClientesManager, useCreateClienteManager, useUpdateClienteManager, useDeleteClienteManager } from "@/hooks/useClientesManager";
 import { checkClienteDuplicado } from "@/hooks/useCheckClienteDuplicado";
+import { useFiltroClientes } from "./useFiltroClientes";
+import { useDialogCliente } from "./useDialogCliente";
 
 export const clienteSchema = z.object({
   nome_razao_social: z.string().min(1, "Nome/Razão Social é obrigatório"),
@@ -23,10 +25,7 @@ export const clienteSchema = z.object({
 export type ClienteFormDataSchema = z.infer<typeof clienteSchema>;
 
 export function useCadastroClientesForm({ empresaId, onSuccess }: { empresaId?: string, onSuccess?: () => void }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingCliente, setEditingCliente] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const form = useForm<ClienteFormDataSchema>({
     resolver: zodResolver(clienteSchema),
@@ -43,6 +42,9 @@ export function useCadastroClientesForm({ empresaId, onSuccess }: { empresaId?: 
       email: "",
     }
   });
+
+  const { isDialogOpen, setIsDialogOpen, editingCliente, setEditingCliente, openDialog, closeDialog } = useDialogCliente(form);
+  const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const { data: clientes, isLoading } = useClientesManager(empresaId);
   const createMutation = useCreateClienteManager();
@@ -132,20 +134,7 @@ export function useCadastroClientesForm({ empresaId, onSuccess }: { empresaId?: 
   };
 
   const handleEdit = (cliente: any) => {
-    form.reset({
-      nome_razao_social: cliente.nome_razao_social,
-      cpf_cnpj: cliente.cpf_cnpj,
-      tipo_pessoa: cliente.tipo_pessoa,
-      inscricao_estadual: cliente.inscricao_estadual || "",
-      endereco: cliente.endereco,
-      cidade: cliente.cidade,
-      estado: cliente.estado,
-      cep: cliente.cep,
-      telefone: cliente.telefone || "",
-      email: cliente.email || "",
-    });
-    setEditingCliente(cliente);
-    setIsDialogOpen(true);
+    openDialog(cliente);
   };
 
   const handleDelete = async (id: string) => {
@@ -154,32 +143,7 @@ export function useCadastroClientesForm({ empresaId, onSuccess }: { empresaId?: 
     }
   };
 
-  const openDialog = (cliente?: any) => {
-    if (cliente) {
-      form.reset({
-        nome_razao_social: cliente.nome_razao_social,
-        cpf_cnpj: cliente.cpf_cnpj,
-        tipo_pessoa: cliente.tipo_pessoa,
-        inscricao_estadual: cliente.inscricao_estadual || "",
-        endereco: cliente.endereco,
-        cidade: cliente.cidade,
-        estado: cliente.estado,
-        cep: cliente.cep,
-        telefone: cliente.telefone || "",
-        email: cliente.email || "",
-      });
-      setEditingCliente(cliente);
-    } else {
-      form.reset();
-      setEditingCliente(null);
-    }
-    setIsDialogOpen(true);
-  };
-
-  const filteredClientes = clientes?.filter(cliente =>
-    cliente.nome_razao_social.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cliente.cpf_cnpj.includes(searchTerm)
-  ) || [];
+  const filteredClientes = useFiltroClientes(clientes || [], searchTerm);
 
   return {
     form,
