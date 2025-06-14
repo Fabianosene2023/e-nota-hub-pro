@@ -1040,6 +1040,51 @@ export type Database = {
           },
         ]
       }
+      servicos: {
+        Row: {
+          aliquota_iss: number | null
+          ativo: boolean
+          codigo: string
+          codigo_servico_municipal: string | null
+          created_at: string
+          descricao: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          preco_unitario: number
+          unidade: string
+          updated_at: string
+        }
+        Insert: {
+          aliquota_iss?: number | null
+          ativo?: boolean
+          codigo: string
+          codigo_servico_municipal?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          preco_unitario?: number
+          unidade?: string
+          updated_at?: string
+        }
+        Update: {
+          aliquota_iss?: number | null
+          ativo?: boolean
+          codigo?: string
+          codigo_servico_municipal?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          preco_unitario?: number
+          unidade?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transportadoras: {
         Row: {
           ativo: boolean | null
