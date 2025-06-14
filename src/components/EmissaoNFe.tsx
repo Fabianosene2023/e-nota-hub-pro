@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { useEmpresasManager } from '@/hooks/useEmpresasManager';
 import { useClientesManager } from '@/hooks/useClientesManager';
-import { useProdutos } from '@/hooks/useProdutos';
+import { useProdutosManager } from '@/hooks/useProdutosManager';
+import { useServicosManager } from '@/hooks/useServicosManager';
 import { useCreateNotaFiscal } from '@/hooks/useNotasFiscais';
 import { useCreateLog } from '@/hooks/useLogsOperacoes';
 import { emitirNFe } from '@/utils/integracaoSefaz';
@@ -18,12 +19,14 @@ import { toast } from '@/hooks/use-toast';
 import { Loader2, FileText, Plus, Trash2, User, Building } from "lucide-react";
 
 interface ItemNFe {
-  produto_id: string;
-  produto_nome: string;
+  produto_id?: string;
+  servico_id?: string;
+  item_nome: string;
   quantidade: number;
   valor_unitario: number;
   valor_total: number;
   cfop: string;
+  tipo: 'produto' | 'servico';
 }
 
 export const EmissaoNFe = () => {
@@ -39,7 +42,8 @@ export const EmissaoNFe = () => {
   
   const [itens, setItens] = useState<ItemNFe[]>([]);
   const [itemAtual, setItemAtual] = useState({
-    produto_id: '',
+    item_id: '',
+    tipo_item: 'produto' as 'produto' | 'servico',
     quantidade: 1,
     valor_unitario: 0,
     cfop: '5102'
@@ -48,7 +52,8 @@ export const EmissaoNFe = () => {
   // Hooks para carregar dados
   const { data: empresas } = useEmpresasManager();
   const { data: clientes } = useClientesManager(formData.empresa_id);
-  const { data: produtos } = useProdutos();
+  const { data: produtos } = useProdutosManager(formData.empresa_id);
+  const { data: servicos } = useServicosManager(formData.empresa_id);
   const createNotaFiscal = useCreateNotaFiscal();
   const createLog = useCreateLog();
 
@@ -62,32 +67,44 @@ export const EmissaoNFe = () => {
   }) || [];
 
   const adicionarItem = () => {
-    if (!itemAtual.produto_id) {
+    if (!itemAtual.item_id) {
       toast({
         title: "Erro",
-        description: "Selecione um produto",
+        description: "Selecione um produto ou serviço",
         variant: "destructive",
       });
       return;
     }
 
-    const produto = produtos?.find(p => p.id === itemAtual.produto_id);
-    if (!produto) return;
+    let item: any;
+    let itemNome: string;
+    
+    if (itemAtual.tipo_item === 'produto') {
+      item = produtos?.find(p => p.id === itemAtual.item_id);
+      itemNome = item?.nome || item?.descricao || '';
+    } else {
+      item = servicos?.find(s => s.id === itemAtual.item_id);
+      itemNome = item?.nome || item?.descricao || '';
+    }
+    
+    if (!item) return;
 
     const valorTotal = itemAtual.quantidade * itemAtual.valor_unitario;
     
     const novoItem: ItemNFe = {
-      produto_id: produto.id,
-      produto_nome: produto.nome || produto.descricao,
+      ...(itemAtual.tipo_item === 'produto' ? { produto_id: item.id } : { servico_id: item.id }),
+      item_nome: itemNome,
       quantidade: itemAtual.quantidade,
       valor_unitario: itemAtual.valor_unitario,
       valor_total: valorTotal,
-      cfop: itemAtual.cfop
+      cfop: itemAtual.cfop,
+      tipo: itemAtual.tipo_item
     };
 
     setItens([...itens, novoItem]);
     setItemAtual({
-      produto_id: '',
+      item_id: '',
+      tipo_item: 'produto',
       quantidade: 1,
       valor_unitario: 0,
       cfop: '5102'
@@ -123,6 +140,7 @@ export const EmissaoNFe = () => {
         natureza_operacao: formData.natureza_operacao,
         itens: itens.map(item => ({
           produto_id: item.produto_id,
+          servico_id: item.servico_id,
           quantidade: item.quantidade,
           valor_unitario: item.valor_unitario,
           valor_total: item.valor_total,
@@ -350,17 +368,35 @@ export const EmissaoNFe = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Adicionar Item */}
-            <div className="grid grid-cols-5 gap-4 p-4 border rounded-lg">
+            <div className="grid grid-cols-6 gap-4 p-4 border rounded-lg">
               <div className="space-y-2">
-                <Label>Produto</Label>
+                <Label>Tipo</Label>
                 <Select 
-                  value={itemAtual.produto_id} 
+                  value={itemAtual.tipo_item} 
+                  onValueChange={(value: 'produto' | 'servico') => setItemAtual({...itemAtual, tipo_item: value, item_id: ''})}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="produto">Produto</SelectItem>
+                    <SelectItem value="servico">Serviço</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{itemAtual.tipo_item === 'produto' ? 'Produto' : 'Serviço'}</Label>
+                <Select 
+                  value={itemAtual.item_id} 
                   onValueChange={(value) => {
-                    const produto = produtos?.find(p => p.id === value);
+                    const item = itemAtual.tipo_item === 'produto' 
+                      ? produtos?.find(p => p.id === value)
+                      : servicos?.find(s => s.id === value);
                     setItemAtual({
                       ...itemAtual, 
-                      produto_id: value,
-                      valor_unitario: produto?.preco_unitario || 0
+                      item_id: value,
+                      valor_unitario: item?.preco_unitario || 0
                     });
                   }}
                 >
@@ -368,11 +404,18 @@ export const EmissaoNFe = () => {
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    {produtos?.map((produto) => (
-                      <SelectItem key={produto.id} value={produto.id}>
-                        {produto.nome || produto.descricao}
-                      </SelectItem>
-                    ))}
+                    {itemAtual.tipo_item === 'produto' 
+                      ? produtos?.map((produto) => (
+                          <SelectItem key={produto.id} value={produto.id}>
+                            {produto.nome || produto.descricao}
+                          </SelectItem>
+                        ))
+                      : servicos?.map((servico) => (
+                          <SelectItem key={servico.id} value={servico.id}>
+                            {servico.nome || servico.descricao}
+                          </SelectItem>
+                        ))
+                    }
                   </SelectContent>
                 </Select>
               </div>
@@ -421,7 +464,8 @@ export const EmissaoNFe = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Produto</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Item</TableHead>
                     <TableHead>Qtd</TableHead>
                     <TableHead>Valor Unit.</TableHead>
                     <TableHead>CFOP</TableHead>
@@ -432,7 +476,8 @@ export const EmissaoNFe = () => {
                 <TableBody>
                   {itens.map((item, index) => (
                     <TableRow key={index}>
-                      <TableCell>{item.produto_nome}</TableCell>
+                      <TableCell>{item.tipo === 'produto' ? 'Produto' : 'Serviço'}</TableCell>
+                      <TableCell>{item.item_nome}</TableCell>
                       <TableCell>{item.quantidade}</TableCell>
                       <TableCell>R$ {item.valor_unitario.toFixed(2)}</TableCell>
                       <TableCell>{item.cfop}</TableCell>
@@ -450,7 +495,7 @@ export const EmissaoNFe = () => {
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell colSpan={4} className="font-bold">Total Geral:</TableCell>
+                    <TableCell colSpan={5} className="font-bold">Total Geral:</TableCell>
                     <TableCell className="font-bold">R$ {valorTotalNota.toFixed(2)}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
