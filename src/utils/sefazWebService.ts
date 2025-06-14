@@ -270,7 +270,8 @@ export class SEFAZWebService {
       codigo_retorno: resultado.codigo_retorno,
       mensagem_retorno: resultado.mensagem_retorno,
       tempo_resposta_ms: resultado.tempo_resposta || 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      status_operacao: resultado.success ? 'sucesso' : 'erro'
     };
 
     await SefazLogger.gravarLog(log);
