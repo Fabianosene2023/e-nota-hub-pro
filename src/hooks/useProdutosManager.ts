@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { validarProduto, formatarErrosValidacao, type ProdutoValidation } from '@/utils/validacoes';
 
 export const useProdutosManager = (empresaId?: string) => {
   return useQuery({
@@ -18,7 +19,10 @@ export const useProdutosManager = (empresaId?: string) => {
       
       const { data, error } = await query;
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao carregar produtos:', error);
+        throw new Error(`Erro ao carregar produtos: ${error.message}`);
+      }
       return data;
     },
     enabled: !!empresaId,
@@ -29,14 +33,28 @@ export const useCreateProdutoManager = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (produtoData: any) => {
+    mutationFn: async (produtoData: ProdutoValidation & { empresa_id: string }) => {
+      // Validação no frontend
+      const validationErrors = validarProduto(produtoData);
+      if (validationErrors.length > 0) {
+        const formattedErrors = formatarErrosValidacao(validationErrors);
+        const errorMessage = Object.values(formattedErrors).join(', ');
+        throw new Error(`Dados inválidos: ${errorMessage}`);
+      }
+
       const { data, error } = await supabase
         .from('produtos')
         .insert([produtoData])
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao criar produto:', error);
+        if (error.code === '23505') {
+          throw new Error('Produto com este código já existe');
+        }
+        throw new Error(`Erro ao criar produto: ${error.message}`);
+      }
       return data;
     },
     onSuccess: (_, variables) => {
@@ -49,8 +67,8 @@ export const useCreateProdutoManager = () => {
     onError: (error) => {
       console.error('Erro ao criar produto:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao cadastrar produto",
+        title: "Erro ao cadastrar produto",
+        description: error.message || "Ocorreu um erro inesperado",
         variant: "destructive",
       });
     },
@@ -61,7 +79,18 @@ export const useUpdateProdutoManager = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string, updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string, updates: Partial<ProdutoValidation> }) => {
+      // Se houver dados para validar, valide
+      if (Object.keys(updates).length > 0) {
+        const fullData = updates as ProdutoValidation;
+        const validationErrors = validarProduto(fullData);
+        if (validationErrors.length > 0) {
+          const formattedErrors = formatarErrosValidacao(validationErrors);
+          const errorMessage = Object.values(formattedErrors).join(', ');
+          throw new Error(`Dados inválidos: ${errorMessage}`);
+        }
+      }
+
       const { data, error } = await supabase
         .from('produtos')
         .update(updates)
@@ -69,7 +98,13 @@ export const useUpdateProdutoManager = () => {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao atualizar produto:', error);
+        if (error.code === '23505') {
+          throw new Error('Produto com este código já existe');
+        }
+        throw new Error(`Erro ao atualizar produto: ${error.message}`);
+      }
       return data;
     },
     onSuccess: (data) => {
@@ -82,8 +117,8 @@ export const useUpdateProdutoManager = () => {
     onError: (error) => {
       console.error('Erro ao atualizar produto:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao atualizar produto",
+        title: "Erro ao atualizar produto",
+        description: error.message || "Ocorreu um erro inesperado",
         variant: "destructive",
       });
     },
@@ -100,7 +135,13 @@ export const useDeleteProdutoManager = () => {
         .delete()
         .eq('id', id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao excluir produto:', error);
+        if (error.code === '23503') {
+          throw new Error('Não é possível excluir produto que possui itens em notas fiscais');
+        }
+        throw new Error(`Erro ao excluir produto: ${error.message}`);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['produtos'] });
@@ -112,8 +153,8 @@ export const useDeleteProdutoManager = () => {
     onError: (error) => {
       console.error('Erro ao excluir produto:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao excluir produto",
+        title: "Erro ao excluir produto",
+        description: error.message || "Ocorreu um erro inesperado",
         variant: "destructive",
       });
     },

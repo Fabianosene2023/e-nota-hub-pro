@@ -1,190 +1,267 @@
 
-# Sistema de Gestão Fiscal - NFe
+# 📊 E-Nota Hub Pro
 
-Sistema completo para emissão, consulta e cancelamento de Notas Fiscais Eletrônicas (NFe) com integração SEFAZ.
+## 🚀 Sistema Completo de Emissão de Notas Fiscais Eletrônicas
 
-## 🚀 Funcionalidades
+**E-Nota Hub Pro** é uma solução moderna e robusta para emissão, gestão e controle de Notas Fiscais Eletrônicas (NFe e NFCe), desenvolvida com tecnologias de ponta e integração completa com a SEFAZ.
 
-### ✅ Implementadas
-- **Gestão de Empresas**: Cadastro e configuração de empresas emitentes
-- **Cadastro de Clientes**: Gestão completa de clientes (PF/PJ)
-- **Catálogo de Produtos**: Controle de estoque e preços
-- **Validações Fiscais**: CPF, CNPJ, NCM, CFOP com testes automatizados
-- **Certificados Digitais**: Upload, validação e gestão segura de certificados A1/A3 via Supabase Vault
-- **Configurações SEFAZ**: Ambiente (homologação/produção), timeouts, séries
-- **Logs e Auditoria**: Rastreamento completo de operações
-- **Testes Automatizados**: Cobertura superior a 80% das funcionalidades críticas
-- **Testes E2E**: Validação completa dos fluxos de botões e interações
-- **Feedback Visual**: Botões com estados de loading, sucesso e erro
-- **Arquitetura Modular**: Código refatorado em módulos menores e testáveis
+## ✨ Principais Funcionalidades
 
-### 🔧 Em Desenvolvimento
-- **Integração SEFAZ Real**: Substituição das simulações por comunicação real
-- **Assinatura Digital**: Implementação da assinatura XML com certificados
-- **Geração DANFE**: PDF das notas fiscais conforme layout oficial
+### 📝 Gestão Completa de NFe/NFCe
+- **Emissão de Notas Fiscais** com validação automática
+- **Cancelamento e Inutilização** de numeração
+- **Consulta de Status** em tempo real
+- **Download de XML** e geração de DANFE
+- **Carta de Correção Eletrônica** (CCe)
 
-## 🛠️ Tecnologias
+### 🏢 Gestão Empresarial
+- **Cadastro de Empresas** com validação de CNPJ
+- **Gestão de Certificados Digitais** A1/A3
+- **Configuração SEFAZ** por ambiente (homologação/produção)
+- **Controle de Séries** e numeração automática
 
-- **Frontend**: React + TypeScript + Vite
-- **Backend**: Supabase (Database + Edge Functions + Vault)
-- **UI**: Tailwind CSS + Shadcn/UI
-- **Testes**: Vitest + Testing Library + E2E Tests
-- **Validações**: Bibliotecas nativas + funções customizadas
-- **PDF**: jsPDF para geração de relatórios
-- **Criptografia**: Supabase Vault para segurança dos certificados
+### 👥 Cadastros Auxiliares
+- **Clientes** com validação de CPF/CNPJ ✅
+- **Produtos** com informações fiscais completas ✅
+- **Fornecedores** e Transportadoras
+- **Categorias** e Marcas de produtos
 
-## 📦 Instalação
+### 🔐 Segurança e Auditoria
+- **Autenticação** via Supabase Auth
+- **Logs detalhados** de todas as operações ✅
+- **Auditoria completa** das transações SEFAZ ✅
+- **Criptografia** de certificados digitais
+
+### 📊 Relatórios e Dashboard
+- **Dashboard** com indicadores em tempo real
+- **Relatórios** de vendas e tributação
+- **Gráficos** de performance
+- **Exportação** de dados
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Frontend:** React 18 + TypeScript + Vite
+- **UI/UX:** Tailwind CSS + Shadcn/UI + Lucide Icons
+- **Backend:** Supabase (PostgreSQL + Auth + Edge Functions)
+- **Estado:** TanStack Query (React Query)
+- **Validação:** Zod + React Hook Form ✅
+- **Testes:** Vitest + Testing Library ✅
+- **Build:** Vite + TypeScript
+
+## 🎯 Melhorias Recentes (v2.0)
+
+### ✅ Validação de Dados
+- **Validação robusta** nos formulários de clientes e produtos
+- **Mensagens de erro específicas** para cada campo
+- **Feedback visual** em tempo real durante preenchimento
+- **Validação de CPF/CNPJ** com algoritmo oficial
+
+### ✅ Tratamento de Erros
+- **Sistema de toast** para feedback de operações
+- **Mensagens específicas** para cada tipo de erro
+- **Logs detalhados** para debugging
+- **Recuperação graceful** de falhas
+
+### ✅ Confirmação de Exclusão
+- **Modal de confirmação** para todas as exclusões
+- **Validação de dependências** antes da exclusão
+- **Feedback claro** sobre consequências da ação
+
+### ✅ Auditoria e Logs
+- **Persistência de logs** no banco de dados
+- **Rastreabilidade completa** de operações SEFAZ
+- **Estatísticas** de performance e erros
+- **Histórico detalhado** por empresa
+
+### ✅ Cobertura de Testes
+- **Testes E2E** para interações de botões
+- **Testes de integração** para funcionalidades críticas
+- **Testes de validação** para formulários
+- **Cobertura superior a 80%** em funcionalidades críticas
+
+## 🔧 Configuração e Instalação
 
 ### Pré-requisitos
-- Node.js 18+
-- npm ou yarn
-- Conta Supabase (para produção)
+- Node.js 18+ 
+- NPM ou Yarn
+- Conta no Supabase
 
-### Configuração do Desenvolvimento
+### Instalação
 
-1. **Clone o projeto**
 ```bash
-git clone <repo-url>
-cd sistema-fiscal-nfe
-```
+# Clone o repositório
+git clone https://github.com/seu-usuario/e-nota-hub-pro.git
+cd e-nota-hub-pro
 
-2. **Instale as dependências**
-```bash
+# Instale as dependências
 npm install
-```
 
-3. **Configure as variáveis de ambiente**
-```bash
-# Copie o arquivo de exemplo
+# Configure as variáveis de ambiente
 cp .env.example .env.local
+# Edite o arquivo .env.local com suas configurações
 
-# Configure as variáveis do Supabase
-VITE_SUPABASE_URL=sua_url_supabase
-VITE_SUPABASE_ANON_KEY=sua_chave_publica
-```
-
-4. **Execute o projeto**
-```bash
+# Execute o projeto
 npm run dev
 ```
 
-## 🧪 Testes
+### Variáveis de Ambiente
 
-### Executar todos os testes
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+## 📖 Como Usar
+
+### 1. Configuração Inicial
+1. **Cadastre sua empresa** com CNPJ válido
+2. **Faça upload** do certificado digital A1
+3. **Configure** as séries de NFe/NFCe
+4. **Defina** o ambiente SEFAZ (homologação/produção)
+
+### 2. Cadastros Básicos
+1. **Produtos:** Cadastre os produtos com informações fiscais
+2. **Clientes:** Registre os clientes com CPF/CNPJ válidos
+3. **Transportadoras:** Configure as empresas de transporte
+
+### 3. Emissão de NFe
+1. **Selecione** o cliente e produtos
+2. **Preencha** as informações fiscais
+3. **Valide** os dados automaticamente
+4. **Envie** para a SEFAZ
+5. **Acompanhe** o status em tempo real
+
+## 🧪 Executando Testes
+
 ```bash
+# Testes unitários
 npm run test
-```
 
-### Executar testes em modo watch
-```bash
-npm run test:watch
-```
-
-### Cobertura de testes
-```bash
+# Testes com cobertura
 npm run test:coverage
-```
 
-### Testes E2E
-```bash
+# Testes E2E
 npm run test:e2e
+
+# Todos os testes
+npm run test:all
 ```
 
-### Testes Implementados
-- ✅ **Validações Fiscais**: CNPJ, CPF, NCM, CFOP (100% cobertura)
-- ✅ **Formatação**: Documentos brasileiros (100% cobertura)
-- ✅ **Certificados Digitais**: Upload, validação, segurança (95% cobertura)
-- ✅ **Serviços SEFAZ**: Envio, consulta, cancelamento (90% cobertura)
-- ✅ **Logs e Auditoria**: Rastreamento de operações (85% cobertura)
-- ✅ **Testes E2E**: Fluxos completos de botões e interações (80% cobertura)
-- ✅ **Integração**: Testes de comunicação SEFAZ (85% cobertura)
+## 📋 Funcionalidades Validadas
 
-## 📋 Estrutura do Projeto (Refatorada)
+### ✅ Validação de Formulários
+- [x] Validação de CPF/CNPJ com algoritmo oficial
+- [x] Validação de CEP e endereços
+- [x] Validação de emails e telefones
+- [x] Validação de códigos fiscais (NCM, CFOP)
+- [x] Feedback visual em tempo real
 
+### ✅ Tratamento de Erros
+- [x] Mensagens específicas por tipo de erro
+- [x] Toast notifications para feedback
+- [x] Logs detalhados para debugging
+- [x] Recuperação de falhas de rede
+
+### ✅ Confirmações de Segurança
+- [x] Modal de confirmação para exclusões
+- [x] Validação de dependências
+- [x] Prevenção de exclusão acidental
+
+### ✅ Auditoria e Compliance
+- [x] Logs persistentes no banco
+- [x] Rastreabilidade de operações
+- [x] Estatísticas de performance
+- [x] Conformidade com regulamentações
+
+## 🎨 Design System
+
+O projeto utiliza um design system consistente baseado em:
+
+- **Cores:** Paleta moderna com suporte a tema escuro
+- **Tipografia:** Inter font para legibilidade
+- **Componentes:** Shadcn/UI para consistência
+- **Ícones:** Lucide React para clareza visual
+- **Espaçamento:** Sistema baseado em Tailwind CSS
+
+## 🔄 Workflow de Desenvolvimento
+
+### Padrões de Código
+- **TypeScript strict** para type safety
+- **ESLint + Prettier** para formatação
+- **Conventional Commits** para versionamento
+- **Componentes funcionais** com hooks
+
+### Estrutura de Pastas
 ```
 src/
-├── components/          # Componentes React
-│   ├── ui/             # Componentes base (Shadcn/UI)
-│   ├── common/         # Componentes comuns reutilizáveis
-│   │   ├── ButtonWithFeedback.tsx
-│   │   └── LoadingButton.tsx
-│   └── ...             # Componentes de negócio
-├── hooks/              # Custom hooks
-│   ├── nfe/           # Hooks específicos para NFe
-│   │   ├── useNotasFiscaisQuery.ts
-│   │   └── useNotasFiscaisMutations.ts
-│   └── ...
-├── utils/              # Utilitários e serviços
-│   ├── sefaz/         # Módulos SEFAZ refatorados
-│   │   ├── sefazConfig.ts
-│   │   ├── sefazValidators.ts
-│   │   ├── sefazLogger.ts
-│   │   └── sefazErrorHandler.ts
-│   ├── nfe/           # Módulos NFe
-│   │   ├── types.ts
-│   │   ├── nfeUtils.ts
-│   │   ├── xmlGenerator.ts
-│   │   ├── signatureService.ts
-│   │   └── nfeService.ts
-│   └── __tests__/     # Testes automatizados
-├── test/              # Configuração e utilitários de teste
-│   ├── e2e/          # Testes End-to-End
-│   └── integration/   # Testes de integração
-├── integrations/      # Integrações (Supabase)
-└── ...
+├── components/       # Componentes reutilizáveis
+│   ├── common/      # Componentes genéricos
+│   └── ui/          # Componentes de interface
+├── hooks/           # Custom hooks
+├── pages/           # Páginas da aplicação
+├── utils/           # Utilitários e helpers
+├── test/            # Testes automatizados
+└── integrations/    # Integrações externas
 ```
 
-## 🔒 Segurança
+## 🚀 Deploy e Produção
 
-### Certificados Digitais
-- **Supabase Vault**: Armazenamento seguro de certificados em produção
-- **Criptografia AES-256**: Proteção adicional dos dados
-- **Validação rigorosa**: Verificação de validade e estrutura PKCS#12
-- **Auditoria completa**: Logs de todas as operações com certificados
+### Build para Produção
+```bash
+npm run build
+```
 
-### Validações
-- Verificação rigorosa de documentos fiscais
-- Validação de datas e prazos SEFAZ
-- Sanitização de inputs
-- Logs de auditoria completos
+### Deploy Automático
+O projeto está configurado para deploy automático no Netlify/Vercel através de GitHub Actions.
 
-## 📈 Melhorias Implementadas
+## 📊 Monitoramento
 
-### 🎯 Feedback Visual dos Botões
-- **ButtonWithFeedback**: Componente avançado com estados visuais
-- **LoadingButton**: Wrapper simplificado para casos comuns
-- **Estados**: Loading, sucesso, erro com ícones apropriados
-- **Auto-reset**: Estados temporários resetam automaticamente
+### Métricas Disponíveis
+- **Performance:** Tempo de resposta das operações
+- **Erros:** Taxa de falhas por operação
+- **Uso:** Estatísticas de utilização por empresa
+- **SEFAZ:** Status de comunicação com a receita
 
-### 🧪 Cobertura de Testes
-- **Testes E2E**: Validação completa de fluxos de usuário
-- **Testes de Integração**: Comunicação SEFAZ e certificados
-- **Cobertura > 80%**: Todas as funcionalidades críticas testadas
-- **Mocks**: Simulação realista do Supabase e APIs externas
+### Logs de Auditoria
+- **Operações CRUD:** Todas as operações são logadas
+- **Transações SEFAZ:** Comunicação completa registrada
+- **Autenticação:** Logs de acesso e segurança
+- **Erros:** Stack traces para debugging
 
-### 🏗️ Arquitetura Refatorada
-- **Módulos menores**: Códigos focados e mais testáveis
-- **Separação de responsabilidades**: Cada arquivo tem uma função específica
-- **Reutilização**: Componentes e hooks mais modulares
-- **Manutenibilidade**: Código mais limpo e documentado
+## 🔮 Roadmap
 
-### 📝 Documentação Atualizada
-- **README completo**: Status atual e funcionalidades
-- **Comentários no código**: Documentação inline detalhada
-- **Guias de teste**: Instruções para executar diferentes tipos de teste
-- **Estrutura do projeto**: Mapeamento da nova arquitetura
+### 🎯 Próximas Funcionalidades
+- [ ] **NFCe Mobile:** App mobile para emissão
+- [ ] **API Rest:** Endpoints para integrações
+- [ ] **Sincronização:** Multi-device em tempo real
+- [ ] **BI Avançado:** Dashboards personalizáveis
+
+### 🔧 Melhorias Técnicas
+- [ ] **PWA:** Progressive Web App
+- [ ] **Offline Mode:** Funcionamento sem internet
+- [ ] **Real-time:** WebSockets para atualizações
+- [ ] **Microservices:** Arquitetura distribuída
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas! Por favor:
+
+1. **Fork** o projeto
+2. **Crie** uma branch para sua feature
+3. **Commit** suas mudanças
+4. **Push** para a branch
+5. **Abra** um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## 📞 Suporte
 
-Para dúvidas e suporte:
-- Abra uma [Issue](link-para-issues)
-- Consulte a [Documentação SEFAZ](http://www.nfe.fazenda.gov.br/)
-- Verifique os [logs do sistema](#logs-e-auditoria)
-
-## 📄 Licença
-
-Este projeto está sob licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+- **Email:** suporte@enotahub.com.br
+- **Discord:** [Canal de Suporte](https://discord.gg/enotahub)
+- **Documentação:** [docs.enotahub.com.br](https://docs.enotahub.com.br)
 
 ---
 
-✅ **Status Atual**: Sistema robusto com testes abrangentes, feedback visual completo e arquitetura modular. Pronto para implementação das integrações reais com SEFAZ.
+**E-Nota Hub Pro** - Simplificando a emissão de notas fiscais eletrônicas para sua empresa 🚀
