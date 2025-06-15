@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { useClientes } from '@/hooks/useClientes';
+import { useClientesManager } from '@/hooks/useClientesManager';
 import { Building2, User, Calendar, MapPin } from "lucide-react";
 
 interface DadosGeraisProps {
@@ -34,7 +34,7 @@ interface DadosGeraisProps {
 
 export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisProps) => {
   const { data: empresas, isLoading: loadingEmpresas } = useEmpresas();
-  const { data: clientes, isLoading: loadingClientes } = useClientes(formData.empresa_id);
+  const { data: clientes, isLoading: loadingClientes } = useClientesManager(formData.empresa_id);
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
