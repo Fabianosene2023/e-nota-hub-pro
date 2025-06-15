@@ -11,6 +11,7 @@ interface Usuario {
   role: string;
   ativo: boolean;
   empresa_id?: string;
+  user_id?: string; // Para user_profiles
 }
 
 interface UsuarioSelectorProps {
@@ -24,7 +25,8 @@ const getRoleLabel = (role: string) => {
   const roles = {
     admin: 'Administrador',
     editor: 'Editor',
-    visualizador: 'Visualizador'
+    visualizador: 'Visualizador',
+    user: 'Usuário'
   };
   return roles[role as keyof typeof roles] || role;
 };
@@ -33,7 +35,8 @@ const getRoleVariant = (role: string): "default" | "destructive" | "secondary" |
   const variants = {
     admin: 'destructive' as const,
     editor: 'default' as const,
-    visualizador: 'secondary' as const
+    visualizador: 'secondary' as const,
+    user: 'secondary' as const
   };
   return variants[role as keyof typeof variants] || 'default';
 };
@@ -74,7 +77,7 @@ export const UsuarioSelector: React.FC<UsuarioSelectorProps> = ({
             </SelectTrigger>
             <SelectContent>
               {usuarios.map((usuario) => (
-                <SelectItem key={usuario.id} value={usuario.id}>
+                <SelectItem key={usuario.id} value={usuario.user_id || usuario.id}>
                   <div className="flex items-center gap-2 w-full">
                     <div className="flex flex-col min-w-0 flex-1">
                       <span className="font-medium truncate">{usuario.nome}</span>

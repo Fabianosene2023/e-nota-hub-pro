@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Shield, Users } from 'lucide-react';
 import { UsuarioSelector } from './ConfiguracaoPermissoes/UsuarioSelector';
 import { PermissoesTable } from './ConfiguracaoPermissoes/PermissoesTable';
-import { useUserProfiles } from '@/hooks/useUserProfiles';
+import { useUserProfiles, useProfiles } from '@/hooks/useUserProfiles';
 import { useUserPermissions, useUpdateUserPermission } from '@/hooks/usePermissoes';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -13,12 +13,21 @@ export const ConfiguracaoPermissoes = () => {
   
   console.log('ConfiguracaoPermissoes - profile:', profile);
   
-  // Busca usuários - se não tem empresa_id, busca todos (admin geral)
-  const { data: usuarios = [], isLoading: loadingUsuarios, error: usuariosError } = useUserProfiles(profile?.empresa_id);
+  // Tenta buscar da tabela user_profiles primeiro, depois da profiles como fallback
+  const { data: userProfiles = [], isLoading: loadingUserProfiles, error: userProfilesError } = useUserProfiles(profile?.empresa_id);
+  const { data: profiles = [], isLoading: loadingProfiles, error: profilesError } = useProfiles(profile?.empresa_id);
+  
+  // Usa user_profiles se disponível, senão usa profiles
+  const usuarios = userProfiles.length > 0 ? userProfiles : profiles;
+  const loadingUsuarios = loadingUserProfiles || loadingProfiles;
+  const usuariosError = userProfilesError || profilesError;
+  
   const { data: userPermissions = {}, isLoading: loadingPermissions } = useUserPermissions(selectedUserId);
   const updatePermission = useUpdateUserPermission();
 
-  console.log('ConfiguracaoPermissoes - usuarios:', usuarios);
+  console.log('ConfiguracaoPermissoes - userProfiles:', userProfiles);
+  console.log('ConfiguracaoPermissoes - profiles:', profiles);
+  console.log('ConfiguracaoPermissoes - usuarios finais:', usuarios);
   console.log('ConfiguracaoPermissoes - loadingUsuarios:', loadingUsuarios);
   console.log('ConfiguracaoPermissoes - usuariosError:', usuariosError);
 

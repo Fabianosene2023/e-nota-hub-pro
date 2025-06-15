@@ -35,6 +35,36 @@ export const useUserProfiles = (empresaId?: string) => {
   });
 };
 
+// Hook para buscar perfis da tabela profiles (para compatibilidade com o AuthContext)
+export const useProfiles = (empresaId?: string) => {
+  return useQuery({
+    queryKey: ['profiles', empresaId],
+    queryFn: async () => {
+      console.log('Buscando profiles para empresa:', empresaId);
+      
+      let query = supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (empresaId) {
+        query = query.eq('empresa_id', empresaId);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('Erro ao buscar profiles:', error);
+        throw error;
+      }
+      
+      console.log('Profiles encontrados:', data);
+      return data || [];
+    },
+    enabled: true,
+  });
+};
+
 export const useCreateUserProfile = () => {
   const queryClient = useQueryClient();
   
@@ -150,6 +180,7 @@ export const useCreateUserProfile = () => {
     onSuccess: (data) => {
       console.log('Sucesso na criação do perfil:', data);
       queryClient.invalidateQueries({ queryKey: ['user-profiles'] });
+      queryClient.invalidateQueries({ queryKey: ['profiles'] });
       toast({
         title: "Sucesso!",
         description: `Perfil de usuário "${data.nome}" criado com sucesso`,
