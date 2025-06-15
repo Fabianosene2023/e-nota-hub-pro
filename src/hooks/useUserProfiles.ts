@@ -28,7 +28,7 @@ export const useUserProfiles = (empresaId?: string) => {
       }
       
       console.log('User profiles encontrados:', data);
-      return data;
+      return data || [];
     },
     // Sempre executa a query, mesmo sem empresa_id
     enabled: true,

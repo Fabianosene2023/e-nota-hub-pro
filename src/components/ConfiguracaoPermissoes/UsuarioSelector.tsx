@@ -29,11 +29,11 @@ const getRoleLabel = (role: string) => {
   return roles[role as keyof typeof roles] || role;
 };
 
-const getRoleVariant = (role: string) => {
+const getRoleVariant = (role: string): "default" | "destructive" | "secondary" | "outline" => {
   const variants = {
-    admin: 'destructive',
-    editor: 'default',
-    visualizador: 'secondary'
+    admin: 'destructive' as const,
+    editor: 'default' as const,
+    visualizador: 'secondary' as const
   };
   return variants[role as keyof typeof variants] || 'default';
 };
@@ -76,12 +76,12 @@ export const UsuarioSelector: React.FC<UsuarioSelectorProps> = ({
               {usuarios.map((usuario) => (
                 <SelectItem key={usuario.id} value={usuario.id}>
                   <div className="flex items-center gap-2 w-full">
-                    <div className="flex flex-col">
-                      <span className="font-medium">{usuario.nome}</span>
-                      <span className="text-sm text-muted-foreground">{usuario.email}</span>
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="font-medium truncate">{usuario.nome}</span>
+                      <span className="text-sm text-muted-foreground truncate">{usuario.email}</span>
                     </div>
-                    <div className="flex gap-1 ml-auto">
-                      <Badge variant={getRoleVariant(usuario.role) as any} className="text-xs">
+                    <div className="flex gap-1 ml-2">
+                      <Badge variant={getRoleVariant(usuario.role)} className="text-xs">
                         {getRoleLabel(usuario.role)}
                       </Badge>
                       {!usuario.ativo && (

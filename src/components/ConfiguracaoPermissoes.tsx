@@ -14,12 +14,13 @@ export const ConfiguracaoPermissoes = () => {
   console.log('ConfiguracaoPermissoes - profile:', profile);
   
   // Busca usuários - se não tem empresa_id, busca todos (admin geral)
-  const { data: usuarios, isLoading: loadingUsuarios } = useUserProfiles(profile?.empresa_id);
+  const { data: usuarios = [], isLoading: loadingUsuarios, error: usuariosError } = useUserProfiles(profile?.empresa_id);
   const { data: userPermissions = {}, isLoading: loadingPermissions } = useUserPermissions(selectedUserId);
   const updatePermission = useUpdateUserPermission();
 
   console.log('ConfiguracaoPermissoes - usuarios:', usuarios);
   console.log('ConfiguracaoPermissoes - loadingUsuarios:', loadingUsuarios);
+  console.log('ConfiguracaoPermissoes - usuariosError:', usuariosError);
 
   const handlePermissionChange = (permissionId: string, granted: boolean) => {
     if (!selectedUserId) return;
@@ -42,6 +43,13 @@ export const ConfiguracaoPermissoes = () => {
           </p>
         </div>
       </div>
+
+      {usuariosError && (
+        <div className="bg-destructive/15 border border-destructive/20 rounded-lg p-4">
+          <p className="text-destructive font-medium">Erro ao carregar usuários:</p>
+          <p className="text-destructive text-sm">{usuariosError.message}</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
