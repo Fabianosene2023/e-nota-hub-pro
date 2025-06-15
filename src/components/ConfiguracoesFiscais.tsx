@@ -82,7 +82,7 @@ export const ConfiguracoesFiscais = () => {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Configurações Fiscais</h2>
           <p className="text-muted-foreground">
-            Configure certificados digitais, séries e parâmetros fiscais
+            Configure certificados digitais, séries, SEFAZ e parâmetros fiscais
           </p>
         </div>
       </div>
@@ -98,6 +98,7 @@ export const ConfiguracoesFiscais = () => {
           <ConfiguracoesFiscaisTabs
             formData={formData}
             onFormDataChange={handleFormDataChange}
+            empresaId={empresaSelecionada}
           />
 
           <div className="flex justify-end mt-6">
