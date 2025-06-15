@@ -64,6 +64,11 @@ export const AppRoutes = () => {
             <LazyComponents.NfeExportacao />
           </Suspense>
         } />
+        <Route path="notas/consulta" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.ConsultaDocumentos />
+          </Suspense>
+        } />
         <Route path="notas/nfce" element={
           <Suspense fallback={<LoadingSpinner />}>
             <LazyComponents.NfcePage />
