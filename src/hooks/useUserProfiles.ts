@@ -13,6 +13,8 @@ export const useUserProfiles = (empresaId?: string) => {
         .select('*')
         .order('created_at', { ascending: false });
       
+      // Se empresaId for fornecido, filtra por empresa
+      // Se não, busca todos os usuários (para casos onde o usuário é admin geral)
       if (empresaId) {
         query = query.eq('empresa_id', empresaId);
       }
@@ -27,7 +29,8 @@ export const useUserProfiles = (empresaId?: string) => {
       console.log('User profiles encontrados:', data);
       return data;
     },
-    enabled: !!empresaId,
+    // Sempre executa a query, mesmo sem empresa_id
+    enabled: true,
   });
 };
 

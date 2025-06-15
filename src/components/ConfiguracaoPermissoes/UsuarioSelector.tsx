@@ -10,6 +10,7 @@ interface Usuario {
   email: string;
   role: string;
   ativo: boolean;
+  empresa_id?: string;
 }
 
 interface UsuarioSelectorProps {
@@ -61,7 +62,10 @@ export const UsuarioSelector: React.FC<UsuarioSelectorProps> = ({
           </div>
         ) : !usuarios || usuarios.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            Nenhum usuário encontrado para esta empresa
+            <p>Nenhum usuário encontrado</p>
+            <p className="text-sm mt-2">
+              Certifique-se de que existem usuários cadastrados no sistema
+            </p>
           </div>
         ) : (
           <Select value={usuarioSelecionado} onValueChange={onUsuarioChange}>

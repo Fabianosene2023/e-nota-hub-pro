@@ -13,6 +13,7 @@ export const ConfiguracaoPermissoes = () => {
   
   console.log('ConfiguracaoPermissoes - profile:', profile);
   
+  // Busca usuários - se não tem empresa_id, busca todos (admin geral)
   const { data: usuarios, isLoading: loadingUsuarios } = useUserProfiles(profile?.empresa_id);
   const { data: userPermissions = {}, isLoading: loadingPermissions } = useUserPermissions(selectedUserId);
   const updatePermission = useUpdateUserPermission();
