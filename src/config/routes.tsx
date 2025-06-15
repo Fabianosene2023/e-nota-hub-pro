@@ -28,10 +28,17 @@ export const CadastroMarcas = lazy(() => import("../pages/CadastroMarcas"));
 export const CadastroCategorias = lazy(() => import("../pages/CadastroCategorias"));
 export const CadastroUnidades = lazy(() => import("../pages/CadastroUnidades"));
 
-// Configurações
+// Configurações - Todas as rotas integradas
 export const ConfiguracoesEmpresa = lazy(() => import("../components/ConfiguracoesEmpresa").then(module => ({ default: module.ConfiguracoesEmpresa })));
 export const ConfiguracaoPermissoes = lazy(() => import("../pages/ConfiguracaoPermissoes"));
 export const ConfiguracoesFiscais = lazy(() => import("../components/ConfiguracoesFiscais").then(module => ({ default: module.ConfiguracoesFiscais })));
+export const ConsultaLogs = lazy(() => import("../pages/ConsultaLogs"));
+export const ConfiguracaoNfe = lazy(() => import("../pages/ConfiguracaoNfe"));
+export const ConfiguracaoCte = lazy(() => import("../pages/ConfiguracaoCte"));
+export const ConfiguracaoNfce = lazy(() => import("../pages/ConfiguracaoNfce"));
+export const ConfiguracaoNfse = lazy(() => import("../pages/ConfiguracaoNfse"));
+export const MatrizFiscal = lazy(() => import("../pages/MatrizFiscal"));
+export const NaturezaOperacao = lazy(() => import("../pages/NaturezaOperacao"));
 
 // Relatórios
 export const Relatorios = lazy(() => import("../components/Relatorios").then(module => ({ default: module.Relatorios })));

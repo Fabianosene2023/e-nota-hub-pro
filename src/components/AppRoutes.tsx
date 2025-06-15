@@ -1,3 +1,4 @@
+
 import { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -136,7 +137,7 @@ export const AppRoutes = () => {
           </Suspense>
         } />
 
-        {/* Configurações */}
+        {/* Configurações - Todas as rotas integradas */}
         <Route path="configuracoes/empresa" element={
           <Suspense fallback={<LoadingSpinner />}>
             <LazyComponents.ConfiguracoesEmpresa />
@@ -152,9 +153,44 @@ export const AppRoutes = () => {
             <LazyComponents.ConfiguracaoPermissoes />
           </Suspense>
         } />
+        <Route path="configuracoes/logs" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.ConsultaLogs />
+          </Suspense>
+        } />
         <Route path="configuracoes/fiscais" element={
           <Suspense fallback={<LoadingSpinner />}>
             <LazyComponents.ConfiguracoesFiscais />
+          </Suspense>
+        } />
+        <Route path="configuracoes/nfe" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.ConfiguracaoNfe />
+          </Suspense>
+        } />
+        <Route path="configuracoes/cte" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.ConfiguracaoCte />
+          </Suspense>
+        } />
+        <Route path="configuracoes/nfce" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.ConfiguracaoNfce />
+          </Suspense>
+        } />
+        <Route path="configuracoes/nfse" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.ConfiguracaoNfse />
+          </Suspense>
+        } />
+        <Route path="configuracoes/matriz-fiscal" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.MatrizFiscal />
+          </Suspense>
+        } />
+        <Route path="configuracoes/natureza-operacao" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.NaturezaOperacao />
           </Suspense>
         } />
         
