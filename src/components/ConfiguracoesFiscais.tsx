@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import { toast } from '@/hooks/use-toast';
-import { Loader2, Settings, Shield, FileText } from "lucide-react";
+import { Loader2, Settings, Shield, FileText, Building2 } from "lucide-react";
 
 export const ConfiguracoesFiscais = () => {
   const { data: empresas } = useEmpresas();
@@ -27,7 +28,10 @@ export const ConfiguracoesFiscais = () => {
     csc_token: '',
     email_padrao_envio: '',
     layout_danfe: 'retrato',
-    proxima_num_nf: 1
+    proxima_num_nf: 1,
+    regime_fiscal: 'simples_nacional',
+    regime_tributario: 'simples_nacional',
+    enviar_nfe_por_email: false
   });
 
   // Atualizar form quando configurações carregarem
@@ -42,7 +46,10 @@ export const ConfiguracoesFiscais = () => {
         csc_token: configuracoes.csc_token || '',
         email_padrao_envio: configuracoes.email_padrao_envio || '',
         layout_danfe: configuracoes.layout_danfe || 'retrato',
-        proxima_num_nf: configuracoes.proxima_num_nf || 1
+        proxima_num_nf: configuracoes.proxima_num_nf || 1,
+        regime_fiscal: configuracoes.regime_fiscal || 'simples_nacional',
+        regime_tributario: configuracoes.regime_tributario || 'simples_nacional',
+        enviar_nfe_por_email: configuracoes.enviar_nfe_por_email || false
       });
     }
   }, [configuracoes]);
@@ -121,8 +128,12 @@ export const ConfiguracoesFiscais = () => {
 
       {empresaSelecionada && (
         <form onSubmit={handleSubmit}>
-          <Tabs defaultValue="certificado" className="space-y-4">
+          <Tabs defaultValue="regime" className="space-y-4">
             <TabsList>
+              <TabsTrigger value="regime" className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                Regime Fiscal
+              </TabsTrigger>
               <TabsTrigger value="certificado" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
                 Certificado Digital
@@ -136,6 +147,66 @@ export const ConfiguracoesFiscais = () => {
                 Configurações Gerais
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="regime">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Regime Fiscal e Tributário</CardTitle>
+                  <CardDescription>
+                    Configure o regime fiscal e tributário da empresa
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="regime_fiscal">Regime Fiscal</Label>
+                    <Select 
+                      value={formData.regime_fiscal} 
+                      onValueChange={(value) => setFormData({...formData, regime_fiscal: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="simples_nacional">Simples Nacional</SelectItem>
+                        <SelectItem value="simples_nacional_mei">Simples Nacional - MEI</SelectItem>
+                        <SelectItem value="lucro_presumido">Lucro Presumido</SelectItem>
+                        <SelectItem value="lucro_real">Lucro Real</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="regime_tributario">Regime Tributário</Label>
+                    <Select 
+                      value={formData.regime_tributario} 
+                      onValueChange={(value) => setFormData({...formData, regime_tributario: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="simples_nacional">Simples Nacional</SelectItem>
+                        <SelectItem value="simples_nacional_excesso">Simples Nacional - Excesso de Sublimite de Receita Bruta</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="enviar_nfe_por_email">Enviar NFe por E-mail</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Enviar automaticamente as notas fiscais por e-mail para os clientes
+                      </p>
+                    </div>
+                    <Switch
+                      id="enviar_nfe_por_email"
+                      checked={formData.enviar_nfe_por_email}
+                      onCheckedChange={(checked) => setFormData({...formData, enviar_nfe_por_email: checked})}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             <TabsContent value="certificado">
               <Card>
