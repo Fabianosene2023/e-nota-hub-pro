@@ -7,9 +7,24 @@ export const useCategorias = () => {
   return useQuery({
     queryKey: ['categorias'],
     queryFn: async () => {
+      // Obter perfil do usuário para pegar empresa_id
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('empresa_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.empresa_id) {
+        throw new Error('Empresa não encontrada para o usuário');
+      }
+
       const { data, error } = await supabase
         .from('categorias_produtos')
         .select('*')
+        .eq('empresa_id', profile.empresa_id)
         .order('nome');
       
       if (error) throw error;
@@ -23,9 +38,23 @@ export const useCategoriasManager = () => {
 
   const createCategoria = useMutation({
     mutationFn: async (categoria: any) => {
+      // Obter perfil do usuário para pegar empresa_id
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('empresa_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.empresa_id) {
+        throw new Error('Empresa não encontrada para o usuário');
+      }
+
       const { data, error } = await supabase
         .from('categorias_produtos')
-        .insert([categoria])
+        .insert([{ ...categoria, empresa_id: profile.empresa_id }])
         .select()
         .single();
       

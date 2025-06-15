@@ -1,4 +1,3 @@
-
 import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,6 +27,7 @@ const CadastroMarcas = lazy(() => import("./pages/CadastroMarcas"));
 const Relatorios = lazy(() => import("./components/Relatorios").then(module => ({ default: module.Relatorios })));
 const NfcePage = lazy(() => import("./components/Nfce").then(m => ({ default: m.default })));
 const CtePage = lazy(() => import("./pages/CtePage"));
+const CadastroCategorias = lazy(() => import("./pages/CadastroCategorias"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -114,6 +114,11 @@ function App() {
                 <Route path="produtos/marcas" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <CadastroMarcas />
+                  </Suspense>
+                } />
+                <Route path="produtos/categorias" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <CadastroCategorias />
                   </Suspense>
                 } />
 
