@@ -1,14 +1,15 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { useCtes, useCteDelete } from "@/hooks/useCte";
+import { useCtes, useCteDelete, useCteEmit } from "@/hooks/useCte";
 import { CteForm } from "./CteForm";
-import { Pencil, Trash, Plus } from "lucide-react";
+import { Pencil, Trash, Plus, Send } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 export function CteTable() {
   const { data: ctes = [], isLoading } = useCtes();
   const remove = useCteDelete();
+  const emit = useCteEmit();
 
   const [formOpen, setFormOpen] = React.useState(false);
   const [editData, setEditData] = React.useState<any | null>(null);
@@ -18,6 +19,15 @@ export function CteTable() {
       remove.mutate(id, {
         onSuccess: () => toast({ title: "CT-e removido com sucesso!" }),
         onError: () => toast({ title: "Erro ao remover CT-e", variant: "destructive" }),
+      });
+    }
+  };
+
+  const handleEmit = (id: string) => {
+    if (window.confirm("Tem certeza que deseja emitir este CT-e? Esta ação não pode ser desfeita.")) {
+      emit.mutate(id, {
+        onSuccess: () => toast({ title: "CT-e emitido com sucesso!" }),
+        onError: (error: any) => toast({ title: "Erro ao emitir CT-e", description: error.message, variant: "destructive" }),
       });
     }
   };
@@ -43,7 +53,7 @@ export function CteTable() {
               <th className="p-2 border">Valor Total</th>
               <th className="p-2 border">Natureza da Operação</th>
               <th className="p-2 border">Status</th>
-              <th className="p-2 border w-24">Ações</th>
+              <th className="p-2 border w-32">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -61,12 +71,21 @@ export function CteTable() {
                 <td className="p-2 border">{cte.natureza_operacao}</td>
                 <td className="p-2 border">{cte.status}</td>
                 <td className="p-2 border flex gap-1 justify-center">
-                  <Button variant="ghost" size="sm" onClick={() => { setEditData(cte); setFormOpen(true); }}>
-                    <Pencil size={14} />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(cte.id)}>
-                    <Trash size={14} />
-                  </Button>
+                  {cte.status === 'rascunho' ? (
+                    <>
+                      <Button variant="ghost" size="sm" onClick={() => { setEditData(cte); setFormOpen(true); }} title="Editar">
+                        <Pencil size={14} />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleEmit(cte.id)} disabled={emit.isPending} title="Emitir CT-e">
+                        <Send size={14} />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(cte.id)} title="Remover">
+                        <Trash size={14} />
+                      </Button>
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground text-xs p-2">Não editável</span>
+                  )}
                 </td>
               </tr>
             ))}

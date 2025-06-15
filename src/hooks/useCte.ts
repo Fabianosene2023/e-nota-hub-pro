@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { emitirCte } from "@/utils/cteSefazSimulator";
 
 export function useCtes() {
   return useQuery({
@@ -56,6 +57,38 @@ export function useCteUpsert() {
       }
 
       return savedCte;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ctes"] });
+    },
+  });
+}
+
+// For emitting a CTE
+export function useCteEmit() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (cte_id: string) => {
+      const sefazResponse = await emitirCte(cte_id);
+
+      if (!sefazResponse.success) {
+        throw new Error(sefazResponse.motivo || "Erro desconhecido ao emitir CT-e.");
+      }
+
+      const { data, error } = await supabase
+        .from("cte")
+        .update({
+          status: "emitido",
+          chave_acesso: sefazResponse.chave_acesso,
+          protocolo_autorizacao: sefazResponse.protocolo,
+          data_autorizacao: new Date().toISOString(),
+        })
+        .eq("id", cte_id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ctes"] });
