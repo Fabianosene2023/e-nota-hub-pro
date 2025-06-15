@@ -73,7 +73,14 @@ export const ConfiguracoesSefazTab: React.FC<ConfiguracoesSefazTabProps> = ({ em
   };
 
   if (isLoading) {
-    return <div>Carregando configurações...</div>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-muted-foreground">Carregando configurações...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
