@@ -33,16 +33,23 @@ export const UnidadesTable: React.FC = () => {
     setEditingUnidade(unidade);
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = (unidade: Unidade) => {
+    console.log('Solicitando exclusão da unidade:', unidade);
+    setDeletingUnidade(unidade);
+  };
+
+  const handleConfirmDelete = async () => {
     if (!deletingUnidade) return;
     
     console.log('Confirmando exclusão da unidade:', deletingUnidade);
-    try {
-      await deleteUnidade.mutateAsync(deletingUnidade.id);
-      setDeletingUnidade(null);
-    } catch (error) {
-      console.error('Erro ao deletar unidade:', error);
-    }
+    deleteUnidade.mutate(deletingUnidade.id, {
+      onSuccess: () => {
+        setDeletingUnidade(null);
+      },
+      onError: (error) => {
+        console.error('Erro ao deletar unidade:', error);
+      }
+    });
   };
 
   if (isLoading) {
@@ -97,7 +104,7 @@ export const UnidadesTable: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setDeletingUnidade(unidade)}
+                    onClick={() => handleDeleteClick(unidade)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -117,7 +124,7 @@ export const UnidadesTable: React.FC = () => {
       <ConfirmationDialog
         open={!!deletingUnidade}
         onOpenChange={(open) => !open && setDeletingUnidade(null)}
-        onConfirm={handleDelete}
+        onConfirm={handleConfirmDelete}
         title="Excluir Unidade de Medida"
         description={`Tem certeza que deseja excluir a unidade "${deletingUnidade?.codigo} - ${deletingUnidade?.descricao}"? Esta ação não pode ser desfeita.`}
         variant="destructive"
