@@ -7,9 +7,24 @@ export const useMarcas = () => {
   return useQuery({
     queryKey: ['marcas'],
     queryFn: async () => {
+      // Obter perfil do usuário para pegar empresa_id
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('empresa_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.empresa_id) {
+        throw new Error('Empresa não encontrada para o usuário');
+      }
+
       const { data, error } = await supabase
         .from('marcas')
         .select('*')
+        .eq('empresa_id', profile.empresa_id)
         .order('nome');
       
       if (error) throw error;
@@ -23,9 +38,23 @@ export const useMarcasManager = () => {
 
   const createMarca = useMutation({
     mutationFn: async (marca: any) => {
+      // Obter perfil do usuário para pegar empresa_id
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('empresa_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.empresa_id) {
+        throw new Error('Empresa não encontrada para o usuário');
+      }
+
       const { data, error } = await supabase
         .from('marcas')
-        .insert([marca])
+        .insert([{ ...marca, empresa_id: profile.empresa_id }])
         .select()
         .single();
       
