@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/common/FormField';
 import { useCreateUserProfile } from '@/hooks/useUserProfiles';
 import { useAuth } from '@/contexts/AuthContext';
+import { useEmpresas } from '@/hooks/useEmpresas';
 import { toast } from '@/hooks/use-toast';
 
 interface UsuarioFormDialogProps {
@@ -24,6 +25,7 @@ interface FormData {
   email: string;
   role: string;
   ativo: boolean;
+  empresa_id: string;
 }
 
 const initialFormData: FormData = {
@@ -31,6 +33,7 @@ const initialFormData: FormData = {
   email: '',
   role: 'visualizador',
   ativo: true,
+  empresa_id: '',
 };
 
 const roleOptions = [
@@ -48,11 +51,13 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const createUserProfile = useCreateUserProfile();
+  const { data: empresas, isLoading: loadingEmpresas } = useEmpresas();
 
   console.log('=== USUARIO FORM DIALOG ===');
   console.log('Profile do usuário logado:', profile);
   console.log('Dialog aberto:', open);
   console.log('Usuário para edição:', usuario);
+  console.log('Empresas carregadas:', empresas);
 
   useEffect(() => {
     if (usuario) {
@@ -62,13 +67,19 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
         email: usuario.email || '',
         role: usuario.role || 'visualizador',
         ativo: usuario.ativo ?? true,
+        empresa_id: usuario.empresa_id || '',
       });
     } else {
       console.log('Resetando formulário para novo usuário');
-      setFormData(initialFormData);
+      // Para novos usuários, pré-seleciona a empresa do usuário logado se houver
+      const initialData = {
+        ...initialFormData,
+        empresa_id: profile?.empresa_id || '',
+      };
+      setFormData(initialData);
     }
     setErrors({});
-  }, [usuario, open]);
+  }, [usuario, open, profile?.empresa_id]);
 
   const validateForm = () => {
     console.log('Validando formulário:', formData);
@@ -128,7 +139,7 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
         email: formData.email.trim(),
         role: formData.role,
         ativo: formData.ativo,
-        empresa_id: profile?.empresa_id || null, // Explicitamente null se não tiver empresa
+        empresa_id: formData.empresa_id || null, // Usa a empresa selecionada ou null
       };
 
       console.log('Enviando dados para criação:', profileData);
@@ -138,7 +149,10 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
       console.log('Perfil criado com sucesso, resetando formulário');
       
       // Resetar formulário e fechar
-      setFormData(initialFormData);
+      setFormData({
+        ...initialFormData,
+        empresa_id: profile?.empresa_id || '',
+      });
       setErrors({});
       onClose();
       
@@ -160,6 +174,15 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
 
   const isLoading = createUserProfile.isPending;
 
+  // Preparar opções de empresa
+  const empresaOptions = [
+    { value: '', label: 'Sem vínculo específico' },
+    ...(empresas?.map(empresa => ({
+      value: empresa.id,
+      label: empresa.nome_fantasia || empresa.razao_social
+    })) || [])
+  ];
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -172,11 +195,6 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
               ? 'Edite as informações do usuário'
               : 'Preencha as informações para criar um novo usuário'
             }
-            {!profile?.empresa_id && (
-              <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                ⚠️ Usuário será criado sem vínculo específico de empresa
-              </div>
-            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -202,6 +220,16 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
             required
             placeholder="Digite o email"
             disabled={isLoading}
+          />
+
+          <FormField
+            type="select"
+            label="Empresa"
+            value={formData.empresa_id}
+            onChange={(value) => handleInputChange('empresa_id', value)}
+            options={empresaOptions}
+            disabled={isLoading || loadingEmpresas}
+            placeholder={loadingEmpresas ? "Carregando empresas..." : "Selecione uma empresa"}
           />
 
           <FormField
