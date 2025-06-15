@@ -215,9 +215,12 @@ export type Database = {
           csc_token: string | null
           email_padrao_envio: string | null
           empresa_id: string
+          enviar_nfe_por_email: boolean | null
           id: string
           layout_danfe: string | null
           proxima_num_nf: number | null
+          regime_fiscal: string | null
+          regime_tributario: string | null
           serie_nfce: number | null
           serie_nfe: number | null
           updated_at: string
@@ -230,9 +233,12 @@ export type Database = {
           csc_token?: string | null
           email_padrao_envio?: string | null
           empresa_id: string
+          enviar_nfe_por_email?: boolean | null
           id?: string
           layout_danfe?: string | null
           proxima_num_nf?: number | null
+          regime_fiscal?: string | null
+          regime_tributario?: string | null
           serie_nfce?: number | null
           serie_nfe?: number | null
           updated_at?: string
@@ -245,9 +251,12 @@ export type Database = {
           csc_token?: string | null
           email_padrao_envio?: string | null
           empresa_id?: string
+          enviar_nfe_por_email?: boolean | null
           id?: string
           layout_danfe?: string | null
           proxima_num_nf?: number | null
+          regime_fiscal?: string | null
+          regime_tributario?: string | null
           serie_nfce?: number | null
           serie_nfe?: number | null
           updated_at?: string
