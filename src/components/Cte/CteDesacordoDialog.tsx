@@ -21,7 +21,7 @@ interface CteDesacordoDialogProps {
 }
 
 export function CteDesacordoDialog({ open, onOpenChange, cteId }: CteDesacordoDialogProps) {
-  const { register, handleSubmit, reset, formState: { isSubmitting, errors } } = useForm<{ justificativa: string }>();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<{ justificativa: string }>();
   const desacordoMutation = useCteDesacordo();
 
   React.useEffect(() => {
@@ -30,23 +30,25 @@ export function CteDesacordoDialog({ open, onOpenChange, cteId }: CteDesacordoDi
     }
   }, [open, reset]);
 
-  const onSubmit = async (data: { justificativa: string }) => {
+  const onSubmit = (data: { justificativa: string }) => {
     if (!cteId) return;
 
-    try {
-      await desacordoMutation.mutateAsync({
-        cte_id: cteId,
-        justificativa: data.justificativa,
-      });
-      toast({ title: "Manifestação de Desacordo enviada com sucesso!" });
-      onOpenChange(false);
-    } catch (error: any) {
-      toast({
-        title: "Erro ao enviar desacordo",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+    desacordoMutation.mutate({
+      cte_id: cteId,
+      justificativa: data.justificativa,
+    }, {
+      onSuccess: () => {
+        toast({ title: "Manifestação de Desacordo enviada com sucesso!" });
+        onOpenChange(false);
+      },
+      onError: (error: any) => {
+        toast({
+          title: "Erro ao enviar desacordo",
+          description: error.message || "Ocorreu um erro desconhecido.",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   return (
@@ -64,17 +66,18 @@ export function CteDesacordoDialog({ open, onOpenChange, cteId }: CteDesacordoDi
               placeholder="Justificativa (mínimo 15 caracteres)"
               {...register("justificativa", { required: "Justificativa é obrigatória.", minLength: { value: 15, message: "A justificativa deve ter no mínimo 15 caracteres." } })}
               className={`w-full ${errors.justificativa ? "border-destructive" : ""}`}
+              disabled={desacordoMutation.isPending}
             />
             {errors.justificativa && (
               <p className="text-sm text-destructive mt-1">{errors.justificativa.message}</p>
             )}
           </div>
           <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} disabled={desacordoMutation.isPending}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Enviando..." : "Confirmar Desacordo"}
+            <Button type="submit" disabled={desacordoMutation.isPending}>
+              {desacordoMutation.isPending ? "Enviando..." : "Confirmar Desacordo"}
             </Button>
           </DialogFooter>
         </form>
