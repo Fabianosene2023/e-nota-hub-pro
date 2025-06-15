@@ -14,20 +14,29 @@ import { useUnidadesMedida, useUnidadesMedidaManager } from '@/hooks/useUnidades
 import { UnidadeFormDialog } from './UnidadeFormDialog';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 
+interface Unidade {
+  id: string;
+  codigo: string;
+  descricao: string;
+  created_at: string;
+}
+
 export const UnidadesTable: React.FC = () => {
-  const { data: unidades, isLoading } = useUnidadesMedida();
+  const { data: unidades, isLoading, error } = useUnidadesMedida();
   const { deleteUnidade } = useUnidadesMedidaManager();
   
-  const [editingUnidade, setEditingUnidade] = React.useState<any>(null);
-  const [deletingUnidade, setDeletingUnidade] = React.useState<any>(null);
+  const [editingUnidade, setEditingUnidade] = React.useState<Unidade | null>(null);
+  const [deletingUnidade, setDeletingUnidade] = React.useState<Unidade | null>(null);
 
-  const handleEdit = (unidade: any) => {
+  const handleEdit = (unidade: Unidade) => {
+    console.log('Editando unidade:', unidade);
     setEditingUnidade(unidade);
   };
 
   const handleDelete = async () => {
     if (!deletingUnidade) return;
     
+    console.log('Confirmando exclusão da unidade:', deletingUnidade);
     try {
       await deleteUnidade.mutateAsync(deletingUnidade.id);
       setDeletingUnidade(null);
@@ -38,6 +47,15 @@ export const UnidadesTable: React.FC = () => {
 
   if (isLoading) {
     return <div className="text-center py-4">Carregando unidades...</div>;
+  }
+
+  if (error) {
+    console.error('Erro ao carregar unidades:', error);
+    return (
+      <div className="text-center py-8 text-red-500">
+        Erro ao carregar unidades de medida
+      </div>
+    );
   }
 
   if (!unidades || unidades.length === 0) {

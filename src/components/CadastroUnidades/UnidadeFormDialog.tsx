@@ -14,7 +14,12 @@ import { toast } from '@/hooks/use-toast';
 interface UnidadeFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  unidade?: any;
+  unidade?: {
+    id: string;
+    codigo: string;
+    descricao: string;
+    created_at: string;
+  } | null;
 }
 
 export const UnidadeFormDialog: React.FC<UnidadeFormDialogProps> = ({
@@ -32,11 +37,13 @@ export const UnidadeFormDialog: React.FC<UnidadeFormDialogProps> = ({
 
   React.useEffect(() => {
     if (unidade) {
+      console.log('Preenchendo formulário para edição:', unidade);
       setFormData({
         codigo: unidade.codigo || '',
         descricao: unidade.descricao || '',
       });
     } else {
+      console.log('Limpando formulário para nova unidade');
       setFormData({
         codigo: '',
         descricao: '',
@@ -57,12 +64,14 @@ export const UnidadeFormDialog: React.FC<UnidadeFormDialogProps> = ({
     }
 
     try {
-      if (isEditing) {
+      if (isEditing && unidade) {
+        console.log('Atualizando unidade:', { id: unidade.id, ...formData });
         await updateUnidade.mutateAsync({
           id: unidade.id,
           ...formData,
         });
       } else {
+        console.log('Criando nova unidade:', formData);
         await createUnidade.mutateAsync(formData);
       }
       onOpenChange(false);
@@ -70,6 +79,8 @@ export const UnidadeFormDialog: React.FC<UnidadeFormDialogProps> = ({
       console.error('Erro ao salvar unidade:', error);
     }
   };
+
+  const isLoading = createUnidade.isPending || updateUnidade.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -104,14 +115,18 @@ export const UnidadeFormDialog: React.FC<UnidadeFormDialogProps> = ({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isLoading}
             >
               Cancelar
             </Button>
             <Button
               type="submit"
-              disabled={createUnidade.isPending || updateUnidade.isPending}
+              disabled={isLoading}
             >
-              {isEditing ? 'Atualizar' : 'Criar'}
+              {isLoading 
+                ? (isEditing ? 'Atualizando...' : 'Criando...') 
+                : (isEditing ? 'Atualizar' : 'Criar')
+              }
             </Button>
           </div>
         </form>

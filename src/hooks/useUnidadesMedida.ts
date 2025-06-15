@@ -7,12 +7,17 @@ export const useUnidadesMedida = () => {
   return useQuery({
     queryKey: ['unidades-medida'],
     queryFn: async () => {
+      console.log('Buscando unidades de medida...');
       const { data, error } = await supabase
         .from('unidades_medida')
         .select('*')
         .order('codigo');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar unidades:', error);
+        throw error;
+      }
+      console.log('Unidades encontradas:', data);
       return data;
     },
   });
@@ -22,14 +27,19 @@ export const useUnidadesMedidaManager = () => {
   const queryClient = useQueryClient();
 
   const createUnidade = useMutation({
-    mutationFn: async (unidade: any) => {
+    mutationFn: async (unidade: { codigo: string; descricao: string }) => {
+      console.log('Criando unidade:', unidade);
       const { data, error } = await supabase
         .from('unidades_medida')
         .insert([unidade])
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao criar unidade:', error);
+        throw error;
+      }
+      console.log('Unidade criada:', data);
       return data;
     },
     onSuccess: () => {
@@ -39,7 +49,8 @@ export const useUnidadesMedidaManager = () => {
         description: "Unidade de medida criada com sucesso",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Erro na mutação de criação:', error);
       toast({
         title: "Erro",
         description: "Erro ao criar unidade de medida: " + error.message,
@@ -49,7 +60,8 @@ export const useUnidadesMedidaManager = () => {
   });
 
   const updateUnidade = useMutation({
-    mutationFn: async ({ id, ...unidade }: any) => {
+    mutationFn: async ({ id, ...unidade }: { id: string; codigo: string; descricao: string }) => {
+      console.log('Atualizando unidade:', { id, ...unidade });
       const { data, error } = await supabase
         .from('unidades_medida')
         .update(unidade)
@@ -57,7 +69,11 @@ export const useUnidadesMedidaManager = () => {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao atualizar unidade:', error);
+        throw error;
+      }
+      console.log('Unidade atualizada:', data);
       return data;
     },
     onSuccess: () => {
@@ -67,7 +83,8 @@ export const useUnidadesMedidaManager = () => {
         description: "Unidade de medida atualizada com sucesso",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Erro na mutação de atualização:', error);
       toast({
         title: "Erro",
         description: "Erro ao atualizar unidade de medida: " + error.message,
@@ -78,12 +95,17 @@ export const useUnidadesMedidaManager = () => {
 
   const deleteUnidade = useMutation({
     mutationFn: async (id: string) => {
+      console.log('Deletando unidade:', id);
       const { error } = await supabase
         .from('unidades_medida')
         .delete()
         .eq('id', id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao deletar unidade:', error);
+        throw error;
+      }
+      console.log('Unidade deletada com sucesso');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['unidades-medida'] });
@@ -92,7 +114,8 @@ export const useUnidadesMedidaManager = () => {
         description: "Unidade de medida removida com sucesso",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Erro na mutação de exclusão:', error);
       toast({
         title: "Erro",
         description: "Erro ao remover unidade de medida: " + error.message,
