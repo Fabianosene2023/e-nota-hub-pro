@@ -30,6 +30,8 @@ const CtePage = lazy(() => import("./pages/CtePage"));
 const CadastroCategorias = lazy(() => import("./pages/CadastroCategorias"));
 const CadastroUnidades = lazy(() => import("./pages/CadastroUnidades"));
 
+const ConfiguracoesEmpresa = lazy(() => import("./components/ConfiguracoesEmpresa").then(module => ({ default: module.ConfiguracoesEmpresa })));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -129,6 +131,11 @@ function App() {
                 } />
 
                 {/* Configurações */}
+                <Route path="configuracoes/empresa" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <ConfiguracoesEmpresa />
+                  </Suspense>
+                } />
                 <Route path="configuracoes/fiscais" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <ConfiguracoesFiscais />
