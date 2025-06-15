@@ -232,7 +232,7 @@ export const NfeExportacaoForm: React.FC = () => {
                       <SelectValue placeholder="Todos os status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
+                      <SelectItem value="todos">Todos</SelectItem>
                       <SelectItem value="autorizada">Autorizada</SelectItem>
                       <SelectItem value="cancelada">Cancelada</SelectItem>
                       <SelectItem value="erro">Erro</SelectItem>
