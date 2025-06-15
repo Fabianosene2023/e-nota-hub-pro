@@ -12,6 +12,7 @@ export const NfseEmissao = lazy(() => import("../pages/NfseEmissao"));
 export const NfeAjuste = lazy(() => import("../pages/NfeAjuste"));
 export const NfeComplementar = lazy(() => import("../pages/NfeComplementar"));
 export const NfeImportacao = lazy(() => import("../pages/NfeImportacao"));
+export const NfeExportacao = lazy(() => import("../pages/NfeExportacao"));
 
 // Cadastros
 export const CadastroClientes = lazy(() => import("../pages/CadastroClientes"));
