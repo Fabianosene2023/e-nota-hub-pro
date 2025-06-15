@@ -22,7 +22,7 @@ export const ConfiguracoesFiscaisTabs: React.FC<ConfiguracoesFiscaisTabsProps> =
 }) => {
   return (
     <Tabs defaultValue="regime" className="space-y-4">
-      <TabsList>
+      <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="regime" className="flex items-center gap-2">
           <Building2 className="h-4 w-4" />
           Regime Fiscal

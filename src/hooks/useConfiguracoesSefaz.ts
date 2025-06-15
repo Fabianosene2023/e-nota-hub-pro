@@ -23,14 +23,36 @@ export const useConfiguracoesSefaz = (empresaId: string) => {
   return useQuery({
     queryKey: ['configuracoes-sefaz', empresaId],
     queryFn: async () => {
+      if (!empresaId) return null;
+      
       const { data, error } = await supabase
         .from('configuracoes_sefaz')
         .select('*')
         .eq('empresa_id', empresaId)
         .single();
       
-      if (error && error.code !== 'PGRST116') throw error;
-      return data as ConfiguracaoSefaz | null;
+      if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao buscar configurações SEFAZ:', error);
+        throw error;
+      }
+      
+      // Se não existe configuração, retorna valores padrão
+      if (!data) {
+        return {
+          empresa_id: empresaId,
+          ambiente: 'homologacao' as const,
+          csc_id: '',
+          csc_token: '',
+          serie_nfe: 1,
+          serie_nfce: 1,
+          proximo_numero_nfe: 1,
+          proximo_numero_nfce: 1,
+          timeout_sefaz: 30000,
+          tentativas_reenvio: 3
+        };
+      }
+      
+      return data as ConfiguracaoSefaz;
     },
     enabled: !!empresaId,
   });
