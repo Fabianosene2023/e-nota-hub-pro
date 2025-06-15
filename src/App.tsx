@@ -53,7 +53,7 @@ function App() {
               {/* Rota pública */}
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
-              
+
               {/* Rotas protegidas */}
               <Route path="/*" element={
                 <ProtectedRoute>
@@ -109,12 +109,12 @@ function App() {
                     <CadastroTransportadoras />
                   </Suspense>
                 } />
-                
+
                 {/* Configurações */}
                 <Route path="configuracoes/fiscais" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <ConfiguracoesFiscais />
-                  Suspense>
+                  </Suspense>
                 } />
                 
                 {/* Relatórios */}
@@ -130,7 +130,7 @@ function App() {
                     <TesteApiNfe />
                   </Suspense>
                 } />
-                
+
                 {/* Redirecionamento padrão */}
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="notas/cte" element={
