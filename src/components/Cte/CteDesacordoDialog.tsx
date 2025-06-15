@@ -75,27 +75,26 @@ export function CteDesacordoDialog({ open, onOpenChange, cteId }: CteDesacordoDi
             Descreva o motivo do desacordo. Esta ação será registrada e, em um sistema real, enviada para a SEFAZ.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
-          <div className="py-4">
-            <Textarea
-              placeholder="Justificativa (mínimo 15 caracteres)"
-              {...register("justificativa", { required: "Justificativa é obrigatória.", minLength: { value: 15, message: "A justificativa deve ter no mínimo 15 caracteres." } })}
-              className={`w-full ${errors.justificativa ? "border-destructive" : ""}`}
-              disabled={desacordoMutation.isPending}
-            />
-            {errors.justificativa && (
-              <p className="text-sm text-destructive mt-1">{errors.justificativa.message}</p>
-            )}
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} disabled={desacordoMutation.isPending}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={desacordoMutation.isPending}>
-              {desacordoMutation.isPending ? "Enviando..." : "Confirmar Desacordo"}
-            </Button>
-          </DialogFooter>
-        </form>
+        {/* The <form> element is removed to avoid conflicts with the Dialog. Submission is now handled by the button's onClick. */}
+        <div className="py-4">
+          <Textarea
+            placeholder="Justificativa (mínimo 15 caracteres)"
+            {...register("justificativa", { required: "Justificativa é obrigatória.", minLength: { value: 15, message: "A justificativa deve ter no mínimo 15 caracteres." } })}
+            className={`w-full ${errors.justificativa ? "border-destructive" : ""}`}
+            disabled={desacordoMutation.isPending}
+          />
+          {errors.justificativa && (
+            <p className="text-sm text-destructive mt-1">{errors.justificativa.message}</p>
+          )}
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} disabled={desacordoMutation.isPending}>
+            Cancelar
+          </Button>
+          <Button type="button" onClick={handleSubmit(onSubmit, onInvalid)} disabled={desacordoMutation.isPending}>
+            {desacordoMutation.isPending ? "Enviando..." : "Confirmar Desacordo"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
