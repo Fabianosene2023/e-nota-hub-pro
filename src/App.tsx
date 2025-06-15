@@ -1,4 +1,3 @@
-
 import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +24,7 @@ const CadastroServicos = lazy(() => import("./pages/CadastroServicos"));
 const CadastroFornecedores = lazy(() => import("./pages/CadastroFornecedores"));
 const CadastroTransportadoras = lazy(() => import("./pages/CadastroTransportadoras"));
 const Relatorios = lazy(() => import("./components/Relatorios").then(module => ({ default: module.Relatorios })));
+const NfcePage = lazy(() => import("./components/Nfce").then(m => ({ default: m.default })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -74,6 +74,11 @@ function App() {
                 <Route path="notas/nfe" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <EmissaoNFe />
+                  </Suspense>
+                } />
+                <Route path="notas/nfce" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <NfcePage />
                   </Suspense>
                 } />
                 

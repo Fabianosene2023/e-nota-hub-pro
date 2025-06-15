@@ -586,6 +586,47 @@ export type Database = {
         }
         Relationships: []
       }
+      itens_nfce: {
+        Row: {
+          cfop: string | null
+          created_at: string
+          id: string
+          nfce_id: string
+          produto_id: string
+          quantidade: number
+          valor_total: number
+          valor_unitario: number
+        }
+        Insert: {
+          cfop?: string | null
+          created_at?: string
+          id?: string
+          nfce_id: string
+          produto_id: string
+          quantidade: number
+          valor_total: number
+          valor_unitario: number
+        }
+        Update: {
+          cfop?: string | null
+          created_at?: string
+          id?: string
+          nfce_id?: string
+          produto_id?: string
+          quantidade?: number
+          valor_total?: number
+          valor_unitario?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_nfce_nfce_id_fkey"
+            columns: ["nfce_id"]
+            isOneToOne: false
+            referencedRelation: "nfce"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       itens_nota_fiscal: {
         Row: {
           cfop: string | null
@@ -773,6 +814,81 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      nfce: {
+        Row: {
+          ambiente_emissao: string | null
+          chave_acesso: string | null
+          cliente_id: string
+          codigo_retorno_sefaz: string | null
+          created_at: string
+          danfe_pdf_url: string | null
+          data_autorizacao: string | null
+          data_cancelamento: string | null
+          data_emissao: string
+          empresa_id: string
+          id: string
+          justificativa_cancelamento: string | null
+          mensagem_retorno_sefaz: string | null
+          natureza_operacao: string | null
+          numero: number
+          observacoes: string | null
+          protocolo_autorizacao: string | null
+          serie: number
+          status: string
+          updated_at: string
+          valor_total: number
+          xml_nfce: string | null
+        }
+        Insert: {
+          ambiente_emissao?: string | null
+          chave_acesso?: string | null
+          cliente_id: string
+          codigo_retorno_sefaz?: string | null
+          created_at?: string
+          danfe_pdf_url?: string | null
+          data_autorizacao?: string | null
+          data_cancelamento?: string | null
+          data_emissao?: string
+          empresa_id: string
+          id?: string
+          justificativa_cancelamento?: string | null
+          mensagem_retorno_sefaz?: string | null
+          natureza_operacao?: string | null
+          numero: number
+          observacoes?: string | null
+          protocolo_autorizacao?: string | null
+          serie?: number
+          status?: string
+          updated_at?: string
+          valor_total: number
+          xml_nfce?: string | null
+        }
+        Update: {
+          ambiente_emissao?: string | null
+          chave_acesso?: string | null
+          cliente_id?: string
+          codigo_retorno_sefaz?: string | null
+          created_at?: string
+          danfe_pdf_url?: string | null
+          data_autorizacao?: string | null
+          data_cancelamento?: string | null
+          data_emissao?: string
+          empresa_id?: string
+          id?: string
+          justificativa_cancelamento?: string | null
+          mensagem_retorno_sefaz?: string | null
+          natureza_operacao?: string | null
+          numero?: number
+          observacoes?: string | null
+          protocolo_autorizacao?: string | null
+          serie?: number
+          status?: string
+          updated_at?: string
+          valor_total?: number
+          xml_nfce?: string | null
+        }
+        Relationships: []
       }
       notas_fiscais: {
         Row: {
