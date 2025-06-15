@@ -122,22 +122,13 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
         return;
       }
 
-      // Verificar se temos empresa_id
-      if (!profile?.empresa_id) {
-        console.warn('Usuário logado sem empresa_id:', profile);
-        toast({
-          title: "Aviso",
-          description: "Empresa não identificada. Usuário será criado sem vínculo específico.",
-        });
-      }
-
       // Dados para criação
       const profileData = {
         nome: formData.nome.trim(),
         email: formData.email.trim(),
         role: formData.role,
         ativo: formData.ativo,
-        empresa_id: profile?.empresa_id || null,
+        empresa_id: profile?.empresa_id || null, // Explicitamente null se não tiver empresa
       };
 
       console.log('Enviando dados para criação:', profileData);
@@ -181,6 +172,11 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
               ? 'Edite as informações do usuário'
               : 'Preencha as informações para criar um novo usuário'
             }
+            {!profile?.empresa_id && (
+              <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                ⚠️ Usuário será criado sem vínculo específico de empresa
+              </div>
+            )}
           </DialogDescription>
         </DialogHeader>
 

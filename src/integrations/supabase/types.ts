@@ -1568,7 +1568,7 @@ export type Database = {
           ativo: boolean | null
           created_at: string
           email: string
-          empresa_id: string
+          empresa_id: string | null
           id: string
           nome: string
           role: string
@@ -1579,7 +1579,7 @@ export type Database = {
           ativo?: boolean | null
           created_at?: string
           email: string
-          empresa_id: string
+          empresa_id?: string | null
           id?: string
           nome: string
           role?: string
@@ -1590,7 +1590,7 @@ export type Database = {
           ativo?: boolean | null
           created_at?: string
           email?: string
-          empresa_id?: string
+          empresa_id?: string | null
           id?: string
           nome?: string
           role?: string

@@ -80,7 +80,7 @@ export const useCreateUserProfile = () => {
         throw new Error('Este email já está cadastrado no sistema');
       }
       
-      // Verificar se a empresa existe (se empresa_id foi fornecido)
+      // Verificar se a empresa existe (somente se empresa_id foi fornecido e não é null)
       if (profileData.empresa_id) {
         console.log('Verificando se empresa existe:', profileData.empresa_id);
         const { data: empresa, error: empresaError } = await supabase
@@ -105,7 +105,7 @@ export const useCreateUserProfile = () => {
         nome: profileData.nome.trim(),
         email: profileData.email.trim().toLowerCase(),
         role: profileData.role,
-        empresa_id: profileData.empresa_id || null,
+        empresa_id: profileData.empresa_id || null, // Explicitamente null se não fornecido
         ativo: profileData.ativo !== undefined ? profileData.ativo : true,
       };
 
