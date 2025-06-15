@@ -15,6 +15,9 @@ export const ConfiguracoesFiscais = () => {
   const { data: configuracoes } = useConfiguracoes(empresaSelecionada);
   const updateConfiguracoes = useUpdateConfiguracoes();
   
+  console.log('ConfiguracoesFiscais - empresaSelecionada:', empresaSelecionada);
+  console.log('ConfiguracoesFiscais - empresas:', empresas);
+  
   const [formData, setFormData] = useState<ConfiguracoesFiscaisFormData>({
     certificado_a1_data: '',
     certificado_a1_senha: '',

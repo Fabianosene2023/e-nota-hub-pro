@@ -20,6 +20,8 @@ export const ConfiguracoesFiscaisTabs: React.FC<ConfiguracoesFiscaisTabsProps> =
   onFormDataChange,
   empresaId
 }) => {
+  console.log('ConfiguracoesFiscaisTabs - empresaId:', empresaId);
+  
   return (
     <Tabs defaultValue="regime" className="space-y-4">
       <TabsList className="grid w-full grid-cols-5">
