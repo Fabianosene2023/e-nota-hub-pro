@@ -1,4 +1,3 @@
-
 import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -52,6 +51,7 @@ const CadastroUsuarios = lazy(() => import("./pages/CadastroUsuarios"));
 const ConfiguracaoPermissoes = lazy(() => import("./pages/ConfiguracaoPermissoes"));
 const RelatoriosProdutos = lazy(() => import("./pages/RelatoriosProdutos"));
 const RelatoriosClientes = lazy(() => import("./pages/RelatoriosClientes"));
+const RelatoriosEstoque = lazy(() => import("./pages/RelatoriosEstoque"));
 
 function App() {
   return (
@@ -177,6 +177,11 @@ function App() {
                 <Route path="relatorios/clientes" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <RelatoriosClientes />
+                  </Suspense>
+                } />
+                <Route path="relatorios/estoque" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <RelatoriosEstoque />
                   </Suspense>
                 } />
                 
