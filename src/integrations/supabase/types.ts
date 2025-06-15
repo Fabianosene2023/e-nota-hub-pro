@@ -383,6 +383,122 @@ export type Database = {
           },
         ]
       }
+      cte: {
+        Row: {
+          ambiente_emissao: string | null
+          chave_acesso: string | null
+          codigo_retorno_sefaz: string | null
+          created_at: string
+          data_autorizacao: string | null
+          data_cancelamento: string | null
+          data_emissao: string
+          destinatario_id: string | null
+          empresa_id: string
+          id: string
+          justificativa_cancelamento: string | null
+          mensagem_retorno_sefaz: string | null
+          natureza_operacao: string | null
+          numero: number
+          observacoes: string | null
+          pdf_dacte_url: string | null
+          protocolo_autorizacao: string | null
+          remetente_id: string | null
+          serie: number
+          status: string
+          updated_at: string
+          valor_total: number
+          xml_cte: string | null
+        }
+        Insert: {
+          ambiente_emissao?: string | null
+          chave_acesso?: string | null
+          codigo_retorno_sefaz?: string | null
+          created_at?: string
+          data_autorizacao?: string | null
+          data_cancelamento?: string | null
+          data_emissao?: string
+          destinatario_id?: string | null
+          empresa_id: string
+          id?: string
+          justificativa_cancelamento?: string | null
+          mensagem_retorno_sefaz?: string | null
+          natureza_operacao?: string | null
+          numero: number
+          observacoes?: string | null
+          pdf_dacte_url?: string | null
+          protocolo_autorizacao?: string | null
+          remetente_id?: string | null
+          serie?: number
+          status?: string
+          updated_at?: string
+          valor_total: number
+          xml_cte?: string | null
+        }
+        Update: {
+          ambiente_emissao?: string | null
+          chave_acesso?: string | null
+          codigo_retorno_sefaz?: string | null
+          created_at?: string
+          data_autorizacao?: string | null
+          data_cancelamento?: string | null
+          data_emissao?: string
+          destinatario_id?: string | null
+          empresa_id?: string
+          id?: string
+          justificativa_cancelamento?: string | null
+          mensagem_retorno_sefaz?: string | null
+          natureza_operacao?: string | null
+          numero?: number
+          observacoes?: string | null
+          pdf_dacte_url?: string | null
+          protocolo_autorizacao?: string | null
+          remetente_id?: string | null
+          serie?: number
+          status?: string
+          updated_at?: string
+          valor_total?: number
+          xml_cte?: string | null
+        }
+        Relationships: []
+      }
+      desacordo_cte: {
+        Row: {
+          created_at: string
+          cte_id: string
+          data_desacordo: string
+          id: string
+          justificativa: string
+          status: string
+          usuario_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          cte_id: string
+          data_desacordo?: string
+          id?: string
+          justificativa: string
+          status?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          cte_id?: string
+          data_desacordo?: string
+          id?: string
+          justificativa?: string
+          status?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "desacordo_cte_cte_id_fkey"
+            columns: ["cte_id"]
+            isOneToOne: false
+            referencedRelation: "cte"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos_fiscais: {
         Row: {
           conteudo_base64: string | null
@@ -488,6 +604,47 @@ export type Database = {
         }
         Relationships: []
       }
+      eventos_cte: {
+        Row: {
+          created_at: string
+          cte_id: string
+          dados: Json | null
+          data_evento: string
+          id: string
+          justificativa: string | null
+          tipo_evento: string
+          usuario_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          cte_id: string
+          dados?: Json | null
+          data_evento?: string
+          id?: string
+          justificativa?: string | null
+          tipo_evento: string
+          usuario_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          cte_id?: string
+          dados?: Json | null
+          data_evento?: string
+          id?: string
+          justificativa?: string | null
+          tipo_evento?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_cte_cte_id_fkey"
+            columns: ["cte_id"]
+            isOneToOne: false
+            referencedRelation: "cte"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fornecedores: {
         Row: {
           ativo: boolean | null
@@ -585,6 +742,47 @@ export type Database = {
           status_novo?: string
         }
         Relationships: []
+      }
+      itens_cte: {
+        Row: {
+          cfop: string | null
+          created_at: string
+          cte_id: string
+          id: string
+          produto_id: string
+          quantidade: number
+          valor_total: number
+          valor_unitario: number
+        }
+        Insert: {
+          cfop?: string | null
+          created_at?: string
+          cte_id: string
+          id?: string
+          produto_id: string
+          quantidade: number
+          valor_total: number
+          valor_unitario: number
+        }
+        Update: {
+          cfop?: string | null
+          created_at?: string
+          cte_id?: string
+          id?: string
+          produto_id?: string
+          quantidade?: number
+          valor_total?: number
+          valor_unitario?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_cte_cte_id_fkey"
+            columns: ["cte_id"]
+            isOneToOne: false
+            referencedRelation: "cte"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       itens_nfce: {
         Row: {
