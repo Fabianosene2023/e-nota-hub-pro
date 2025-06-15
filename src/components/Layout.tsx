@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -30,7 +29,6 @@ const navigation = [
       { name: "Emissão NFe", href: "/notas/nfe" },
       { name: "Emissão NFCe", href: "/notas/nfce" },
       { name: "Emissão CTe", href: "/notas/cte" },
-      { name: "Emissão Desacordo de CTe", href: "/notas/cte-desacordo" },
       { name: "Emissão NFSe", href: "/notas/nfse" },
       { name: "Emissão NFe Ajuste", href: "/notas/nfe-ajuste" },
       { name: "Emissão NFe Complementar", href: "/notas/nfe-complementar" },

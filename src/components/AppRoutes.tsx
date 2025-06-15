@@ -37,10 +37,25 @@ export const AppRoutes = () => {
           </Suspense>
         } />
         
-        {/* Notas Fiscais */}
+        {/* Notas Fiscais - Todas as rotas integradas */}
         <Route path="notas/nfe" element={
           <Suspense fallback={<LoadingSpinner />}>
             <LazyComponents.EmissaoNFe />
+          </Suspense>
+        } />
+        <Route path="notas/nfce" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.NfcePage />
+          </Suspense>
+        } />
+        <Route path="notas/cte" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.CtePage />
+          </Suspense>
+        } />
+        <Route path="notas/nfse" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.NfseEmissao />
           </Suspense>
         } />
         <Route path="notas/nfe-ajuste" element={
@@ -71,21 +86,6 @@ export const AppRoutes = () => {
         <Route path="notas/recebidas" element={
           <Suspense fallback={<LoadingSpinner />}>
             <LazyComponents.NotasRecebidas />
-          </Suspense>
-        } />
-        <Route path="notas/nfce" element={
-          <Suspense fallback={<LoadingSpinner />}>
-            <LazyComponents.NfcePage />
-          </Suspense>
-        } />
-        <Route path="notas/cte" element={
-          <Suspense fallback={<LoadingSpinner />}>
-            <LazyComponents.CtePage />
-          </Suspense>
-        } />
-        <Route path="notas/nfse" element={
-          <Suspense fallback={<LoadingSpinner />}>
-            <LazyComponents.NfseEmissao />
           </Suspense>
         } />
         

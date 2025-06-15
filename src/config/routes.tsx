@@ -1,10 +1,11 @@
+
 import { lazy } from "react";
 
 // Lazy loading de componentes
 export const Dashboard = lazy(() => import("../pages/Index"));
 export const Empresas = lazy(() => import("../components/Empresas").then(module => ({ default: module.Empresas })));
 
-// Notas Fiscais
+// Notas Fiscais - Todas as rotas integradas
 export const EmissaoNFe = lazy(() => import("../components/EmissaoNFe").then(module => ({ default: module.EmissaoNFe })));
 export const NfcePage = lazy(() => import("../components/Nfce"));
 export const CtePage = lazy(() => import("../pages/CtePage"));
