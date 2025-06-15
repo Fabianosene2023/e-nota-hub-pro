@@ -1,174 +1,302 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useEmpresasManager } from '@/hooks/useEmpresasManager';
-import { useClientesManager } from '@/hooks/useClientesManager';
-import { Building, User } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { useEmpresas } from '@/hooks/useEmpresas';
+import { useClientes } from '@/hooks/useClientes';
+import { Building2, User, Calendar, MapPin } from "lucide-react";
 
-interface FormData {
-  empresa_id: string;
-  cliente_id: string;
-  numero: string;
-  serie: number;
-  natureza_operacao: string;
-  observacoes: string;
-  tipo_pessoa: 'fisica' | 'juridica';
+interface DadosGeraisProps {
+  formData: {
+    empresa_id: string;
+    cliente_id: string;
+    numero: string;
+    serie: number;
+    natureza_operacao: string;
+    observacoes: string;
+    tipo_pessoa: 'fisica' | 'juridica';
+    // Novos campos
+    email_cliente: string;
+    telefone_cliente: string;
+    cnpj_cpf_entrega: string;
+    inscricao_estadual_cliente: string;
+    endereco_faturamento: string;
+    endereco_entrega: string;
+    tipo_nota: 'entrada' | 'saida';
+    data_emissao: string;
+    data_entrega: string;
+    data_cancelamento: string;
+  };
+  setFormData: (data: any) => void;
 }
 
-interface DadosGeraisSectionProps {
-  formData: FormData;
-  setFormData: (data: FormData) => void;
-}
+export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisProps) => {
+  const { data: empresas, isLoading: loadingEmpresas } = useEmpresas();
+  const { data: clientes, isLoading: loadingClientes } = useClientes(formData.empresa_id);
 
-export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisSectionProps) => {
-  const { data: empresas } = useEmpresasManager();
-  const { data: clientes } = useClientesManager(formData.empresa_id);
+  const handleInputChange = (field: string, value: string | number) => {
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  };
 
-  // Filtrar clientes por tipo de pessoa
-  const clientesFiltrados = clientes?.filter(cliente => {
-    if (formData.tipo_pessoa === 'fisica') {
-      return cliente.tipo_pessoa === 'fisica';
-    } else {
-      return cliente.tipo_pessoa === 'juridica';
+  const clienteSelecionado = clientes?.find(c => c.id === formData.cliente_id);
+
+  // Auto-preencher dados do cliente quando selecionado
+  React.useEffect(() => {
+    if (clienteSelecionado) {
+      setFormData((prev: any) => ({
+        ...prev,
+        email_cliente: clienteSelecionado.email || '',
+        telefone_cliente: clienteSelecionado.telefone || '',
+        cnpj_cpf_entrega: clienteSelecionado.cpf_cnpj || '',
+        inscricao_estadual_cliente: clienteSelecionado.inscricao_estadual || '',
+        endereco_faturamento: `${clienteSelecionado.endereco}, ${clienteSelecionado.cidade} - ${clienteSelecionado.estado}, ${clienteSelecionado.cep}`,
+        endereco_entrega: `${clienteSelecionado.endereco}, ${clienteSelecionado.cidade} - ${clienteSelecionado.estado}, ${clienteSelecionado.cep}`
+      }));
     }
-  }) || [];
+  }, [clienteSelecionado, setFormData]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Dados Gerais</CardTitle>
-        <CardDescription>
-          Informações básicas da nota fiscal
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="empresa">Empresa Emitente *</Label>
-            <Select 
-              value={formData.empresa_id} 
-              onValueChange={(value) => setFormData({...formData, empresa_id: value, cliente_id: ''})}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione a empresa" />
-              </SelectTrigger>
-              <SelectContent>
-                {empresas?.map((empresa) => (
-                  <SelectItem key={empresa.id} value={empresa.id}>
-                    <div className="flex items-center gap-2">
-                      <Building className="h-4 w-4" />
-                      {empresa.nome_fantasia || empresa.razao_social}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <div className="space-y-6">
+      {/* Dados Básicos */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Dados Básicos da Nota
+          </CardTitle>
+          <CardDescription>
+            Informações fundamentais da nota fiscal
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="empresa">Empresa Emitente *</Label>
+              <Select 
+                value={formData.empresa_id} 
+                onValueChange={(value) => handleInputChange('empresa_id', value)}
+                disabled={loadingEmpresas}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma empresa" />
+                </SelectTrigger>
+                <SelectContent>
+                  {empresas?.map((empresa) => (
+                    <SelectItem key={empresa.id} value={empresa.id}>
+                      {empresa.nome_fantasia || empresa.razao_social} - {empresa.cnpj}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tipo_nota">Tipo de Nota *</Label>
+              <Select 
+                value={formData.tipo_nota} 
+                onValueChange={(value) => handleInputChange('tipo_nota', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="saida">Saída</SelectItem>
+                  <SelectItem value="entrada">Entrada</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="numero">Número *</Label>
+              <Label htmlFor="numero">Número da Nota *</Label>
               <Input
                 id="numero"
-                type="number"
-                placeholder="1001"
                 value={formData.numero}
-                onChange={(e) => setFormData({...formData, numero: e.target.value})}
+                onChange={(e) => handleInputChange('numero', e.target.value)}
+                placeholder="Ex: 1001"
+                required
               />
             </div>
+            
             <div className="space-y-2">
               <Label htmlFor="serie">Série</Label>
               <Input
                 id="serie"
                 type="number"
                 value={formData.serie}
-                onChange={(e) => setFormData({...formData, serie: parseInt(e.target.value) || 1})}
+                onChange={(e) => handleInputChange('serie', parseInt(e.target.value) || 1)}
+                placeholder="1"
+                min="1"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="data_emissao">Data de Emissão *</Label>
+              <Input
+                id="data_emissao"
+                type="date"
+                value={formData.data_emissao}
+                onChange={(e) => handleInputChange('data_emissao', e.target.value)}
+                required
               />
             </div>
           </div>
-        </div>
 
-        {/* Tipo de Pessoa e Cliente */}
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <Label>Tipo de Cliente *</Label>
-            <RadioGroup
-              value={formData.tipo_pessoa}
-              onValueChange={(value: 'fisica' | 'juridica') => setFormData({...formData, tipo_pessoa: value, cliente_id: ''})}
-              className="flex gap-6"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="fisica" id="fisica" />
-                <Label htmlFor="fisica" className="flex items-center gap-2 cursor-pointer">
-                  <User className="h-4 w-4" />
-                  Pessoa Física
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="juridica" id="juridica" />
-                <Label htmlFor="juridica" className="flex items-center gap-2 cursor-pointer">
-                  <Building className="h-4 w-4" />
-                  Pessoa Jurídica
-                </Label>
-              </div>
-            </RadioGroup>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="data_entrega">Data de Entrega</Label>
+              <Input
+                id="data_entrega"
+                type="date"
+                value={formData.data_entrega}
+                onChange={(e) => handleInputChange('data_entrega', e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="data_cancelamento">Data de Cancelamento</Label>
+              <Input
+                id="data_cancelamento"
+                type="date"
+                value={formData.data_cancelamento}
+                onChange={(e) => handleInputChange('data_cancelamento', e.target.value)}
+                disabled
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="cliente">
-              {formData.tipo_pessoa === 'fisica' ? 'Cliente (Pessoa Física) *' : 'Cliente (Pessoa Jurídica) *'}
-            </Label>
+            <Label htmlFor="natureza_operacao">Natureza da Operação *</Label>
+            <Input
+              id="natureza_operacao"
+              value={formData.natureza_operacao}
+              onChange={(e) => handleInputChange('natureza_operacao', e.target.value)}
+              placeholder="Ex: Venda de mercadoria adquirida ou produzida pelo estabelecimento"
+              required
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Dados do Cliente */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Dados do Cliente/Destinatário
+          </CardTitle>
+          <CardDescription>
+            Informações do cliente e contato
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="cliente">Cliente/Destinatário *</Label>
             <Select 
               value={formData.cliente_id} 
-              onValueChange={(value) => setFormData({...formData, cliente_id: value})}
-              disabled={!formData.empresa_id}
+              onValueChange={(value) => handleInputChange('cliente_id', value)}
+              disabled={!formData.empresa_id || loadingClientes}
             >
               <SelectTrigger>
-                <SelectValue placeholder={
-                  !formData.empresa_id 
-                    ? "Selecione uma empresa primeiro" 
-                    : `Selecione o cliente (${formData.tipo_pessoa === 'fisica' ? 'PF' : 'PJ'})`
-                } />
+                <SelectValue placeholder="Selecione um cliente" />
               </SelectTrigger>
               <SelectContent>
-                {clientesFiltrados?.map((cliente) => (
+                {clientes?.map((cliente) => (
                   <SelectItem key={cliente.id} value={cliente.id}>
-                    <div className="flex items-center gap-2">
-                      {formData.tipo_pessoa === 'fisica' ? 
-                        <User className="h-4 w-4" /> : 
-                        <Building className="h-4 w-4" />
-                      }
-                      <div className="flex flex-col">
-                        <span>{cliente.nome_razao_social}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {cliente.cpf_cnpj}
-                        </span>
-                      </div>
-                    </div>
+                    {cliente.nome_razao_social} - {cliente.cpf_cnpj}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {formData.empresa_id && clientesFiltrados?.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                Nenhum cliente do tipo {formData.tipo_pessoa === 'fisica' ? 'pessoa física' : 'pessoa jurídica'} encontrado para esta empresa.
-              </p>
-            )}
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="natureza">Natureza da Operação</Label>
-          <Input
-            id="natureza"
-            value={formData.natureza_operacao}
-            onChange={(e) => setFormData({...formData, natureza_operacao: e.target.value})}
-          />
-        </div>
-      </CardContent>
-    </Card>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="email_cliente">Email do Cliente</Label>
+              <Input
+                id="email_cliente"
+                type="email"
+                value={formData.email_cliente}
+                onChange={(e) => handleInputChange('email_cliente', e.target.value)}
+                placeholder="email@cliente.com"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="telefone_cliente">Telefone do Cliente</Label>
+              <Input
+                id="telefone_cliente"
+                value={formData.telefone_cliente}
+                onChange={(e) => handleInputChange('telefone_cliente', e.target.value)}
+                placeholder="(11) 99999-9999"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cnpj_cpf_entrega">CNPJ/CPF para Entrega</Label>
+              <Input
+                id="cnpj_cpf_entrega"
+                value={formData.cnpj_cpf_entrega}
+                onChange={(e) => handleInputChange('cnpj_cpf_entrega', e.target.value)}
+                placeholder="00.000.000/0000-00 ou 000.000.000-00"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="inscricao_estadual_cliente">Inscrição Estadual</Label>
+              <Input
+                id="inscricao_estadual_cliente"
+                value={formData.inscricao_estadual_cliente}
+                onChange={(e) => handleInputChange('inscricao_estadual_cliente', e.target.value)}
+                placeholder="000.000.000.000"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Endereços */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Endereços
+          </CardTitle>
+          <CardDescription>
+            Endereços de faturamento e entrega
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="endereco_faturamento">Endereço para Faturamento *</Label>
+            <Textarea
+              id="endereco_faturamento"
+              value={formData.endereco_faturamento}
+              onChange={(e) => handleInputChange('endereco_faturamento', e.target.value)}
+              placeholder="Rua, número, bairro, cidade - UF, CEP"
+              rows={2}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="endereco_entrega">Endereço para Entrega *</Label>
+            <Textarea
+              id="endereco_entrega"
+              value={formData.endereco_entrega}
+              onChange={(e) => handleInputChange('endereco_entrega', e.target.value)}
+              placeholder="Rua, número, bairro, cidade - UF, CEP"
+              rows={2}
+              required
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };

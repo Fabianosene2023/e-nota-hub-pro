@@ -29,6 +29,17 @@ interface FormData {
   natureza_operacao: string;
   observacoes: string;
   tipo_pessoa: 'fisica' | 'juridica';
+  // Novos campos
+  email_cliente: string;
+  telefone_cliente: string;
+  cnpj_cpf_entrega: string;
+  inscricao_estadual_cliente: string;
+  endereco_faturamento: string;
+  endereco_entrega: string;
+  tipo_nota: 'entrada' | 'saida';
+  data_emissao: string;
+  data_entrega: string;
+  data_cancelamento: string;
 }
 
 export const EmissaoNFeForm = () => {
@@ -39,7 +50,18 @@ export const EmissaoNFeForm = () => {
     serie: 1,
     natureza_operacao: 'Venda de mercadoria adquirida ou produzida pelo estabelecimento',
     observacoes: '',
-    tipo_pessoa: 'juridica'
+    tipo_pessoa: 'juridica',
+    // Novos campos
+    email_cliente: '',
+    telefone_cliente: '',
+    cnpj_cpf_entrega: '',
+    inscricao_estadual_cliente: '',
+    endereco_faturamento: '',
+    endereco_entrega: '',
+    tipo_nota: 'saida',
+    data_emissao: new Date().toISOString().split('T')[0],
+    data_entrega: '',
+    data_cancelamento: ''
   });
   
   const [itens, setItens] = useState<ItemNFe[]>([]);
@@ -52,6 +74,9 @@ export const EmissaoNFeForm = () => {
     if (!formData.empresa_id) return "Selecione uma empresa";
     if (!formData.cliente_id) return "Selecione um cliente";
     if (!formData.numero) return "Informe o número da nota";
+    if (!formData.data_emissao) return "Informe a data de emissão";
+    if (!formData.endereco_faturamento) return "Informe o endereço de faturamento";
+    if (!formData.endereco_entrega) return "Informe o endereço de entrega";
     if (itens.length === 0) return "Adicione pelo menos um item";
     
     // Validar itens
@@ -87,6 +112,17 @@ export const EmissaoNFeForm = () => {
         valor_total: valorTotalNota,
         natureza_operacao: formData.natureza_operacao,
         observacoes: formData.observacoes,
+        // Novos campos
+        email_cliente: formData.email_cliente,
+        telefone_cliente: formData.telefone_cliente,
+        cnpj_cpf_entrega: formData.cnpj_cpf_entrega,
+        inscricao_estadual_cliente: formData.inscricao_estadual_cliente,
+        endereco_faturamento: formData.endereco_faturamento,
+        endereco_entrega: formData.endereco_entrega,
+        tipo_nota: formData.tipo_nota,
+        data_emissao: formData.data_emissao,
+        data_entrega: formData.data_entrega,
+        data_cancelamento: formData.data_cancelamento,
         itens: itens.map(item => ({
           ...(item.produto_id ? { produto_id: item.produto_id } : {}),
           ...(item.servico_id ? { servico_id: item.servico_id } : {}),
@@ -110,11 +146,12 @@ export const EmissaoNFeForm = () => {
           dados_operacao: { 
             numero: formData.numero,
             valor_total: valorTotalNota,
-            cliente_id: formData.cliente_id
+            cliente_id: formData.cliente_id,
+            tipo_nota: formData.tipo_nota
           }
         });
 
-        // Limpar formulário
+        // Limpar formulário mantendo dados básicos
         setFormData({
           empresa_id: formData.empresa_id, // Manter empresa selecionada
           cliente_id: '',
@@ -122,7 +159,17 @@ export const EmissaoNFeForm = () => {
           serie: 1,
           natureza_operacao: 'Venda de mercadoria adquirida ou produzida pelo estabelecimento',
           observacoes: '',
-          tipo_pessoa: 'juridica'
+          tipo_pessoa: 'juridica',
+          email_cliente: '',
+          telefone_cliente: '',
+          cnpj_cpf_entrega: '',
+          inscricao_estadual_cliente: '',
+          endereco_faturamento: '',
+          endereco_entrega: '',
+          tipo_nota: 'saida',
+          data_emissao: new Date().toISOString().split('T')[0],
+          data_entrega: '',
+          data_cancelamento: ''
         });
         setItens([]);
         
@@ -141,7 +188,8 @@ export const EmissaoNFeForm = () => {
         descricao: `Erro ao emitir NFe ${formData.numero}`,
         dados_operacao: { 
           erro: error instanceof Error ? error.message : 'Erro desconhecido',
-          numero: formData.numero
+          numero: formData.numero,
+          tipo_nota: formData.tipo_nota
         }
       });
     }
