@@ -17,8 +17,20 @@ export const ConfiguracaoPermissoes = () => {
   const { data: userProfiles = [], isLoading: loadingUserProfiles, error: userProfilesError } = useUserProfiles(profile?.empresa_id);
   const { data: profiles = [], isLoading: loadingProfiles, error: profilesError } = useProfiles(profile?.empresa_id);
   
+  // Normaliza os dados das duas tabelas para o formato esperado
+  const normalizedUserProfiles = userProfiles.map(user => ({
+    ...user,
+    ativo: user.ativo ?? true // user_profiles já tem o campo ativo
+  }));
+  
+  const normalizedProfiles = profiles.map(user => ({
+    ...user,
+    ativo: true, // profiles não tem campo ativo, assume true
+    user_id: user.id // para compatibilidade com user_profiles
+  }));
+  
   // Usa user_profiles se disponível, senão usa profiles
-  const usuarios = userProfiles.length > 0 ? userProfiles : profiles;
+  const usuarios = userProfiles.length > 0 ? normalizedUserProfiles : normalizedProfiles;
   const loadingUsuarios = loadingUserProfiles || loadingProfiles;
   const usuariosError = userProfilesError || profilesError;
   
