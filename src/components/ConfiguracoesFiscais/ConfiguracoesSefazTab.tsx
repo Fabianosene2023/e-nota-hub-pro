@@ -142,7 +142,7 @@ export const ConfiguracoesSefazTab: React.FC<ConfiguracoesSefazTabProps> = ({ em
                 value={formData.serie_nfce}
                 onChange={(e) => setFormData(prev => ({ 
                   ...prev, 
-                  serie_nfce: parseInt e.target.value) || 1 
+                  serie_nfce: parseInt(e.target.value) || 1 
                 }))}
                 min="1"
                 max="999"
