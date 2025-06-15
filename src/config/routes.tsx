@@ -1,8 +1,7 @@
-
 import { lazy } from "react";
 
 // Lazy loading de componentes
-export const Dashboard = lazy(() => import("../pages/Index"));
+export const Dashboard = lazy(() => import("../components/Dashboard").then(module => ({ default: module.Dashboard })));
 export const Empresas = lazy(() => import("../components/Empresas").then(module => ({ default: module.Empresas })));
 
 // Notas Fiscais - Todas as rotas integradas
