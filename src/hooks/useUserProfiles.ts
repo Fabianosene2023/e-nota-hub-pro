@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -39,27 +40,61 @@ export const useCreateUserProfile = () => {
   
   return useMutation({
     mutationFn: async (profileData: any) => {
+      console.log('Tentando criar perfil com dados:', profileData);
+      
+      // Validação básica dos dados obrigatórios
+      if (!profileData.nome || !profileData.email || !profileData.role) {
+        throw new Error('Dados obrigatórios não fornecidos');
+      }
+
+      // Gerar um user_id único se não fornecido
+      const finalProfileData = {
+        ...profileData,
+        user_id: profileData.user_id || crypto.randomUUID(),
+        ativo: profileData.ativo !== undefined ? profileData.ativo : true,
+      };
+
+      console.log('Dados finais para inserção:', finalProfileData);
+
       const { data, error } = await supabase
         .from('user_profiles')
-        .insert([profileData])
+        .insert([finalProfileData])
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao inserir no banco:', error);
+        throw error;
+      }
+
+      console.log('Perfil criado com sucesso:', data);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Sucesso na criação:', data);
       queryClient.invalidateQueries({ queryKey: ['user-profiles'] });
       toast({
         title: "Sucesso!",
         description: "Perfil de usuário criado com sucesso",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Erro ao criar perfil:', error);
+      
+      let errorMessage = "Erro ao criar perfil de usuário";
+      
+      // Mensagens de erro mais específicas
+      if (error.code === '23505') {
+        errorMessage = "Este email já está cadastrado no sistema";
+      } else if (error.code === '23502') {
+        errorMessage = "Campos obrigatórios não preenchidos";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Erro",
-        description: "Erro ao criar perfil de usuário",
+        description: errorMessage,
         variant: "destructive",
       });
     },

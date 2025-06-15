@@ -49,6 +49,8 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const createUserProfile = useCreateUserProfile();
 
+  console.log('UsuarioFormDialog - profile atual:', profile);
+
   useEffect(() => {
     if (usuario) {
       setFormData({
@@ -63,17 +65,40 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
     setErrors({});
   }, [usuario, open]);
 
+  const validateForm = () => {
+    const newErrors: Partial<FormData> = {};
+    
+    if (!formData.nome.trim()) {
+      newErrors.nome = 'Nome é obrigatório';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email é obrigatório';
+    } else {
+      // Validação básica de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = 'Email inválido';
+      }
+    }
+    
+    if (!formData.role) {
+      newErrors.role = 'Perfil é obrigatório';
+    }
+    
+    return newErrors;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: Partial<FormData> = {};
+    console.log('Submetendo formulário com dados:', formData);
     
-    if (!formData.nome.trim()) newErrors.nome = 'Nome é obrigatório';
-    if (!formData.email.trim()) newErrors.email = 'Email é obrigatório';
-    if (!formData.role) newErrors.role = 'Perfil é obrigatório';
+    const validationErrors = validateForm();
     
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      console.log('Erros de validação:', validationErrors);
       return;
     }
 
@@ -84,16 +109,30 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
           title: "Informação",
           description: "Funcionalidade de edição será implementada em breve",
         });
-      } else {
-        await createUserProfile.mutateAsync({
-          ...formData,
-          empresa_id: profile?.empresa_id,
-          user_id: crypto.randomUUID(), // Placeholder - em produção seria o ID do usuário criado no auth
-        });
-        onClose();
+        return;
       }
+
+      // Dados para criação
+      const profileData = {
+        nome: formData.nome.trim(),
+        email: formData.email.trim().toLowerCase(),
+        role: formData.role,
+        ativo: formData.ativo,
+        empresa_id: profile?.empresa_id || null,
+        user_id: crypto.randomUUID(),
+      };
+
+      console.log('Enviando dados para criação:', profileData);
+
+      await createUserProfile.mutateAsync(profileData);
+      
+      // Resetar formulário e fechar
+      setFormData(initialFormData);
+      setErrors({});
+      onClose();
+      
     } catch (error) {
-      console.error('Erro ao salvar usuário:', error);
+      console.error('Erro no handleSubmit:', error);
     }
   };
 
@@ -127,6 +166,7 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
             onChange={(value) => handleInputChange('nome', value)}
             error={errors.nome}
             required
+            placeholder="Digite o nome completo"
           />
 
           <FormField
@@ -137,6 +177,7 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
             onChange={(value) => handleInputChange('email', value)}
             error={errors.email}
             required
+            placeholder="Digite o email"
           />
 
           <FormField
