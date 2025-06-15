@@ -47,6 +47,8 @@ const LoadingSpinner = () => (
   </div>
 );
 
+const CadastroUsuarios = lazy(() => import("./pages/CadastroUsuarios"));
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -94,6 +96,11 @@ function App() {
                     <CadastroClientes />
                   </Suspense>
                 } />
+                <Route path="usuarios" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <CadastroUsuarios />
+                  </Suspense>
+                } />
                 <Route path="produtos/lista" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <CadastroProdutos />
@@ -134,6 +141,11 @@ function App() {
                 <Route path="configuracoes/empresa" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <ConfiguracoesEmpresa />
+                  </Suspense>
+                } />
+                <Route path="configuracoes/usuarios" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <CadastroUsuarios />
                   </Suspense>
                 } />
                 <Route path="configuracoes/fiscais" element={
