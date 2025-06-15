@@ -49,10 +49,14 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const createUserProfile = useCreateUserProfile();
 
-  console.log('UsuarioFormDialog - profile atual:', profile);
+  console.log('=== USUARIO FORM DIALOG ===');
+  console.log('Profile do usuário logado:', profile);
+  console.log('Dialog aberto:', open);
+  console.log('Usuário para edição:', usuario);
 
   useEffect(() => {
     if (usuario) {
+      console.log('Carregando dados para edição:', usuario);
       setFormData({
         nome: usuario.nome || '',
         email: usuario.email || '',
@@ -60,25 +64,29 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
         ativo: usuario.ativo ?? true,
       });
     } else {
+      console.log('Resetando formulário para novo usuário');
       setFormData(initialFormData);
     }
     setErrors({});
   }, [usuario, open]);
 
   const validateForm = () => {
+    console.log('Validando formulário:', formData);
     const newErrors: Partial<FormData> = {};
     
     if (!formData.nome.trim()) {
       newErrors.nome = 'Nome é obrigatório';
+    } else if (formData.nome.trim().length < 2) {
+      newErrors.nome = 'Nome deve ter pelo menos 2 caracteres';
     }
     
     if (!formData.email.trim()) {
       newErrors.email = 'Email é obrigatório';
     } else {
-      // Validação básica de email
+      // Validação de formato de email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) {
-        newErrors.email = 'Email inválido';
+      if (!emailRegex.test(formData.email.trim())) {
+        newErrors.email = 'Formato de email inválido';
       }
     }
     
@@ -86,25 +94,27 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
       newErrors.role = 'Perfil é obrigatório';
     }
     
+    console.log('Erros de validação encontrados:', newErrors);
     return newErrors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Submetendo formulário com dados:', formData);
+    console.log('=== SUBMETENDO FORMULÁRIO ===');
+    console.log('Dados do formulário:', formData);
     
     const validationErrors = validateForm();
     
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log('Erros de validação:', validationErrors);
+      console.log('Formulário inválido, parando submissão');
       return;
     }
 
     try {
       if (usuario) {
-        // TODO: Implementar atualização quando necessário
+        console.log('Modo edição - funcionalidade não implementada ainda');
         toast({
           title: "Informação",
           description: "Funcionalidade de edição será implementada em breve",
@@ -112,19 +122,29 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
         return;
       }
 
+      // Verificar se temos empresa_id
+      if (!profile?.empresa_id) {
+        console.warn('Usuário logado sem empresa_id:', profile);
+        toast({
+          title: "Aviso",
+          description: "Empresa não identificada. Usuário será criado sem vínculo específico.",
+        });
+      }
+
       // Dados para criação
       const profileData = {
         nome: formData.nome.trim(),
-        email: formData.email.trim().toLowerCase(),
+        email: formData.email.trim(),
         role: formData.role,
         ativo: formData.ativo,
         empresa_id: profile?.empresa_id || null,
-        user_id: crypto.randomUUID(),
       };
 
       console.log('Enviando dados para criação:', profileData);
 
       await createUserProfile.mutateAsync(profileData);
+      
+      console.log('Perfil criado com sucesso, resetando formulário');
       
       // Resetar formulário e fechar
       setFormData(initialFormData);
@@ -132,16 +152,22 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
       onClose();
       
     } catch (error) {
-      console.error('Erro no handleSubmit:', error);
+      console.error('Erro capturado no handleSubmit:', error);
+      // O erro já é tratado pelo onError da mutation
     }
   };
 
   const handleInputChange = (field: keyof FormData, value: string | boolean) => {
+    console.log(`Campo ${field} alterado para:`, value);
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Limpar erro do campo quando o usuário começar a digitar
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
+
+  const isLoading = createUserProfile.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -167,6 +193,7 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
             error={errors.nome}
             required
             placeholder="Digite o nome completo"
+            disabled={isLoading}
           />
 
           <FormField
@@ -178,6 +205,7 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
             error={errors.email}
             required
             placeholder="Digite o email"
+            disabled={isLoading}
           />
 
           <FormField
@@ -188,6 +216,7 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
             options={roleOptions}
             error={errors.role}
             required
+            disabled={isLoading}
           />
 
           <FormField
@@ -199,17 +228,23 @@ export const UsuarioFormDialog: React.FC<UsuarioFormDialogProps> = ({
               { value: 'true', label: 'Ativo' },
               { value: 'false', label: 'Inativo' },
             ]}
+            disabled={isLoading}
           />
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              disabled={isLoading}
+            >
               Cancelar
             </Button>
             <Button 
               type="submit" 
-              disabled={createUserProfile.isPending}
+              disabled={isLoading}
             >
-              {createUserProfile.isPending ? 'Salvando...' : 'Salvar'}
+              {isLoading ? 'Salvando...' : 'Salvar'}
             </Button>
           </div>
         </form>
