@@ -27,6 +27,7 @@ interface UsuariosTableProps {
   usuarios: Usuario[];
   isLoading: boolean;
   onEdit: (usuario: Usuario) => void;
+  onDelete: (usuario: Usuario) => void;
 }
 
 const getRoleLabel = (role: string) => {
@@ -51,6 +52,7 @@ export const UsuariosTable: React.FC<UsuariosTableProps> = ({
   usuarios,
   isLoading,
   onEdit,
+  onDelete,
 }) => {
   if (isLoading) {
     return (
@@ -106,6 +108,14 @@ export const UsuariosTable: React.FC<UsuariosTableProps> = ({
                   onClick={() => onEdit(usuario)}
                 >
                   <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onDelete(usuario)}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </TableCell>
