@@ -110,7 +110,6 @@ export const MarcasTable: React.FC = () => {
         onConfirm={handleDelete}
         title="Excluir Marca"
         description={`Tem certeza que deseja excluir a marca "${deletingMarca?.nome}"? Esta ação não pode ser desfeita.`}
-        isLoading={deleteMarca.isPending}
       />
     </>
   );
