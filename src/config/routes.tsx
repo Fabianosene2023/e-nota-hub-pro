@@ -1,4 +1,3 @@
-
 import { lazy } from "react";
 
 // Lazy loading de componentes
@@ -15,6 +14,7 @@ export const NfeComplementar = lazy(() => import("../pages/NfeComplementar"));
 export const NfeImportacao = lazy(() => import("../pages/NfeImportacao"));
 export const NfeExportacao = lazy(() => import("../pages/NfeExportacao"));
 export const ConsultaDocumentos = lazy(() => import("../pages/ConsultaDocumentos"));
+export const NotasRecebidas = lazy(() => import("../pages/NotasRecebidas"));
 
 // Cadastros
 export const CadastroClientes = lazy(() => import("../pages/CadastroClientes"));

@@ -722,6 +722,47 @@ export type Database = {
           },
         ]
       }
+      historico_mdfe: {
+        Row: {
+          created_at: string
+          dados_evento: Json | null
+          data_evento: string
+          descricao: string | null
+          evento: string
+          id: string
+          mdfe_id: string
+          usuario_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          dados_evento?: Json | null
+          data_evento?: string
+          descricao?: string | null
+          evento: string
+          id?: string
+          mdfe_id: string
+          usuario_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          dados_evento?: Json | null
+          data_evento?: string
+          descricao?: string | null
+          evento?: string
+          id?: string
+          mdfe_id?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_mdfe_mdfe_id_fkey"
+            columns: ["mdfe_id"]
+            isOneToOne: false
+            referencedRelation: "mdfe_recebidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historico_notas: {
         Row: {
           created_at: string
@@ -792,6 +833,50 @@ export type Database = {
             columns: ["cte_id"]
             isOneToOne: false
             referencedRelation: "cte"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      itens_mdfe: {
+        Row: {
+          cfop: string | null
+          codigo_produto: string | null
+          created_at: string
+          descricao_produto: string
+          id: string
+          mdfe_id: string
+          peso_item: number
+          quantidade: number
+          valor_item: number
+        }
+        Insert: {
+          cfop?: string | null
+          codigo_produto?: string | null
+          created_at?: string
+          descricao_produto: string
+          id?: string
+          mdfe_id: string
+          peso_item?: number
+          quantidade?: number
+          valor_item?: number
+        }
+        Update: {
+          cfop?: string | null
+          codigo_produto?: string | null
+          created_at?: string
+          descricao_produto?: string
+          id?: string
+          mdfe_id?: string
+          peso_item?: number
+          quantidade?: number
+          valor_item?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_mdfe_mdfe_id_fkey"
+            columns: ["mdfe_id"]
+            isOneToOne: false
+            referencedRelation: "mdfe_recebidos"
             referencedColumns: ["id"]
           },
         ]
@@ -1024,6 +1109,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mdfe_recebidos: {
+        Row: {
+          ambiente_emissao: string
+          chave_acesso: string
+          created_at: string
+          data_emissao: string
+          data_recebimento: string
+          destinatario_cnpj: string | null
+          destinatario_nome: string | null
+          empresa_id: string
+          id: string
+          numero_mdfe: string
+          observacoes: string | null
+          peso_total: number
+          protocolo_autorizacao: string | null
+          remetente_cnpj: string
+          remetente_nome: string
+          serie: string
+          status: string
+          updated_at: string
+          valor_total: number
+          xml_mdfe: string | null
+        }
+        Insert: {
+          ambiente_emissao?: string
+          chave_acesso: string
+          created_at?: string
+          data_emissao: string
+          data_recebimento?: string
+          destinatario_cnpj?: string | null
+          destinatario_nome?: string | null
+          empresa_id: string
+          id?: string
+          numero_mdfe: string
+          observacoes?: string | null
+          peso_total?: number
+          protocolo_autorizacao?: string | null
+          remetente_cnpj: string
+          remetente_nome: string
+          serie?: string
+          status?: string
+          updated_at?: string
+          valor_total?: number
+          xml_mdfe?: string | null
+        }
+        Update: {
+          ambiente_emissao?: string
+          chave_acesso?: string
+          created_at?: string
+          data_emissao?: string
+          data_recebimento?: string
+          destinatario_cnpj?: string | null
+          destinatario_nome?: string | null
+          empresa_id?: string
+          id?: string
+          numero_mdfe?: string
+          observacoes?: string | null
+          peso_total?: number
+          protocolo_autorizacao?: string | null
+          remetente_cnpj?: string
+          remetente_nome?: string
+          serie?: string
+          status?: string
+          updated_at?: string
+          valor_total?: number
+          xml_mdfe?: string | null
+        }
+        Relationships: []
       }
       nfce: {
         Row: {
