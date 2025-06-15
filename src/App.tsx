@@ -1,4 +1,3 @@
-
 import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -50,6 +49,7 @@ const LoadingSpinner = () => (
 
 const CadastroUsuarios = lazy(() => import("./pages/CadastroUsuarios"));
 const ConfiguracaoPermissoes = lazy(() => import("./pages/ConfiguracaoPermissoes"));
+const RelatoriosProdutos = lazy(() => import("./pages/RelatoriosProdutos"));
 
 function App() {
   return (
@@ -165,6 +165,11 @@ function App() {
                 <Route path="relatorios" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <Relatorios />
+                  </Suspense>
+                } />
+                <Route path="relatorios/produtos" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <RelatoriosProdutos />
                   </Suspense>
                 } />
                 
