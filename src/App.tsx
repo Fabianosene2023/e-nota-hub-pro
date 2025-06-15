@@ -28,6 +28,7 @@ const Relatorios = lazy(() => import("./components/Relatorios").then(module => (
 const NfcePage = lazy(() => import("./components/Nfce").then(m => ({ default: m.default })));
 const CtePage = lazy(() => import("./pages/CtePage"));
 const CadastroCategorias = lazy(() => import("./pages/CadastroCategorias"));
+const CadastroUnidades = lazy(() => import("./pages/CadastroUnidades"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -119,6 +120,11 @@ function App() {
                 <Route path="produtos/categorias" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <CadastroCategorias />
+                  </Suspense>
+                } />
+                <Route path="produtos/unidades" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <CadastroUnidades />
                   </Suspense>
                 } />
 
