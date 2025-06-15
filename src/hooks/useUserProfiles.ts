@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -7,6 +6,8 @@ export const useUserProfiles = (empresaId?: string) => {
   return useQuery({
     queryKey: ['user-profiles', empresaId],
     queryFn: async () => {
+      console.log('Buscando user profiles para empresa:', empresaId);
+      
       let query = supabase
         .from('user_profiles')
         .select('*')
@@ -18,9 +19,15 @@ export const useUserProfiles = (empresaId?: string) => {
       
       const { data, error } = await query;
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar user profiles:', error);
+        throw error;
+      }
+      
+      console.log('User profiles encontrados:', data);
       return data;
     },
+    enabled: !!empresaId,
   });
 };
 

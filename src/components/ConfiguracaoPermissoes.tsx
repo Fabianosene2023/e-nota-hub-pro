@@ -11,9 +11,14 @@ export const ConfiguracaoPermissoes = () => {
   const { profile } = useAuth();
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   
+  console.log('ConfiguracaoPermissoes - profile:', profile);
+  
   const { data: usuarios, isLoading: loadingUsuarios } = useUserProfiles(profile?.empresa_id);
   const { data: userPermissions = {}, isLoading: loadingPermissions } = useUserPermissions(selectedUserId);
   const updatePermission = useUpdateUserPermission();
+
+  console.log('ConfiguracaoPermissoes - usuarios:', usuarios);
+  console.log('ConfiguracaoPermissoes - loadingUsuarios:', loadingUsuarios);
 
   const handlePermissionChange = (permissionId: string, granted: boolean) => {
     if (!selectedUserId) return;

@@ -43,6 +43,9 @@ export const UsuarioSelector: React.FC<UsuarioSelectorProps> = ({
   onUsuarioChange,
   isLoading
 }) => {
+  console.log('UsuarioSelector - usuarios:', usuarios);
+  console.log('UsuarioSelector - isLoading:', isLoading);
+
   return (
     <Card>
       <CardHeader>
@@ -56,23 +59,31 @@ export const UsuarioSelector: React.FC<UsuarioSelectorProps> = ({
           <div className="flex justify-center items-center h-16">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
+        ) : !usuarios || usuarios.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            Nenhum usuário encontrado para esta empresa
+          </div>
         ) : (
           <Select value={usuarioSelecionado} onValueChange={onUsuarioChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecione um usuário" />
             </SelectTrigger>
             <SelectContent>
-              {usuarios?.map((usuario) => (
+              {usuarios.map((usuario) => (
                 <SelectItem key={usuario.id} value={usuario.id}>
-                  <div className="flex items-center gap-2">
-                    <span>{usuario.nome}</span>
-                    <span className="text-muted-foreground">({usuario.email})</span>
-                    <Badge variant={getRoleVariant(usuario.role) as any}>
-                      {getRoleLabel(usuario.role)}
-                    </Badge>
-                    {!usuario.ativo && (
-                      <Badge variant="secondary">Inativo</Badge>
-                    )}
+                  <div className="flex items-center gap-2 w-full">
+                    <div className="flex flex-col">
+                      <span className="font-medium">{usuario.nome}</span>
+                      <span className="text-sm text-muted-foreground">{usuario.email}</span>
+                    </div>
+                    <div className="flex gap-1 ml-auto">
+                      <Badge variant={getRoleVariant(usuario.role) as any} className="text-xs">
+                        {getRoleLabel(usuario.role)}
+                      </Badge>
+                      {!usuario.ativo && (
+                        <Badge variant="secondary" className="text-xs">Inativo</Badge>
+                      )}
+                    </div>
                   </div>
                 </SelectItem>
               ))}
