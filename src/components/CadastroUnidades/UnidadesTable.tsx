@@ -42,14 +42,12 @@ export const UnidadesTable: React.FC = () => {
     if (!deletingUnidade) return;
     
     console.log('Confirmando exclusão da unidade:', deletingUnidade);
-    deleteUnidade.mutate(deletingUnidade.id, {
-      onSuccess: () => {
-        setDeletingUnidade(null);
-      },
-      onError: (error) => {
-        console.error('Erro ao deletar unidade:', error);
-      }
-    });
+    try {
+      await deleteUnidade.mutateAsync(deletingUnidade.id);
+      setDeletingUnidade(null);
+    } catch (error) {
+      console.error('Erro ao deletar unidade:', error);
+    }
   };
 
   if (isLoading) {

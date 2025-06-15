@@ -36,20 +36,20 @@ export const UnidadeFormDialog: React.FC<UnidadeFormDialogProps> = ({
   });
 
   React.useEffect(() => {
-    if (unidade) {
+    if (unidade && open) {
       console.log('Preenchendo formulário para edição:', unidade);
       setFormData({
         codigo: unidade.codigo || '',
         descricao: unidade.descricao || '',
       });
-    } else {
+    } else if (!unidade && open) {
       console.log('Limpando formulário para nova unidade');
       setFormData({
         codigo: '',
         descricao: '',
       });
     }
-  }, [unidade]);
+  }, [unidade, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
