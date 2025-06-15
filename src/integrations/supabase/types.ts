@@ -1091,6 +1091,66 @@ export type Database = {
         }
         Relationships: []
       }
+      nfse_emitidas: {
+        Row: {
+          ambiente: string
+          codigo_verificacao: string | null
+          created_at: string
+          data_emissao: string
+          descricao_servico: string
+          empresa_id: string
+          id: string
+          numero_nfse: string
+          numero_rps: number
+          protocolo: string | null
+          serie_rps: string
+          status: string
+          tomador_cpf_cnpj: string | null
+          tomador_nome: string
+          updated_at: string
+          valor_servico: number
+          xml_nfse: string | null
+        }
+        Insert: {
+          ambiente?: string
+          codigo_verificacao?: string | null
+          created_at?: string
+          data_emissao: string
+          descricao_servico: string
+          empresa_id: string
+          id?: string
+          numero_nfse: string
+          numero_rps: number
+          protocolo?: string | null
+          serie_rps?: string
+          status?: string
+          tomador_cpf_cnpj?: string | null
+          tomador_nome: string
+          updated_at?: string
+          valor_servico: number
+          xml_nfse?: string | null
+        }
+        Update: {
+          ambiente?: string
+          codigo_verificacao?: string | null
+          created_at?: string
+          data_emissao?: string
+          descricao_servico?: string
+          empresa_id?: string
+          id?: string
+          numero_nfse?: string
+          numero_rps?: number
+          protocolo?: string | null
+          serie_rps?: string
+          status?: string
+          tomador_cpf_cnpj?: string | null
+          tomador_nome?: string
+          updated_at?: string
+          valor_servico?: number
+          xml_nfse?: string | null
+        }
+        Relationships: []
+      }
       notas_fiscais: {
         Row: {
           ambiente_emissao: string | null

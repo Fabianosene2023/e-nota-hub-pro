@@ -64,7 +64,7 @@ export class UberabaNFSeService {
         : this.ENDPOINT_HOMOLOGACAO;
 
       // Em ambiente de desenvolvimento, simular a resposta
-      if (processo.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'development') {
         return this.simularResposta(dadosNFSe);
       }
 
@@ -98,7 +98,7 @@ export class UberabaNFSeService {
 
       const xmlConsulta = this.gerarXmlConsulta(numero, prestadorCnpj);
       
-      if (processo.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'development') {
         return {
           success: true,
           numero_nfse: numero,
