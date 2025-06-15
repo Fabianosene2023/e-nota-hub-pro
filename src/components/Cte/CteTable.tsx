@@ -3,8 +3,9 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { useCtes, useCteDelete, useCteEmit } from "@/hooks/useCte";
 import { CteForm } from "./CteForm";
-import { Pencil, Trash, Plus, Send } from "lucide-react";
+import { Pencil, Trash, Plus, Send, AlertTriangle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { CteDesacordoDialog } from "./CteDesacordoDialog";
 
 export function CteTable() {
   const { data: ctes = [], isLoading } = useCtes();
@@ -13,6 +14,9 @@ export function CteTable() {
 
   const [formOpen, setFormOpen] = React.useState(false);
   const [editData, setEditData] = React.useState<any | null>(null);
+
+  const [desacordoOpen, setDesacordoOpen] = React.useState(false);
+  const [selectedCteId, setSelectedCteId] = React.useState<string | null>(null);
 
   const handleDelete = (id: string) => {
     if (window.confirm("Tem certeza que deseja remover este CT-e?")) {
@@ -30,6 +34,11 @@ export function CteTable() {
         onError: (error: any) => toast({ title: "Erro ao emitir CT-e", description: error.message, variant: "destructive" }),
       });
     }
+  };
+
+  const handleOpenDesacordo = (id: string) => {
+    setSelectedCteId(id);
+    setDesacordoOpen(true);
   };
 
   if (isLoading) {
@@ -70,7 +79,7 @@ export function CteTable() {
                 </td>
                 <td className="p-2 border">{cte.natureza_operacao}</td>
                 <td className="p-2 border">{cte.status}</td>
-                <td className="p-2 border flex gap-1 justify-center">
+                <td className="p-2 border flex gap-1 justify-center items-center">
                   {cte.status === 'rascunho' ? (
                     <>
                       <Button variant="ghost" size="sm" onClick={() => { setEditData(cte); setFormOpen(true); }} title="Editar">
@@ -83,6 +92,12 @@ export function CteTable() {
                         <Trash size={14} />
                       </Button>
                     </>
+                  ) : cte.status === 'emitido' ? (
+                    <Button variant="ghost" size="sm" onClick={() => handleOpenDesacordo(cte.id)} title="Manifestar Desacordo">
+                        <AlertTriangle size={14} className="text-orange-500" />
+                    </Button>
+                  ) : cte.status === 'desacordo_pendente' ? (
+                    <span className="text-muted-foreground text-xs p-2">Em desacordo</span>
                   ) : (
                     <span className="text-muted-foreground text-xs p-2">Não editável</span>
                   )}
@@ -93,6 +108,11 @@ export function CteTable() {
         </table>
       </div>
       <CteForm open={formOpen} onOpenChange={setFormOpen} initialData={editData} />
+      <CteDesacordoDialog
+        open={desacordoOpen}
+        onOpenChange={setDesacordoOpen}
+        cteId={selectedCteId}
+      />
     </div>
   );
 }

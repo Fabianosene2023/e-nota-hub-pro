@@ -96,6 +96,44 @@ export function useCteEmit() {
   });
 }
 
+// For creating a disagreement event
+export function useCteDesacordo() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (values: { cte_id: string; justificativa: string }) => {
+      // 1. Insert into desacordo_cte table
+      const { data: desacordoData, error: desacordoError } = await supabase
+        .from("desacordo_cte")
+        .insert([
+          {
+            cte_id: values.cte_id,
+            justificativa: values.justificativa,
+            status: "pendente",
+          },
+        ])
+        .select()
+        .single();
+
+      if (desacordoError) throw desacordoError;
+
+      // 2. Update the CTE status to reflect the disagreement
+      const { data: cteData, error: cteError } = await supabase
+        .from("cte")
+        .update({ status: "desacordo_pendente" })
+        .eq("id", values.cte_id)
+        .select()
+        .single();
+      
+      if (cteError) throw cteError;
+      
+      return { desacordoData, cteData };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ctes"] });
+    },
+  });
+}
+
 // For delete
 export function useCteDelete() {
   const queryClient = useQueryClient();
