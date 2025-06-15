@@ -54,6 +54,11 @@ export const AppRoutes = () => {
             <LazyComponents.CtePage />
           </Suspense>
         } />
+        <Route path="notas/nfse" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.NfseEmissao />
+          </Suspense>
+        } />
         
         {/* Cadastros */}
         <Route path="clientes" element={
