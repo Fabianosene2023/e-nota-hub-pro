@@ -25,6 +25,7 @@ const CadastroFornecedores = lazy(() => import("./pages/CadastroFornecedores"));
 const CadastroTransportadoras = lazy(() => import("./pages/CadastroTransportadoras"));
 const Relatorios = lazy(() => import("./components/Relatorios").then(module => ({ default: module.Relatorios })));
 const NfcePage = lazy(() => import("./components/Nfce").then(m => ({ default: m.default })));
+const CtePage = lazy(() => import("./pages/CtePage")); // ADDED
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -113,7 +114,7 @@ function App() {
                 <Route path="configuracoes/fiscais" element={
                   <Suspense fallback={<LoadingSpinner />}>
                     <ConfiguracoesFiscais />
-                  </Suspense>
+                  Suspense>
                 } />
                 
                 {/* Relatórios */}
@@ -132,8 +133,13 @@ function App() {
                 
                 {/* Redirecionamento padrão */}
                 <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route path="notas/cte" element={
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <CtePage />
+                  </Suspense>
+                } />
               </Route>
-              
+
               {/* 404 */}
               <Route path="*" element={<NotFound />} />
             </Routes>
