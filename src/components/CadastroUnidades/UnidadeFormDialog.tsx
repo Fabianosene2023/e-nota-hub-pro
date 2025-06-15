@@ -36,18 +36,20 @@ export const UnidadeFormDialog: React.FC<UnidadeFormDialogProps> = ({
   });
 
   React.useEffect(() => {
-    if (unidade && open) {
-      console.log('Preenchendo formulário para edição:', unidade);
-      setFormData({
-        codigo: unidade.codigo || '',
-        descricao: unidade.descricao || '',
-      });
-    } else if (!unidade && open) {
-      console.log('Limpando formulário para nova unidade');
-      setFormData({
-        codigo: '',
-        descricao: '',
-      });
+    if (open) {
+      if (unidade) {
+        console.log('Preenchendo formulário para edição:', unidade);
+        setFormData({
+          codigo: unidade.codigo || '',
+          descricao: unidade.descricao || '',
+        });
+      } else {
+        console.log('Limpando formulário para nova unidade');
+        setFormData({
+          codigo: '',
+          descricao: '',
+        });
+      }
     }
   }, [unidade, open]);
 
@@ -70,13 +72,26 @@ export const UnidadeFormDialog: React.FC<UnidadeFormDialogProps> = ({
           id: unidade.id,
           ...formData,
         });
+        toast({
+          title: "Sucesso",
+          description: "Unidade de medida atualizada com sucesso",
+        });
       } else {
         console.log('Criando nova unidade:', formData);
         await createUnidade.mutateAsync(formData);
+        toast({
+          title: "Sucesso",
+          description: "Unidade de medida criada com sucesso",
+        });
       }
       onOpenChange(false);
     } catch (error) {
       console.error('Erro ao salvar unidade:', error);
+      toast({
+        title: "Erro",
+        description: `Erro ao ${isEditing ? 'atualizar' : 'criar'} unidade de medida`,
+        variant: "destructive",
+      });
     }
   };
 

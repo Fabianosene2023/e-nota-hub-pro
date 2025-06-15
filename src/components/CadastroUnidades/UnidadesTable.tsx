@@ -13,6 +13,7 @@ import { Edit, Trash2 } from 'lucide-react';
 import { useUnidadesMedida, useUnidadesMedidaManager } from '@/hooks/useUnidadesMedida';
 import { UnidadeFormDialog } from './UnidadeFormDialog';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
+import { toast } from '@/hooks/use-toast';
 
 interface Unidade {
   id: string;
@@ -45,8 +46,17 @@ export const UnidadesTable: React.FC = () => {
     try {
       await deleteUnidade.mutateAsync(deletingUnidade.id);
       setDeletingUnidade(null);
+      toast({
+        title: "Sucesso",
+        description: "Unidade de medida removida com sucesso",
+      });
     } catch (error) {
       console.error('Erro ao deletar unidade:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao remover unidade de medida",
+        variant: "destructive",
+      });
     }
   };
 

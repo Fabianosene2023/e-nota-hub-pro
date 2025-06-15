@@ -1,7 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
 
 export const useUnidadesMedida = () => {
   return useQuery({
@@ -44,18 +43,9 @@ export const useUnidadesMedidaManager = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['unidades-medida'] });
-      toast({
-        title: "Sucesso",
-        description: "Unidade de medida criada com sucesso",
-      });
     },
     onError: (error: any) => {
       console.error('Erro na mutação de criação:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao criar unidade de medida: " + error.message,
-        variant: "destructive",
-      });
     },
   });
 
@@ -78,18 +68,9 @@ export const useUnidadesMedidaManager = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['unidades-medida'] });
-      toast({
-        title: "Sucesso",
-        description: "Unidade de medida atualizada com sucesso",
-      });
     },
     onError: (error: any) => {
       console.error('Erro na mutação de atualização:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar unidade de medida: " + error.message,
-        variant: "destructive",
-      });
     },
   });
 
@@ -109,18 +90,9 @@ export const useUnidadesMedidaManager = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['unidades-medida'] });
-      toast({
-        title: "Sucesso",
-        description: "Unidade de medida removida com sucesso",
-      });
     },
     onError: (error: any) => {
       console.error('Erro na mutação de exclusão:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao remover unidade de medida: " + error.message,
-        variant: "destructive",
-      });
     },
   });
 
