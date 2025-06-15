@@ -748,8 +748,9 @@ export type Database = {
           cfop: string | null
           created_at: string
           cte_id: string
+          descricao: string | null
           id: string
-          produto_id: string
+          produto_id: string | null
           quantidade: number
           valor_total: number
           valor_unitario: number
@@ -758,8 +759,9 @@ export type Database = {
           cfop?: string | null
           created_at?: string
           cte_id: string
+          descricao?: string | null
           id?: string
-          produto_id: string
+          produto_id?: string | null
           quantidade: number
           valor_total: number
           valor_unitario: number
@@ -768,8 +770,9 @@ export type Database = {
           cfop?: string | null
           created_at?: string
           cte_id?: string
+          descricao?: string | null
           id?: string
-          produto_id?: string
+          produto_id?: string | null
           quantidade?: number
           valor_total?: number
           valor_unitario?: number

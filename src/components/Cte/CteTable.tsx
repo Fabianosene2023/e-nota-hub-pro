@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useCtes, useCteDelete } from "@/hooks/useCte";
 import { CteForm } from "./CteForm";
 import { Pencil, Trash, Plus } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 export function CteTable() {
   const { data: ctes = [], isLoading } = useCtes();
@@ -11,6 +12,15 @@ export function CteTable() {
 
   const [formOpen, setFormOpen] = React.useState(false);
   const [editData, setEditData] = React.useState<any | null>(null);
+
+  const handleDelete = (id: string) => {
+    if (window.confirm("Tem certeza que deseja remover este CT-e?")) {
+      remove.mutate(id, {
+        onSuccess: () => toast({ title: "CT-e removido com sucesso!" }),
+        onError: () => toast({ title: "Erro ao remover CT-e", variant: "destructive" }),
+      });
+    }
+  };
 
   if (isLoading) {
     return <div className="p-4">Carregando CT-es...</div>;
@@ -45,14 +55,16 @@ export function CteTable() {
             {ctes.map((cte: any) => (
               <tr key={cte.id}>
                 <td className="p-2 border">{cte.numero}</td>
-                <td className="p-2 border">{cte.valor_total}</td>
+                <td className="p-2 border">
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cte.valor_total)}
+                </td>
                 <td className="p-2 border">{cte.natureza_operacao}</td>
                 <td className="p-2 border">{cte.status}</td>
                 <td className="p-2 border flex gap-1 justify-center">
                   <Button variant="ghost" size="sm" onClick={() => { setEditData(cte); setFormOpen(true); }}>
                     <Pencil size={14} />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => remove.mutate(cte.id)}>
+                  <Button variant="ghost" size="sm" onClick={() => handleDelete(cte.id)}>
                     <Trash size={14} />
                   </Button>
                 </td>
