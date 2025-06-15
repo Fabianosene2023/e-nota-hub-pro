@@ -33,7 +33,7 @@ export const useMdfeRecebidos = (filtros: FiltrosMdfe) => {
         query = query.ilike('chave_acesso', `%${filtros.chaveAcesso}%`);
       }
       
-      if (filtros.status) {
+      if (filtros.status && filtros.status !== 'todos') {
         query = query.eq('status', filtros.status);
       }
       
@@ -54,7 +54,7 @@ export const useMdfeRecebidos = (filtros: FiltrosMdfe) => {
 
       return data || [];
     },
-    enabled: Object.values(filtros).some(value => value !== ""), // Só executa se pelo menos um filtro estiver preenchido
+    enabled: Object.values(filtros).some(value => value !== "" && value !== "todos"), // Só executa se pelo menos um filtro estiver preenchido
   });
 };
 

@@ -66,7 +66,7 @@ export const FiltrosMdfe: React.FC<FiltrosMdfeProps> = ({ onBuscar, isLoading })
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="recebido">Recebido</SelectItem>
                   <SelectItem value="processado">Processado</SelectItem>
                   <SelectItem value="erro">Erro</SelectItem>
