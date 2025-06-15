@@ -14,7 +14,7 @@ interface SefazConfigFormProps {
     serie_nfce: number;
     tentativas_reenvio: number;
   };
-  onFormDataChange: (data: Partial<typeof formData>) => void;
+  onFormDataChange: (data: Partial<SefazConfigFormProps['formData']>) => void;
 }
 
 export const SefazConfigForm: React.FC<SefazConfigFormProps> = ({ formData, onFormDataChange }) => {

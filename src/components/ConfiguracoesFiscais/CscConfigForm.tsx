@@ -11,7 +11,7 @@ interface CscConfigFormProps {
     csc_id: string;
     csc_token: string;
   };
-  onFormDataChange: (data: Partial<typeof formData>) => void;
+  onFormDataChange: (data: Partial<CscConfigFormProps['formData']>) => void;
 }
 
 export const CscConfigForm: React.FC<CscConfigFormProps> = ({ formData, onFormDataChange }) => {
