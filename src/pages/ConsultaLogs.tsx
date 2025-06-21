@@ -11,14 +11,14 @@ import { Badge } from "@/components/ui/badge";
 
 const ConsultaLogs = () => {
   const { profile } = useAuth();
-  const [filtroTipo, setFiltroTipo] = useState<string>('');
+  const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [busca, setBusca] = useState<string>('');
   
   const { data: logs, isLoading, error } = useLogsOperacoes(profile?.empresa_id || '');
 
   // Filtrar logs baseado nos filtros
   const logsFiltrados = logs?.filter(log => {
-    const matchTipo = !filtroTipo || log.tipo_operacao === filtroTipo;
+    const matchTipo = filtroTipo === 'todos' || log.tipo_operacao === filtroTipo;
     const matchBusca = !busca || log.descricao.toLowerCase().includes(busca.toLowerCase());
     return matchTipo && matchBusca;
   }) || [];
@@ -156,14 +156,14 @@ const ConsultaLogs = () => {
                 <SelectValue placeholder="Tipo de operação" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os tipos</SelectItem>
+                <SelectItem value="todos">Todos os tipos</SelectItem>
                 <SelectItem value="nfe_emissao">Emissão NFe</SelectItem>
                 <SelectItem value="cliente_cadastro">Cadastro Cliente</SelectItem>
                 <SelectItem value="produto_atualizado">Produto Atualizado</SelectItem>
                 <SelectItem value="configuracao">Configuração</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" onClick={() => { setBusca(''); setFiltroTipo(''); }}>
+            <Button variant="outline" onClick={() => { setBusca(''); setFiltroTipo('todos'); }}>
               Limpar
             </Button>
           </div>
