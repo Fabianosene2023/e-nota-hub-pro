@@ -2,8 +2,15 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, Users, FileText, TrendingUp } from 'lucide-react';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { useAtividadesRecentes } from '@/hooks/useAtividadesRecentes';
+import { useStatusSistema } from '@/hooks/useStatusSistema';
 
 const Dashboard = () => {
+  const { data: stats, isLoading: loadingStats } = useDashboardStats();
+  const { data: atividades, isLoading: loadingAtividades } = useAtividadesRecentes();
+  const { data: status, isLoading: loadingStatus } = useStatusSistema();
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -24,9 +31,11 @@ const Dashboard = () => {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,234</div>
+            <div className="text-2xl font-bold">
+              {loadingStats ? '...' : stats?.nfesEmitidas || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
-              +20.1% em relação ao mês anterior
+              {stats?.crescimentoNfe > 0 ? '+' : ''}{stats?.crescimentoNfe?.toFixed(1) || 0}% em relação ao mês anterior
             </p>
           </CardContent>
         </Card>
@@ -39,9 +48,11 @@ const Dashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">456</div>
+            <div className="text-2xl font-bold">
+              {loadingStats ? '...' : stats?.clientesAtivos || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
-              +5.2% em relação ao mês anterior
+              +{stats?.crescimentoClientes?.toFixed(1) || 0}% em relação ao mês anterior
             </p>
           </CardContent>
         </Card>
@@ -54,9 +65,14 @@ const Dashboard = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 45.231,89</div>
+            <div className="text-2xl font-bold">
+              R$ {loadingStats ? '...' : (stats?.receitaTotal || 0).toLocaleString('pt-BR', { 
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 
+              })}
+            </div>
             <p className="text-xs text-muted-foreground">
-              +12.5% em relação ao mês anterior
+              +{stats?.crescimentoReceita?.toFixed(1) || 0}% em relação ao mês anterior
             </p>
           </CardContent>
         </Card>
@@ -69,7 +85,9 @@ const Dashboard = () => {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89</div>
+            <div className="text-2xl font-bold">
+              {loadingStats ? '...' : stats?.relatoriosGerados || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               Gerados este mês
             </p>
@@ -87,27 +105,23 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">NFe #123 emitida</p>
-                  <p className="text-xs text-muted-foreground">Há 2 minutos</p>
+              {loadingAtividades ? (
+                <div className="text-center py-4">Carregando atividades...</div>
+              ) : atividades && atividades.length > 0 ? (
+                atividades.map((atividade) => (
+                  <div key={atividade.id} className="flex items-center space-x-4">
+                    <div className={`w-2 h-2 ${atividade.cor} rounded-full`}></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{atividade.descricao}</p>
+                      <p className="text-xs text-muted-foreground">{atividade.tempo}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-muted-foreground">
+                  Nenhuma atividade recente encontrada
                 </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Cliente ABC LTDA cadastrado</p>
-                  <p className="text-xs text-muted-foreground">Há 15 minutos</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Produto XYZ atualizado</p>
-                  <p className="text-xs text-muted-foreground">Há 1 hora</p>
-                </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -121,18 +135,30 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">SEFAZ</span>
-                <span className="text-sm text-green-600">Online</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Certificado Digital</span>
-                <span className="text-sm text-green-600">Válido</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Banco de Dados</span>
-                <span className="text-sm text-green-600">Conectado</span>
-              </div>
+              {loadingStatus ? (
+                <div className="text-center py-4">Verificando status...</div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">SEFAZ</span>
+                    <span className={`text-sm ${status?.sefaz === 'Online' ? 'text-green-600' : 'text-red-600'}`}>
+                      {status?.sefaz || 'Offline'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Certificado Digital</span>
+                    <span className={`text-sm ${status?.certificado === 'Válido' ? 'text-green-600' : 'text-red-600'}`}>
+                      {status?.certificado || 'Inválido'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Banco de Dados</span>
+                    <span className="text-sm text-green-600">
+                      {status?.bancoDados || 'Conectado'}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
