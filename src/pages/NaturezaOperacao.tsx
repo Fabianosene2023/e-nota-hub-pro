@@ -1,13 +1,16 @@
 
 import React, { useState } from 'react';
-import { ClipboardList, Settings, Tag, FileText, Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { ClipboardList, Settings, Tag, FileText, Search, Edit, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useNaturezaOperacao, useNaturezaOperacaoStats } from '@/hooks/useNaturezaOperacao';
+import { CreateNaturezaModal } from '@/components/NaturezaOperacao/CreateNaturezaModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 const NaturezaOperacao = () => {
+  const { profile } = useAuth();
   const [busca, setBusca] = useState('');
   const { data: naturezas, isLoading } = useNaturezaOperacao();
   const { data: stats, isLoading: loadingStats } = useNaturezaOperacaoStats();
@@ -27,12 +30,12 @@ const NaturezaOperacao = () => {
             Configure as naturezas de operação utilizadas nas notas fiscais
           </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Natureza
-        </Button>
+        {profile?.empresa_id && (
+          <CreateNaturezaModal empresaId={profile.empresa_id} />
+        )}
       </div>
 
+      {/* Cards de estatísticas permanecem iguais */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -149,11 +152,13 @@ const NaturezaOperacao = () => {
               <p className="text-sm">
                 {busca ? 'Tente ajustar o termo de busca' : 'Comece criando uma nova natureza de operação'}
               </p>
-              {!busca && (
-                <Button className="mt-4">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Criar Primeira Natureza
-                </Button>
+              {!busca && profile?.empresa_id && (
+                <div className="mt-4">
+                  <CreateNaturezaModal 
+                    empresaId={profile.empresa_id} 
+                    triggerText="Criar Primeira Natureza"
+                  />
+                </div>
               )}
             </div>
           ) : (

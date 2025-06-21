@@ -22,7 +22,7 @@ export const TesteApiNfe = () => {
   });
 
   const { data: empresas } = useEmpresas();
-  const { data: clientes } = useClientes();
+  const { data: clientes } = useClientes(formData.empresa_id);
   const createNotaFiscal = useCreateNotaFiscal();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,18 +41,36 @@ export const TesteApiNfe = () => {
       empresa_id: formData.empresa_id,
       cliente_id: formData.cliente_id,
       numero: parseInt(formData.numero),
+      serie: 1,
       valor_total: parseFloat(formData.valor_total),
+      natureza_operacao: 'Venda de mercadoria adquirida ou produzida pelo estabelecimento',
       observacoes: formData.observacoes || null,
+      itens: [
+        {
+          produto_id: 'teste-produto-id',
+          quantidade: 1,
+          valor_unitario: parseFloat(formData.valor_total),
+          valor_total: parseFloat(formData.valor_total),
+          cfop: '5102'
+        }
+      ]
     };
 
     console.log('Testando API de NFe com dados:', notaData);
     
     try {
-      await createNotaFiscal.mutateAsync(notaData);
+      const resultado = await createNotaFiscal.mutateAsync(notaData);
+      
+      if (resultado?.data || resultado?.sefazResult) {
+        toast({
+          title: "Teste realizado com sucesso!",
+          description: `NFe ${formData.numero} processada. Status: ${resultado?.sefazResult?.success ? 'Autorizada' : 'Erro'}`,
+        });
+      }
       
       // Limpar formulário após sucesso
       setFormData({
-        empresa_id: '',
+        empresa_id: formData.empresa_id, // Manter empresa selecionada
         cliente_id: '',
         numero: '',
         valor_total: '',
@@ -81,7 +99,7 @@ export const TesteApiNfe = () => {
               <Label htmlFor="empresa">Empresa *</Label>
               <Select 
                 value={formData.empresa_id} 
-                onValueChange={(value) => setFormData({...formData, empresa_id: value})}
+                onValueChange={(value) => setFormData({...formData, empresa_id: value, cliente_id: ''})}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a empresa" />
@@ -101,6 +119,7 @@ export const TesteApiNfe = () => {
               <Select 
                 value={formData.cliente_id} 
                 onValueChange={(value) => setFormData({...formData, cliente_id: value})}
+                disabled={!formData.empresa_id}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o cliente" />
@@ -108,7 +127,7 @@ export const TesteApiNfe = () => {
                 <SelectContent>
                   {clientes?.map((cliente) => (
                     <SelectItem key={cliente.id} value={cliente.id}>
-                      {cliente.nome_razao_social}
+                      {cliente.nome_razao_social} - {cliente.cpf_cnpj}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -174,13 +193,13 @@ export const TesteApiNfe = () => {
           <h4 className="font-semibold mb-2">Status do Teste:</h4>
           <p className="text-sm text-muted-foreground">
             Este teste simula uma conexão com a API da SEFAZ para criação de NFe. 
-            Em um ambiente real, seria necessário configurar:
+            O sistema agora carrega dados reais de empresas e clientes do banco de dados.
           </p>
           <ul className="text-sm text-muted-foreground mt-2 list-disc list-inside">
-            <li>Certificado digital A1 ou A3</li>
-            <li>Configuração do ambiente (homologação/produção)</li>
-            <li>Endpoint da SEFAZ do estado</li>
-            <li>Validações fiscais e tributárias</li>
+            <li>Empresas carregadas do banco de dados</li>
+            <li>Clientes filtrados por empresa selecionada</li>
+            <li>Integração com Edge Function de SEFAZ</li>
+            <li>Simulação de ambiente de homologação</li>
           </ul>
         </div>
       </CardContent>
