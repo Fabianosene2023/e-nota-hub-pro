@@ -22,7 +22,16 @@ export const useServicosManager = (empresaId?: string) => {
   return useQuery({
     queryKey: ['servicos', empresaId],
     queryFn: async () => {
-      if (!empresaId) return [];
+      if (!empresaId) {
+        const { data, error } = await supabase
+          .from('servicos')
+          .select('*')
+          .eq('ativo', true)
+          .order('nome');
+        
+        if (error) throw error;
+        return data as Servico[];
+      }
       
       const { data, error } = await supabase
         .from('servicos')
@@ -34,7 +43,101 @@ export const useServicosManager = (empresaId?: string) => {
       if (error) throw error;
       return data as Servico[];
     },
-    enabled: !!empresaId,
+  });
+};
+
+export const useCreateServicoManager = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (servicoData: Omit<Servico, 'id' | 'created_at' | 'updated_at'>) => {
+      const { data, error } = await supabase
+        .from('servicos')
+        .insert([servicoData])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['servicos'] });
+      toast({
+        title: "Sucesso!",
+        description: "Serviço criado com sucesso",
+      });
+    },
+    onError: (error) => {
+      console.error('Erro ao criar serviço:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao criar serviço",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useUpdateServicoManager = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Servico> }) => {
+      const { data, error } = await supabase
+        .from('servicos')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['servicos'] });
+      toast({
+        title: "Sucesso!",
+        description: "Serviço atualizado com sucesso",
+      });
+    },
+    onError: (error) => {
+      console.error('Erro ao atualizar serviço:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar serviço",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useDeleteServicoManager = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('servicos')
+        .update({ ativo: false })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['servicos'] });
+      toast({
+        title: "Sucesso!",
+        description: "Serviço excluído com sucesso",
+      });
+    },
+    onError: (error) => {
+      console.error('Erro ao excluir serviço:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao excluir serviço",
+        variant: "destructive",
+      });
+    },
   });
 };
 

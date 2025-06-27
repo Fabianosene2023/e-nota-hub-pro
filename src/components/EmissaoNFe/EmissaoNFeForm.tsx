@@ -10,14 +10,13 @@ import { useNFeSubmit } from './hooks/useNFeSubmit';
 import { toast } from '@/hooks/use-toast';
 
 interface ItemNFe {
-  produto_id?: string;
-  servico_id?: string;
+  produto_id: string;
   item_nome: string;
   quantidade: number;
   valor_unitario: number;
   valor_total: number;
   cfop: string;
-  tipo: 'produto' | 'servico';
+  tipo: 'produto';
 }
 
 interface FormData {
