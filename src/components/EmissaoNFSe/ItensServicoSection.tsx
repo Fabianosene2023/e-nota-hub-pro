@@ -14,7 +14,7 @@ interface ItemNFSe {
   servico_id: string;
   item_nome: string;
   quantidade: number;
-  valor_unitario: number;
+  valor_servico: number;
   valor_total: number;
   codigo_servico: string;
   aliquota_iss: number;
@@ -31,7 +31,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
   const [itemAtual, setItemAtual] = useState({
     servico_id: '',
     quantidade: 1,
-    valor_unitario: 0,
+    valor_servico: 0,
     codigo_servico: '1.01',
     aliquota_iss: 5
   });
@@ -57,7 +57,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
       return;
     }
 
-    if (itemAtual.valor_unitario <= 0) {
+    if (itemAtual.valor_servico <= 0) {
       toast({
         title: "Erro",
         description: "Valor do serviço deve ser maior que zero",
@@ -77,13 +77,13 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
       return;
     }
 
-    const valorTotal = itemAtual.quantidade * itemAtual.valor_unitario;
+    const valorTotal = itemAtual.quantidade * itemAtual.valor_servico;
     
     const novoItem: ItemNFSe = {
       servico_id: servico.id,
       item_nome: servico.nome || servico.descricao || '',
       quantidade: itemAtual.quantidade,
-      valor_unitario: itemAtual.valor_unitario,
+      valor_servico: itemAtual.valor_servico,
       valor_total: valorTotal,
       codigo_servico: itemAtual.codigo_servico,
       aliquota_iss: itemAtual.aliquota_iss
@@ -95,7 +95,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
     setItemAtual({
       servico_id: '',
       quantidade: 1,
-      valor_unitario: 0,
+      valor_servico: 0,
       codigo_servico: '1.01',
       aliquota_iss: 5
     });
@@ -121,7 +121,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
       <CardHeader>
         <CardTitle>Serviços da NFSe</CardTitle>
         <CardDescription>
-          Adicione os serviços da nota fiscal de serviços
+          Adicione os serviços da nota fiscal de serviços eletrônica
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -136,7 +136,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
                 setItemAtual({
                   ...itemAtual, 
                   servico_id: value,
-                  valor_unitario: servico?.preco_unitario || 0,
+                  valor_servico: servico?.preco_unitario || 0,
                   codigo_servico: servico?.codigo_servico_municipal || '1.01',
                   aliquota_iss: servico?.aliquota_iss || 5
                 });
@@ -173,8 +173,8 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
               type="number"
               step="0.01"
               min="0.01"
-              value={itemAtual.valor_unitario}
-              onChange={(e) => setItemAtual({...itemAtual, valor_unitario: parseFloat(e.target.value) || 0})}
+              value={itemAtual.valor_servico}
+              onChange={(e) => setItemAtual({...itemAtual, valor_servico: parseFloat(e.target.value) || 0})}
             />
           </div>
           
@@ -222,7 +222,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
               type="button" 
               onClick={adicionarItem} 
               className="w-full"
-              disabled={!itemAtual.servico_id || itemAtual.quantidade <= 0 || itemAtual.valor_unitario <= 0}
+              disabled={!itemAtual.servico_id || itemAtual.quantidade <= 0 || itemAtual.valor_servico <= 0}
             >
               <Plus className="h-4 w-4 mr-2" />
               Adicionar
@@ -250,7 +250,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
                   <TableRow key={index}>
                     <TableCell>{item.item_nome}</TableCell>
                     <TableCell>{item.quantidade}</TableCell>
-                    <TableCell>R$ {item.valor_unitario.toFixed(2)}</TableCell>
+                    <TableCell>R$ {item.valor_servico.toFixed(2)}</TableCell>
                     <TableCell>{item.codigo_servico}</TableCell>
                     <TableCell>{item.aliquota_iss}%</TableCell>
                     <TableCell>R$ {item.valor_total.toFixed(2)}</TableCell>

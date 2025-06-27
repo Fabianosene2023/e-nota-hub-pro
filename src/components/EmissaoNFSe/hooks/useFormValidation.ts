@@ -23,7 +23,7 @@ interface ItemNFSe {
   servico_id: string;
   item_nome: string;
   quantidade: number;
-  valor_unitario: number;
+  valor_servico: number;
   valor_total: number;
   codigo_servico: string;
   aliquota_iss: number;
@@ -53,8 +53,8 @@ export const useFormValidation = () => {
         return `Quantidade do serviço "${item.item_nome}" deve ser maior que zero`;
       }
       
-      if (item.valor_unitario <= 0) {
-        return `Valor unitário do serviço "${item.item_nome}" deve ser maior que zero`;
+      if (item.valor_servico <= 0) {
+        return `Valor do serviço "${item.item_nome}" deve ser maior que zero`;
       }
 
       if (!item.codigo_servico) {

@@ -47,7 +47,7 @@ export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisSection
       <CardHeader>
         <CardTitle>Dados Gerais da NFSe</CardTitle>
         <CardDescription>
-          Informações básicas da nota fiscal de serviços
+          Informações básicas da nota fiscal de serviços eletrônica
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

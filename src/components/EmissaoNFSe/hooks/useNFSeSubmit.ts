@@ -27,7 +27,7 @@ interface ItemNFSe {
   servico_id: string;
   item_nome: string;
   quantidade: number;
-  valor_unitario: number;
+  valor_servico: number;
   valor_total: number;
   codigo_servico: string;
   aliquota_iss: number;

@@ -117,7 +117,7 @@ export const ItensSection = ({ itens, setItens, empresaId, valorTotalNota }: Ite
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Produtos da Nota Fiscal</CardTitle>
+        <CardTitle>Produtos da NFe</CardTitle>
         <CardDescription>
           Adicione os produtos da nota fiscal eletrônica
         </CardDescription>
