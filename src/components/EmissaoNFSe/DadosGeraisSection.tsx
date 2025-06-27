@@ -3,8 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useEmpresas } from '@/hooks/useEmpresas';
-import { useClientes } from '@/hooks/useClientes';
+import { useEmpresasManager } from '@/hooks/useEmpresasManager';
+import { useClientesManager } from '@/hooks/useClientesManager';
 
 interface FormData {
   empresa_id: string;
@@ -28,20 +28,19 @@ interface FormData {
 
 interface DadosGeraisSectionProps {
   formData: FormData;
-  setFormData: (data: FormData) => void;
+  setFormData: (formData: FormData) => void;
 }
 
-const naturezasOperacao = [
-  'Prestação de serviços',
-  'Prestação de serviços de informática',
-  'Consultoria e assessoria',
-  'Serviços de engenharia',
-  'Serviços de manutenção'
-];
-
 export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisSectionProps) => {
-  const { data: empresas } = useEmpresas();
-  const { data: clientes } = useClientes(formData.empresa_id);
+  const { data: empresas } = useEmpresasManager();
+  const { data: clientes } = useClientesManager(formData.empresa_id);
+
+  const handleFieldChange = (field: keyof FormData, value: string | number) => {
+    setFormData({
+      ...formData,
+      [field]: value
+    });
+  };
 
   return (
     <Card>
@@ -57,7 +56,7 @@ export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisSection
             <Label>Empresa *</Label>
             <Select 
               value={formData.empresa_id} 
-              onValueChange={(value) => setFormData({...formData, empresa_id: value, cliente_id: ''})}
+              onValueChange={(value) => handleFieldChange('empresa_id', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione a empresa" />
@@ -65,7 +64,7 @@ export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisSection
               <SelectContent>
                 {empresas?.map((empresa) => (
                   <SelectItem key={empresa.id} value={empresa.id}>
-                    {empresa.nome_fantasia || empresa.razao_social}
+                    {empresa.razao_social}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -76,16 +75,16 @@ export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisSection
             <Label>Cliente *</Label>
             <Select 
               value={formData.cliente_id} 
-              onValueChange={(value) => setFormData({...formData, cliente_id: value})}
+              onValueChange={(value) => handleFieldChange('cliente_id', value)}
               disabled={!formData.empresa_id}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o cliente" />
+                <SelectValue placeholder={!formData.empresa_id ? "Selecione empresa primeiro" : "Selecione o cliente"} />
               </SelectTrigger>
               <SelectContent>
                 {clientes?.map((cliente) => (
                   <SelectItem key={cliente.id} value={cliente.id}>
-                    {cliente.nome_razao_social} - {cliente.cpf_cnpj}
+                    {cliente.nome_razao_social}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -95,12 +94,11 @@ export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisSection
 
         <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label>Número da NFSe</Label>
+            <Label>Número</Label>
             <Input
-              type="number"
-              placeholder="Automático"
               value={formData.numero}
-              onChange={(e) => setFormData({...formData, numero: e.target.value})}
+              onChange={(e) => handleFieldChange('numero', e.target.value)}
+              placeholder="Deixe vazio para gerar automaticamente"
             />
           </div>
 
@@ -109,7 +107,7 @@ export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisSection
             <Input
               type="number"
               value={formData.serie}
-              onChange={(e) => setFormData({...formData, serie: parseInt(e.target.value) || 1})}
+              onChange={(e) => handleFieldChange('serie', parseInt(e.target.value) || 1)}
             />
           </div>
 
@@ -118,28 +116,48 @@ export const DadosGeraisSection = ({ formData, setFormData }: DadosGeraisSection
             <Input
               type="date"
               value={formData.data_emissao}
-              onChange={(e) => setFormData({...formData, data_emissao: e.target.value})}
+              onChange={(e) => handleFieldChange('data_emissao', e.target.value)}
             />
           </div>
         </div>
 
         <div className="space-y-2">
           <Label>Natureza da Operação</Label>
-          <Select 
-            value={formData.natureza_operacao} 
-            onValueChange={(value) => setFormData({...formData, natureza_operacao: value})}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {naturezasOperacao.map((natureza) => (
-                <SelectItem key={natureza} value={natureza}>
-                  {natureza}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input
+            value={formData.natureza_operacao}
+            onChange={(e) => handleFieldChange('natureza_operacao', e.target.value)}
+            placeholder="Ex: Prestação de serviços"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>E-mail do Cliente</Label>
+            <Input
+              type="email"
+              value={formData.email_cliente}
+              onChange={(e) => handleFieldChange('email_cliente', e.target.value)}
+              placeholder="email@cliente.com"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Telefone do Cliente</Label>
+            <Input
+              value={formData.telefone_cliente}
+              onChange={(e) => handleFieldChange('telefone_cliente', e.target.value)}
+              placeholder="(11) 99999-9999"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Endereço de Faturamento</Label>
+          <Input
+            value={formData.endereco_faturamento}
+            onChange={(e) => handleFieldChange('endereco_faturamento', e.target.value)}
+            placeholder="Rua, número, bairro, cidade - UF"
+          />
         </div>
       </CardContent>
     </Card>

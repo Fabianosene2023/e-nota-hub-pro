@@ -60,7 +60,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
     if (itemAtual.valor_unitario <= 0) {
       toast({
         title: "Erro",
-        description: "Valor unitário deve ser maior que zero",
+        description: "Valor do serviço deve ser maior que zero",
         variant: "destructive",
       });
       return;
@@ -119,7 +119,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Serviços da Nota Fiscal</CardTitle>
+        <CardTitle>Serviços da NFSe</CardTitle>
         <CardDescription>
           Adicione os serviços da nota fiscal de serviços
         </CardDescription>
@@ -168,7 +168,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
           </div>
           
           <div className="space-y-2">
-            <Label>Valor Unitário</Label>
+            <Label>Valor do Serviço</Label>
             <Input
               type="number"
               step="0.01"
@@ -179,24 +179,41 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
           </div>
           
           <div className="space-y-2">
-            <Label>Código Serviço</Label>
-            <Input
+            <Label>Código do Serviço</Label>
+            <Select
               value={itemAtual.codigo_servico}
-              onChange={(e) => setItemAtual({...itemAtual, codigo_servico: e.target.value})}
-              placeholder="1.01"
-            />
+              onValueChange={(value) => setItemAtual({...itemAtual, codigo_servico: value})}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1.01">1.01 - Análise e desenvolvimento de sistemas</SelectItem>
+                <SelectItem value="1.02">1.02 - Programação</SelectItem>
+                <SelectItem value="1.03">1.03 - Processamento de dados</SelectItem>
+                <SelectItem value="1.04">1.04 - Elaboração de programas</SelectItem>
+                <SelectItem value="17.01">17.01 - Assessoria ou consultoria</SelectItem>
+                <SelectItem value="25.01">25.01 - Serviços funerários</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
             <Label>Alíquota ISS (%)</Label>
-            <Input
-              type="number"
-              step="0.01"
-              min="0"
-              max="100"
-              value={itemAtual.aliquota_iss}
-              onChange={(e) => setItemAtual({...itemAtual, aliquota_iss: parseFloat(e.target.value) || 0})}
-            />
+            <Select
+              value={itemAtual.aliquota_iss.toString()}
+              onValueChange={(value) => setItemAtual({...itemAtual, aliquota_iss: parseFloat(value)})}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2">2%</SelectItem>
+                <SelectItem value="3">3%</SelectItem>
+                <SelectItem value="4">4%</SelectItem>
+                <SelectItem value="5">5%</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
           <div className="space-y-2">
@@ -221,9 +238,9 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
                 <TableRow>
                   <TableHead>Serviço</TableHead>
                   <TableHead>Qtd</TableHead>
-                  <TableHead>Valor Unit.</TableHead>
-                  <TableHead>Código</TableHead>
-                  <TableHead>ISS (%)</TableHead>
+                  <TableHead>Valor do Serviço</TableHead>
+                  <TableHead>Código do Serviço</TableHead>
+                  <TableHead>Alíquota ISS (%)</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
