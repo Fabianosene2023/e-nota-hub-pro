@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -76,7 +75,8 @@ export function CadastroServicos() {
     const servicoData = {
       ...formData,
       preco_unitario: parseFloat(formData.preco_unitario),
-      aliquota_iss: formData.aliquota_iss ? parseFloat(formData.aliquota_iss) : 0
+      aliquota_iss: formData.aliquota_iss ? parseFloat(formData.aliquota_iss) : 0,
+      ativo: true
     };
 
     createServico.mutate(servicoData, {
