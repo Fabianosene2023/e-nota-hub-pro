@@ -126,7 +126,7 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Adicionar Serviço */}
-        <div className="grid grid-cols-6 gap-4 p-4 border rounded-lg">
+        <div className="grid grid-cols-5 gap-4 p-4 border rounded-lg">
           <div className="space-y-2">
             <Label>Serviço</Label>
             <Select 
@@ -164,17 +164,6 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
               min="0.01"
               value={itemAtual.quantidade}
               onChange={(e) => setItemAtual({...itemAtual, quantidade: parseFloat(e.target.value) || 0})}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Valor do Serviço</Label>
-            <Input
-              type="number"
-              step="0.01"
-              min="0.01"
-              value={itemAtual.valor_servico}
-              onChange={(e) => setItemAtual({...itemAtual, valor_servico: parseFloat(e.target.value) || 0})}
             />
           </div>
           
@@ -230,6 +219,21 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
           </div>
         </div>
 
+        {/* Campo separado para Valor do Serviço */}
+        <div className="grid grid-cols-1 gap-4 p-4 border rounded-lg bg-muted/20">
+          <div className="space-y-2">
+            <Label>Valor do Serviço (R$)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              min="0.01"
+              value={itemAtual.valor_servico}
+              onChange={(e) => setItemAtual({...itemAtual, valor_servico: parseFloat(e.target.value) || 0})}
+              placeholder="0,00"
+            />
+          </div>
+        </div>
+
         {/* Lista de Serviços */}
         {itens.length > 0 && (
           <div className="border rounded-lg">
@@ -238,8 +242,8 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
                 <TableRow>
                   <TableHead>Serviço</TableHead>
                   <TableHead>Qtd</TableHead>
-                  <TableHead>Valor do Serviço</TableHead>
                   <TableHead>Código do Serviço</TableHead>
+                  <TableHead>Valor do Serviço</TableHead>
                   <TableHead>Alíquota ISS (%)</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead></TableHead>
@@ -250,8 +254,8 @@ export const ItensServicoSection = ({ itens, setItens, empresaId, valorTotalNota
                   <TableRow key={index}>
                     <TableCell>{item.item_nome}</TableCell>
                     <TableCell>{item.quantidade}</TableCell>
-                    <TableCell>R$ {item.valor_servico.toFixed(2)}</TableCell>
                     <TableCell>{item.codigo_servico}</TableCell>
+                    <TableCell>R$ {item.valor_servico.toFixed(2)}</TableCell>
                     <TableCell>{item.aliquota_iss}%</TableCell>
                     <TableCell>R$ {item.valor_total.toFixed(2)}</TableCell>
                     <TableCell>
