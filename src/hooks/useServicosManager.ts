@@ -3,134 +3,67 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
+interface Servico {
+  id: string;
+  empresa_id: string;
+  codigo: string;
+  nome: string;
+  descricao?: string;
+  preco_unitario: number;
+  unidade: string;
+  codigo_servico_municipal?: string;
+  aliquota_iss?: number;
+  ativo: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export const useServicosManager = (empresaId?: string) => {
   return useQuery({
     queryKey: ['servicos', empresaId],
     queryFn: async () => {
-      let query = supabase
+      if (!empresaId) return [];
+      
+      const { data, error } = await supabase
         .from('servicos')
         .select('*')
-        .order('created_at', { ascending: false });
+        .eq('empresa_id', empresaId)
+        .eq('ativo', true)
+        .order('nome');
       
-      if (empresaId) {
-        query = query.eq('empresa_id', empresaId);
-      }
-      
-      const { data, error } = await query;
-      
-      if (error) {
-        console.error('Erro ao carregar serviços:', error);
-        throw new Error(`Erro ao carregar serviços: ${error.message}`);
-      }
-      return data;
+      if (error) throw error;
+      return data as Servico[];
     },
+    enabled: !!empresaId,
   });
 };
 
-export const useCreateServicoManager = () => {
+export const useCreateServico = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (servicoData: any) => {
+    mutationFn: async (servicoData: Omit<Servico, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('servicos')
         .insert([servicoData])
         .select()
         .single();
       
-      if (error) {
-        console.error('Erro ao criar serviço:', error);
-        if (error.code === '23505') {
-          throw new Error('Serviço com este código já existe para esta empresa');
-        }
-        throw new Error(`Erro ao criar serviço: ${error.message}`);
-      }
+      if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['servicos'] });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['servicos', variables.empresa_id] });
       toast({
         title: "Sucesso!",
-        description: "Serviço cadastrado com sucesso",
+        description: "Serviço criado com sucesso",
       });
     },
     onError: (error) => {
       console.error('Erro ao criar serviço:', error);
       toast({
-        title: "Erro ao cadastrar serviço",
-        description: error.message || "Ocorreu um erro inesperado",
-        variant: "destructive",
-      });
-    },
-  });
-};
-
-export const useUpdateServicoManager = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async ({ id, updates }: { id: string, updates: any }) => {
-      const { data, error } = await supabase
-        .from('servicos')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Erro ao atualizar serviço:', error);
-        if (error.code === '23505') {
-          throw new Error('Serviço com este código já existe para esta empresa');
-        }
-        throw new Error(`Erro ao atualizar serviço: ${error.message}`);
-      }
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['servicos'] });
-      toast({
-        title: "Sucesso!",
-        description: "Serviço atualizado com sucesso",
-      });
-    },
-    onError: (error) => {
-      console.error('Erro ao atualizar serviço:', error);
-      toast({
-        title: "Erro ao atualizar serviço",
-        description: error.message || "Ocorreu um erro inesperado",
-        variant: "destructive",
-      });
-    },
-  });
-};
-
-export const useDeleteServicoManager = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('servicos')
-        .delete()
-        .eq('id', id);
-      
-      if (error) {
-        console.error('Erro ao excluir serviço:', error);
-        throw new Error(`Erro ao excluir serviço: ${error.message}`);
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['servicos'] });
-      toast({
-        title: "Sucesso!",
-        description: "Serviço excluído com sucesso",
-      });
-    },
-    onError: (error) => {
-      console.error('Erro ao excluir serviço:', error);
-      toast({
-        title: "Erro ao excluir serviço",
-        description: error.message || "Ocorreu um erro inesperado",
+        title: "Erro",
+        description: "Erro ao criar serviço",
         variant: "destructive",
       });
     },
