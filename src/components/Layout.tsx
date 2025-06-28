@@ -29,7 +29,6 @@ const navigation = [
       { name: "Emissão NFe", href: "/notas/nfe" },
       { name: "Emissão NFCe", href: "/notas/nfce" },
       { name: "Emissão CTe", href: "/notas/cte" },
-      { name: "Emissão NFSe", href: "/notas/nfse" },
       { name: "Emissão NFe Ajuste", href: "/notas/nfe-ajuste" },
       { name: "Emissão NFe Complementar", href: "/notas/nfe-complementar" },
       { name: "Emissão NFe Importação", href: "/notas/nfe-importacao" },
@@ -37,6 +36,12 @@ const navigation = [
       { name: "Consulta de Documentos", href: "/notas/consulta" },
       { name: "Notas Recebidas (MDF-e)", href: "/notas/recebidas" },
     ]
+  },
+  {
+    name: "NFSe - Serviços",
+    href: "/nfse",
+    icon: FileText,
+    current: false,
   },
   {
     name: "Cadastros",
@@ -183,7 +188,6 @@ export const Layout = () => {
             </nav>
           </div>
           
-          {/* User menu at bottom */}
           <div className="mt-auto p-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

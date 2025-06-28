@@ -54,11 +54,6 @@ export const AppRoutes = () => {
             <LazyComponents.CtePage />
           </Suspense>
         } />
-        <Route path="notas/nfse" element={
-          <Suspense fallback={<LoadingSpinner />}>
-            <LazyComponents.NfseEmissao />
-          </Suspense>
-        } />
         <Route path="notas/nfe-ajuste" element={
           <Suspense fallback={<LoadingSpinner />}>
             <LazyComponents.NfeAjuste />
@@ -87,6 +82,13 @@ export const AppRoutes = () => {
         <Route path="notas/recebidas" element={
           <Suspense fallback={<LoadingSpinner />}>
             <LazyComponents.NotasRecebidas />
+          </Suspense>
+        } />
+        
+        {/* NFSe - Rota separada */}
+        <Route path="nfse" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.EmissaoNFSe />
           </Suspense>
         } />
         

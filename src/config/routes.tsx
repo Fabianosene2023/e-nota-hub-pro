@@ -1,3 +1,4 @@
+
 import { lazy } from "react";
 
 // Lazy loading de componentes
@@ -8,7 +9,7 @@ export const Empresas = lazy(() => import("../components/Empresas").then(module 
 export const EmissaoNFe = lazy(() => import("../components/EmissaoNFe").then(module => ({ default: module.EmissaoNFe })));
 export const NfcePage = lazy(() => import("../components/Nfce"));
 export const CtePage = lazy(() => import("../pages/CtePage"));
-export const NfseEmissao = lazy(() => import("../pages/NfseEmissao"));
+export const EmissaoNFSe = lazy(() => import("../components/EmissaoNFSe").then(module => ({ default: module.EmissaoNFSe })));
 export const NfeAjuste = lazy(() => import("../pages/NfeAjuste"));
 export const NfeComplementar = lazy(() => import("../pages/NfeComplementar"));
 export const NfeImportacao = lazy(() => import("../pages/NfeImportacao"));
