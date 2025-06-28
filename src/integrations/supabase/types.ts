@@ -271,6 +271,56 @@ export type Database = {
           },
         ]
       }
+      configuracoes_nfse: {
+        Row: {
+          ambiente: string
+          created_at: string
+          id: string
+          municipio_codigo: string
+          municipio_nome: string
+          padrao_nfse: string
+          prestador_id: string
+          proximo_numero_rps: number
+          serie_rps: string
+          updated_at: string
+          url_webservice: string
+        }
+        Insert: {
+          ambiente?: string
+          created_at?: string
+          id?: string
+          municipio_codigo: string
+          municipio_nome: string
+          padrao_nfse?: string
+          prestador_id: string
+          proximo_numero_rps?: number
+          serie_rps?: string
+          updated_at?: string
+          url_webservice: string
+        }
+        Update: {
+          ambiente?: string
+          created_at?: string
+          id?: string
+          municipio_codigo?: string
+          municipio_nome?: string
+          padrao_nfse?: string
+          prestador_id?: string
+          proximo_numero_rps?: number
+          serie_rps?: string
+          updated_at?: string
+          url_webservice?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuracoes_nfse_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "prestadores_servico"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuracoes_sefaz: {
         Row: {
           ambiente: string
@@ -970,6 +1020,60 @@ export type Database = {
           },
         ]
       }
+      itens_rps_nfse: {
+        Row: {
+          aliquota_iss: number
+          codigo_servico: string | null
+          created_at: string
+          descricao: string
+          id: string
+          quantidade: number
+          rps_id: string
+          servico_id: string | null
+          valor_total: number
+          valor_unitario: number
+        }
+        Insert: {
+          aliquota_iss?: number
+          codigo_servico?: string | null
+          created_at?: string
+          descricao: string
+          id?: string
+          quantidade?: number
+          rps_id: string
+          servico_id?: string | null
+          valor_total?: number
+          valor_unitario?: number
+        }
+        Update: {
+          aliquota_iss?: number
+          codigo_servico?: string | null
+          created_at?: string
+          descricao?: string
+          id?: string
+          quantidade?: number
+          rps_id?: string
+          servico_id?: string | null
+          valor_total?: number
+          valor_unitario?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_rps_nfse_rps_id_fkey"
+            columns: ["rps_id"]
+            isOneToOne: false
+            referencedRelation: "rps_nfse"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itens_rps_nfse_servico_id_fkey"
+            columns: ["servico_id"]
+            isOneToOne: false
+            referencedRelation: "servicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       logs_operacoes: {
         Row: {
           created_at: string
@@ -1432,6 +1536,42 @@ export type Database = {
           },
         ]
       }
+      prestadores_servico: {
+        Row: {
+          ativo: boolean
+          certificado_digital_id: string | null
+          cnpj: string
+          created_at: string
+          empresa_id: string
+          id: string
+          inscricao_municipal: string | null
+          regime_tributario: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          certificado_digital_id?: string | null
+          cnpj: string
+          created_at?: string
+          empresa_id: string
+          id?: string
+          inscricao_municipal?: string | null
+          regime_tributario?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          certificado_digital_id?: string | null
+          cnpj?: string
+          created_at?: string
+          empresa_id?: string
+          id?: string
+          inscricao_municipal?: string | null
+          regime_tributario?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       produtos: {
         Row: {
           categoria_id: string | null
@@ -1576,6 +1716,107 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rps_nfse: {
+        Row: {
+          aliquota_iss: number
+          codigo_servico: string | null
+          codigo_verificacao: string | null
+          created_at: string
+          data_emissao: string
+          data_processamento: string | null
+          discriminacao: string
+          id: string
+          iss_retido: boolean
+          mensagem_retorno: string | null
+          numero_nfse: string | null
+          numero_rps: number
+          pdf_url: string | null
+          prestador_id: string
+          protocolo: string | null
+          serie_rps: string
+          status: string
+          tipo_rps: string
+          tomador_cnpj_cpf: string | null
+          tomador_email: string | null
+          tomador_endereco: string | null
+          tomador_nome: string
+          updated_at: string
+          valor_iss: number
+          valor_liquido: number
+          valor_servicos: number
+          xml_nfse: string | null
+          xml_rps: string | null
+        }
+        Insert: {
+          aliquota_iss?: number
+          codigo_servico?: string | null
+          codigo_verificacao?: string | null
+          created_at?: string
+          data_emissao?: string
+          data_processamento?: string | null
+          discriminacao: string
+          id?: string
+          iss_retido?: boolean
+          mensagem_retorno?: string | null
+          numero_nfse?: string | null
+          numero_rps: number
+          pdf_url?: string | null
+          prestador_id: string
+          protocolo?: string | null
+          serie_rps?: string
+          status?: string
+          tipo_rps?: string
+          tomador_cnpj_cpf?: string | null
+          tomador_email?: string | null
+          tomador_endereco?: string | null
+          tomador_nome: string
+          updated_at?: string
+          valor_iss?: number
+          valor_liquido?: number
+          valor_servicos?: number
+          xml_nfse?: string | null
+          xml_rps?: string | null
+        }
+        Update: {
+          aliquota_iss?: number
+          codigo_servico?: string | null
+          codigo_verificacao?: string | null
+          created_at?: string
+          data_emissao?: string
+          data_processamento?: string | null
+          discriminacao?: string
+          id?: string
+          iss_retido?: boolean
+          mensagem_retorno?: string | null
+          numero_nfse?: string | null
+          numero_rps?: number
+          pdf_url?: string | null
+          prestador_id?: string
+          protocolo?: string | null
+          serie_rps?: string
+          status?: string
+          tipo_rps?: string
+          tomador_cnpj_cpf?: string | null
+          tomador_email?: string | null
+          tomador_endereco?: string | null
+          tomador_nome?: string
+          updated_at?: string
+          valor_iss?: number
+          valor_liquido?: number
+          valor_servicos?: number
+          xml_nfse?: string | null
+          xml_rps?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rps_nfse_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "prestadores_servico"
             referencedColumns: ["id"]
           },
         ]

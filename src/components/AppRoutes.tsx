@@ -1,4 +1,3 @@
-
 import { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -96,6 +95,11 @@ export const AppRoutes = () => {
         <Route path="clientes" element={
           <Suspense fallback={<LoadingSpinner />}>
             <LazyComponents.CadastroClientes />
+          </Suspense>
+        } />
+        <Route path="prestadores" element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponents.CadastroPrestadores />
           </Suspense>
         } />
         <Route path="usuarios" element={

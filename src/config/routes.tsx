@@ -1,4 +1,3 @@
-
 import { lazy } from "react";
 
 // Lazy loading de componentes
@@ -48,3 +47,10 @@ export const RelatoriosEstoque = lazy(() => import("../pages/RelatoriosEstoque")
 
 // Teste API
 export const TesteApiNfe = lazy(() => import("../components/TesteApiNfe").then(module => ({ default: module.TesteApiNfe })));
+
+// NFSe - Todas as rotas integradas
+export const EmissaoNFSe = lazy(() => import("../components/EmissaoNFSe").then(module => ({ default: module.EmissaoNFSe })));
+
+// Prestadores e Configuração NFSe
+export const CadastroPrestadores = lazy(() => import("../pages/CadastroPrestadores"));
+export const ConfiguracaoNfse = lazy(() => import("../pages/ConfiguracaoNfse"));

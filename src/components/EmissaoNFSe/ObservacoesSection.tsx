@@ -4,27 +4,29 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
 interface ObservacoesSectionProps {
-  observacoes: string;
-  setObservacoes: (observacoes: string) => void;
+  discriminacao: string;
+  setDiscriminacao: (discriminacao: string) => void;
 }
 
-export const ObservacoesSection = ({ observacoes, setObservacoes }: ObservacoesSectionProps) => {
+export const ObservacoesSection = ({ discriminacao, setDiscriminacao }: ObservacoesSectionProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Observações</CardTitle>
+        <CardTitle>Discriminação dos Serviços</CardTitle>
         <CardDescription>
-          Informações adicionais para a nota fiscal de serviços
+          Descreva detalhadamente os serviços prestados
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <Label>Observações Gerais</Label>
+          <Label htmlFor="discriminacao">Discriminação *</Label>
           <Textarea
-            placeholder="Digite observações adicionais para a NFSe..."
-            value={observacoes}
-            onChange={(e) => setObservacoes(e.target.value)}
+            id="discriminacao"
+            value={discriminacao}
+            onChange={(e) => setDiscriminacao(e.target.value)}
+            placeholder="Descreva os serviços prestados de forma detalhada..."
             rows={4}
+            required
           />
         </div>
       </CardContent>

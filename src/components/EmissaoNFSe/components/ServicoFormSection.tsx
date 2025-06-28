@@ -5,205 +5,175 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
+import { useServicosManager } from '@/hooks/useServicosManager';
+import { useEmpresasManager } from '@/hooks/useEmpresasManager';
 import { toast } from '@/hooks/use-toast';
 
 interface ItemNFSe {
-  servico_id: string;
-  item_nome: string;
+  servico_id?: string;
+  descricao: string;
   quantidade: number;
-  valor_servico: number;
+  valor_unitario: number;
   valor_total: number;
-  codigo_servico: string;
+  codigo_servico?: string;
   aliquota_iss: number;
 }
 
 interface ServicoFormSectionProps {
-  servicos: any[];
   onAddItem: (item: ItemNFSe) => void;
-  empresaId: string;
 }
 
-export const ServicoFormSection = ({ servicos, onAddItem, empresaId }: ServicoFormSectionProps) => {
-  const [itemAtual, setItemAtual] = useState({
+export const ServicoFormSection = ({ onAddItem }: ServicoFormSectionProps) => {
+  const { data: empresas } = useEmpresasManager();
+  const empresaId = empresas?.[0]?.id || '';
+  const { data: servicos } = useServicosManager(empresaId);
+  
+  const [itemForm, setItemForm] = useState({
     servico_id: '',
+    descricao: '',
     quantidade: 1,
-    valor_servico: 0,
-    codigo_servico: '1.01',
+    valor_unitario: 0,
+    codigo_servico: '',
     aliquota_iss: 5
   });
 
-  const adicionarItem = () => {
-    if (!itemAtual.servico_id) {
+  const handleServicoChange = (servicoId: string) => {
+    const servico = servicos?.find(s => s.id === servicoId);
+    if (servico) {
+      setItemForm({
+        ...itemForm,
+        servico_id: servicoId,
+        descricao: servico.descricao || servico.nome,
+        valor_unitario: Number(servico.preco_unitario),
+        codigo_servico: servico.codigo_servico_municipal || servico.codigo,
+        aliquota_iss: Number(servico.aliquota_iss) || 5
+      });
+    }
+  };
+
+  const handleAddItem = () => {
+    if (!itemForm.descricao || itemForm.valor_unitario <= 0) {
       toast({
         title: "Erro",
-        description: "Selecione um serviço",
+        description: "Preencha descrição e valor do serviço",
         variant: "destructive",
       });
       return;
     }
 
-    if (itemAtual.quantidade <= 0) {
-      toast({
-        title: "Erro",
-        description: "Quantidade deve ser maior que zero",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (itemAtual.valor_servico <= 0) {
-      toast({
-        title: "Erro",
-        description: "Valor do serviço deve ser maior que zero",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const servico = servicos?.find(s => s.id === itemAtual.servico_id);
+    const valor_total = itemForm.quantidade * itemForm.valor_unitario;
     
-    if (!servico) {
-      toast({
-        title: "Erro",
-        description: "Serviço não encontrado",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const valorTotal = itemAtual.quantidade * itemAtual.valor_servico;
-    
-    const novoItem: ItemNFSe = {
-      servico_id: servico.id,
-      item_nome: servico.nome || servico.descricao || '',
-      quantidade: itemAtual.quantidade,
-      valor_servico: itemAtual.valor_servico,
-      valor_total: valorTotal,
-      codigo_servico: itemAtual.codigo_servico,
-      aliquota_iss: itemAtual.aliquota_iss
-    };
-
-    onAddItem(novoItem);
-    
-    // Resetar form do item
-    setItemAtual({
-      servico_id: '',
-      quantidade: 1,
-      valor_servico: 0,
-      codigo_servico: '1.01',
-      aliquota_iss: 5
+    onAddItem({
+      ...itemForm,
+      valor_total
     });
 
-    toast({
-      title: "Serviço adicionado",
-      description: `${servico.nome || servico.descricao} foi adicionado à nota fiscal`,
+    setItemForm({
+      servico_id: '',
+      descricao: '',
+      quantidade: 1,
+      valor_unitario: 0,
+      codigo_servico: '',
+      aliquota_iss: 5
     });
   };
 
   return (
-    <div className="grid grid-cols-6 gap-4 p-4 border rounded-lg">
-      <div className="space-y-2">
-        <Label>Serviço</Label>
-        <Select 
-          value={itemAtual.servico_id} 
-          onValueChange={(value) => {
-            const servico = servicos?.find(s => s.id === value);
-            setItemAtual({
-              ...itemAtual, 
-              servico_id: value,
-              valor_servico: servico?.preco_unitario || 0,
-              codigo_servico: servico?.codigo_servico_municipal || '1.01',
-              aliquota_iss: servico?.aliquota_iss || 5
-            });
-          }}
-          disabled={!empresaId}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={!empresaId ? "Selecione empresa primeiro" : "Selecione"} />
-          </SelectTrigger>
-          <SelectContent>
-            {servicos?.map((servico) => (
-              <SelectItem key={servico.id} value={servico.id}>
-                {servico.nome || servico.descricao} - R$ {servico.preco_unitario?.toFixed(2)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="border rounded-lg p-4 space-y-4">
+      <h4 className="font-medium">Adicionar Serviço</h4>
       
-      <div className="space-y-2">
-        <Label>Quantidade</Label>
-        <Input
-          type="number"
-          step="0.01"
-          min="0.01"
-          value={itemAtual.quantidade}
-          onChange={(e) => setItemAtual({...itemAtual, quantidade: parseFloat(e.target.value) || 0})}
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Valor do Serviço</Label>
-        <Input
-          type="number"
-          step="0.01"
-          min="0.01"
-          value={itemAtual.valor_servico}
-          onChange={(e) => setItemAtual({...itemAtual, valor_servico: parseFloat(e.target.value) || 0})}
-          placeholder="0,00"
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Código do Serviço</Label>
-        <Select
-          value={itemAtual.codigo_servico}
-          onValueChange={(value) => setItemAtual({...itemAtual, codigo_servico: value})}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1.01">1.01 - Análise e desenvolvimento de sistemas</SelectItem>
-            <SelectItem value="1.02">1.02 - Programação</SelectItem>
-            <SelectItem value="1.03">1.03 - Processamento de dados</SelectItem>
-            <SelectItem value="1.04">1.04 - Elaboração de programas</SelectItem>
-            <SelectItem value="17.01">17.01 - Assessoria ou consultoria</SelectItem>
-            <SelectItem value="25.01">25.01 - Serviços funerários</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="servico">Serviço Cadastrado</Label>
+          <Select value={itemForm.servico_id} onValueChange={handleServicoChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione um serviço" />
+            </SelectTrigger>
+            <SelectContent>
+              {servicos?.map((servico) => (
+                <SelectItem key={servico.id} value={servico.id}>
+                  {servico.codigo} - {servico.nome}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="codigo_servico">Código do Serviço</Label>
+          <Input
+            id="codigo_servico"
+            value={itemForm.codigo_servico}
+            onChange={(e) => setItemForm({...itemForm, codigo_servico: e.target.value})}
+            placeholder="1.01"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="aliquota_iss">Alíquota ISS (%)</Label>
+          <Input
+            id="aliquota_iss"
+            type="number"
+            step="0.01"
+            min="0"
+            max="100"
+            value={itemForm.aliquota_iss}
+            onChange={(e) => setItemForm({...itemForm, aliquota_iss: Number(e.target.value)})}
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label>Alíquota ISS (%)</Label>
-        <Select
-          value={itemAtual.aliquota_iss.toString()}
-          onValueChange={(value) => setItemAtual({...itemAtual, aliquota_iss: parseFloat(value)})}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="2">2%</SelectItem>
-            <SelectItem value="3">3%</SelectItem>
-            <SelectItem value="4">4%</SelectItem>
-            <SelectItem value="5">5%</SelectItem>
-          </SelectContent>
-        </Select>
+        <Label htmlFor="descricao">Descrição do Serviço *</Label>
+        <Input
+          id="descricao"
+          value={itemForm.descricao}
+          onChange={(e) => setItemForm({...itemForm, descricao: e.target.value})}
+          placeholder="Descrição detalhada do serviço prestado"
+          required
+        />
       </div>
-      
-      <div className="space-y-2">
-        <Label>&nbsp;</Label>
-        <Button 
-          type="button" 
-          onClick={adicionarItem} 
-          className="w-full"
-          disabled={!itemAtual.servico_id || itemAtual.quantidade <= 0 || itemAtual.valor_servico <= 0}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Adicionar
-        </Button>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="quantidade">Quantidade</Label>
+          <Input
+            id="quantidade"
+            type="number"
+            min="0.01"
+            step="0.01"
+            value={itemForm.quantidade}
+            onChange={(e) => setItemForm({...itemForm, quantidade: Number(e.target.value)})}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="valor_unitario">Valor do Serviço *</Label>
+          <Input
+            id="valor_unitario"
+            type="number"
+            min="0.01"
+            step="0.01"
+            value={itemForm.valor_unitario}
+            onChange={(e) => setItemForm({...itemForm, valor_unitario: Number(e.target.value)})}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Valor Total</Label>
+          <Input
+            value={(itemForm.quantidade * itemForm.valor_unitario).toFixed(2)}
+            readOnly
+            className="bg-muted"
+          />
+        </div>
       </div>
+
+      <Button type="button" onClick={handleAddItem} className="w-full">
+        <Plus className="mr-2 h-4 w-4" />
+        Adicionar Serviço
+      </Button>
     </div>
   );
 };

@@ -2,90 +2,58 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Loader2, FileText } from "lucide-react";
-import { DadosGeraisSection } from './DadosGeraisSection';
+import { DadosPrestadorSection } from './DadosPrestadorSection';
+import { DadosTomadorSection } from './DadosTomadorSection';
 import { ItensServicoSection } from './ItensServicoSection';
 import { ObservacoesSection } from './ObservacoesSection';
 import { useFormValidation } from './hooks/useFormValidation';
-import { useNFSeSubmit } from './hooks/useNFSeSubmit';
+import { useEmitirRpsNfse } from '@/hooks/useRpsNfse';
 import { toast } from '@/hooks/use-toast';
 
 interface ItemNFSe {
-  servico_id: string;
-  item_nome: string;
+  servico_id?: string;
+  descricao: string;
   quantidade: number;
-  valor_servico: number;
+  valor_unitario: number;
   valor_total: number;
-  codigo_servico: string;
+  codigo_servico?: string;
   aliquota_iss: number;
 }
 
 interface FormData {
-  empresa_id: string;
-  cliente_id: string;
-  numero: string;
-  serie: number;
-  natureza_operacao: string;
-  observacoes: string;
-  tipo_pessoa: 'fisica' | 'juridica';
-  email_cliente: string;
-  telefone_cliente: string;
-  cnpj_cpf_entrega: string;
-  inscricao_estadual_cliente: string;
-  endereco_faturamento: string;
-  endereco_entrega: string;
-  tipo_nota: 'entrada' | 'saida';
-  data_emissao: string;
-  data_entrega: string;
-  data_cancelamento: string;
+  prestador_id: string;
+  tomador_nome: string;
+  tomador_cnpj_cpf: string;
+  tomador_endereco: string;
+  tomador_email: string;
+  discriminacao: string;
 }
 
 export const EmissaoNFSeForm = () => {
   const [formData, setFormData] = useState<FormData>({
-    empresa_id: '',
-    cliente_id: '',
-    numero: '',
-    serie: 1,
-    natureza_operacao: 'Prestação de serviços',
-    observacoes: '',
-    tipo_pessoa: 'juridica',
-    email_cliente: '',
-    telefone_cliente: '',
-    cnpj_cpf_entrega: '',
-    inscricao_estadual_cliente: '',
-    endereco_faturamento: '',
-    endereco_entrega: '',
-    tipo_nota: 'saida',
-    data_emissao: new Date().toISOString().split('T')[0],
-    data_entrega: '',
-    data_cancelamento: ''
+    prestador_id: '',
+    tomador_nome: '',
+    tomador_cnpj_cpf: '',
+    tomador_endereco: '',
+    tomador_email: '',
+    discriminacao: ''
   });
   
   const [itens, setItens] = useState<ItemNFSe[]>([]);
   const { validateForm } = useFormValidation();
-  const { submitNFSe, isSubmitting } = useNFSeSubmit();
+  const emitirRps = useEmitirRpsNfse();
 
   const valorTotalNota = itens.reduce((total, item) => total + item.valor_total, 0);
 
   const resetForm = () => {
-    setFormData(prev => ({
-      empresa_id: prev.empresa_id, // Manter empresa selecionada
-      cliente_id: '',
-      numero: '',
-      serie: 1,
-      natureza_operacao: 'Prestação de serviços',
-      observacoes: '',
-      tipo_pessoa: 'juridica',
-      email_cliente: '',
-      telefone_cliente: '',
-      cnpj_cpf_entrega: '',
-      inscricao_estadual_cliente: '',
-      endereco_faturamento: '',
-      endereco_entrega: '',
-      tipo_nota: 'saida',
-      data_emissao: new Date().toISOString().split('T')[0],
-      data_entrega: '',
-      data_cancelamento: ''
-    }));
+    setFormData({
+      prestador_id: '',
+      tomador_nome: '',
+      tomador_cnpj_cpf: '',
+      tomador_endereco: '',
+      tomador_email: '',
+      discriminacao: ''
+    });
     setItens([]);
   };
 
@@ -103,12 +71,19 @@ export const EmissaoNFSeForm = () => {
     }
 
     try {
-      const success = await submitNFSe(formData, itens, valorTotalNota);
-      if (success) {
-        resetForm();
-      }
+      await emitirRps.mutateAsync({
+        prestador_id: formData.prestador_id,
+        tomador_nome: formData.tomador_nome,
+        tomador_cnpj_cpf: formData.tomador_cnpj_cpf,
+        tomador_endereco: formData.tomador_endereco,
+        tomador_email: formData.tomador_email,
+        discriminacao: formData.discriminacao,
+        itens
+      });
+      
+      resetForm();
     } catch (error) {
-      // Error already handled in useNFSeSubmit
+      // Error already handled in hook
     }
   };
 
@@ -124,7 +99,12 @@ export const EmissaoNFSeForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <DadosGeraisSection 
+        <DadosPrestadorSection 
+          prestadorId={formData.prestador_id}
+          setPrestadorId={(id) => setFormData({...formData, prestador_id: id})}
+        />
+
+        <DadosTomadorSection 
           formData={formData}
           setFormData={setFormData}
         />
@@ -132,22 +112,21 @@ export const EmissaoNFSeForm = () => {
         <ItensServicoSection 
           itens={itens}
           setItens={setItens}
-          empresaId={formData.empresa_id}
           valorTotalNota={valorTotalNota}
         />
 
         <ObservacoesSection 
-          observacoes={formData.observacoes}
-          setObservacoes={(observacoes) => setFormData({...formData, observacoes})}
+          discriminacao={formData.discriminacao}
+          setDiscriminacao={(discriminacao) => setFormData({...formData, discriminacao})}
         />
 
         <div className="flex justify-end gap-4">
           <Button 
             type="submit" 
-            disabled={isSubmitting || itens.length === 0}
+            disabled={emitirRps.isPending || itens.length === 0}
             className="min-w-[150px]"
           >
-            {isSubmitting ? (
+            {emitirRps.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Emitindo...

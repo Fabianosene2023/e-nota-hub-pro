@@ -1,2 +1,6 @@
 
-export { EmissaoNFSeForm as EmissaoNFSe } from './EmissaoNFSeForm';
+import { EmissaoNFSeForm } from './EmissaoNFSeForm';
+
+export const EmissaoNFSe = () => {
+  return <EmissaoNFSeForm />;
+};
