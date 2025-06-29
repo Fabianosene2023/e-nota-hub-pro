@@ -6,7 +6,7 @@ export class XMLGenerator {
   public static gerarXMLNFe(dados: DadosNFeCompletos): string {
     const chaveAcesso = NFEUtils.gerarChaveAcesso(dados);
     const dataEmissao = new Date(dados.nota.data_emissao);
-    
+
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <NFe xmlns="http://www.portalfiscal.inf.br/nfe">
   <infNFe Id="NFe${chaveAcesso}">
@@ -62,8 +62,12 @@ export class XMLGenerator {
   }
 
   private static gerarTagDest(dados: DadosNFeCompletos): string {
+    // Se cliente for pessoa física, usar CPF; se jurídica, usar CNPJ (lógica simplificada)
+    const cpfCnpj = dados.cliente.cpf_cnpj.replace(/\D/g, '');
+    const tagDocumento = cpfCnpj.length === 11 ? `<CPF>${cpfCnpj}</CPF>` : `<CNPJ>${cpfCnpj}</CNPJ>`;
+
     return `<dest>
-      <CNPJ>${dados.cliente.cpf_cnpj.replace(/\D/g, '')}</CNPJ>
+      ${tagDocumento}
       <xNome>${dados.cliente.nome_razao_social}</xNome>
       <enderDest>
         <xLgr>${dados.cliente.endereco}</xLgr>
@@ -71,6 +75,7 @@ export class XMLGenerator {
         <UF>${dados.cliente.estado}</UF>
         <CEP>${dados.cliente.cep.replace(/\D/g, '')}</CEP>
       </enderDest>
+      ${dados.cliente.inscricao_estadual ? `<IE>${dados.cliente.inscricao_estadual}</IE>` : ''}
     </dest>`;
   }
 
@@ -83,7 +88,7 @@ export class XMLGenerator {
         <NCM>${item.ncm || '00000000'}</NCM>
         <CFOP>${item.cfop}</CFOP>
         <uCom>${item.unidade}</uCom>
-        <qCom>${item.quantidade}</qCom>
+        <qCom>${item.quantidade.toFixed(4)}</qCom>
         <vUnCom>${item.valor_unitario.toFixed(2)}</vUnCom>
         <vProd>${item.valor_total.toFixed(2)}</vProd>
       </prod>
@@ -97,8 +102,7 @@ export class XMLGenerator {
           </ICMS00>
         </ICMS>
       </imposto>
-    </det>
-    `).join('');
+    </det>`).join('');
   }
 
   private static gerarTagTotal(dados: DadosNFeCompletos): string {
