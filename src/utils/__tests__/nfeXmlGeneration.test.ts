@@ -13,6 +13,7 @@ describe('XMLGenerator', () => {
         estado: 'SP',
         cep: '01001000',
         inscricao_estadual: '123456789'
+        // ❌ Não incluir `id` aqui se não estiver no tipo
       },
       cliente: {
         cpf_cnpj: '12345678901',
@@ -22,6 +23,7 @@ describe('XMLGenerator', () => {
         estado: 'RJ',
         cep: '20000000',
         inscricao_estadual: '987654321'
+        // ❌ Não incluir `id` aqui se não estiver no tipo
       },
       nota: {
         numero: 1,
@@ -30,7 +32,7 @@ describe('XMLGenerator', () => {
         valor_total: 100.0,
         data_emissao: '2024-01-01',
         ambiente: 'homologacao'
-        // Adicione campos opcionais aqui se necessário
+        // ❌ Não incluir `id` aqui se não estiver no tipo
       },
       itens: [
         {
@@ -43,7 +45,7 @@ describe('XMLGenerator', () => {
           unidade: 'UN'
         }
       ]
-      // Adicione transportadora se quiser testar
+      // Se desejar testar transportadora, adicionar aqui respeitando o tipo
     }
 
     const xml = XMLGenerator.gerar(nfe)
