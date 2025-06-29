@@ -16,9 +16,11 @@ interface ItemNFe {
   item_nome: string;
   quantidade: number;
   preco_unitario: number;
+  valor_unitario: number;
   valor_total: number;
   cfop: string;
   ncm: string;
+  tipo: 'produto';
 }
 
 export const EmissaoNFeForm = () => {
@@ -119,17 +121,30 @@ export const EmissaoNFeForm = () => {
     }
   };
 
+  const handleInputChange = (field: string, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <DadosGeraisSection formData={formData} setFormData={setFormData} />
       
-      <DadosClienteCard formData={formData} setFormData={setFormData} />
+      <DadosClienteCard 
+        formData={formData} 
+        clientes={[]} 
+        loadingClientes={false}
+        onInputChange={handleInputChange}
+      />
       
-      <EnderecosCard formData={formData} setFormData={setFormData} />
+      <EnderecosCard 
+        formData={formData} 
+        onInputChange={handleInputChange}
+      />
       
       <ItensSection 
         itens={itens} 
         setItens={setItens} 
+        empresaId={formData.empresa_id}
         valorTotalNota={valorTotalNota}
       />
 

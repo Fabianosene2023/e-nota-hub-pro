@@ -8,9 +8,11 @@ interface ItemNFe {
   produto_id: string;
   item_nome: string;
   quantidade: number;
+  preco_unitario: number;
   valor_unitario: number;
   valor_total: number;
   cfop: string;
+  ncm: string;
   tipo: 'produto';
 }
 
@@ -57,7 +59,7 @@ export const ProdutosTable = ({ itens, valorTotalNota, onRemoveItem }: ProdutosT
             <TableRow key={index}>
               <TableCell>{item.item_nome}</TableCell>
               <TableCell>{item.quantidade}</TableCell>
-              <TableCell>R$ {item.valor_unitario.toFixed(2)}</TableCell>
+              <TableCell>R$ {(item.valor_unitario || item.preco_unitario).toFixed(2)}</TableCell>
               <TableCell>{item.cfop}</TableCell>
               <TableCell>R$ {item.valor_total.toFixed(2)}</TableCell>
               <TableCell>

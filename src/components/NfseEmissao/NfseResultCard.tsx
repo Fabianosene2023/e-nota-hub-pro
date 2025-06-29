@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface NfseResultData {
   numero_nfse: string;
-  codigo_verificacao: string;
+  codigo_verificacao?: string;
   valor_total: number;
   data_emissao: string;
 }
@@ -24,9 +24,11 @@ export const NfseResultCard: React.FC<NfseResultCardProps> = ({ data }) => {
           <div>
             <strong>Número da NFSe:</strong> {data.numero_nfse}
           </div>
-          <div>
-            <strong>Código de Verificação:</strong> {data.codigo_verificacao}
-          </div>
+          {data.codigo_verificacao && (
+            <div>
+              <strong>Código de Verificação:</strong> {data.codigo_verificacao}
+            </div>
+          )}
           <div>
             <strong>Valor Total:</strong> R$ {data.valor_total?.toFixed(2)}
           </div>

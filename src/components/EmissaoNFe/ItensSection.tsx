@@ -8,9 +8,11 @@ interface ItemNFe {
   produto_id: string;
   item_nome: string;
   quantidade: number;
+  preco_unitario: number;
   valor_unitario: number;
   valor_total: number;
   cfop: string;
+  ncm: string;
   tipo: 'produto';
 }
 
