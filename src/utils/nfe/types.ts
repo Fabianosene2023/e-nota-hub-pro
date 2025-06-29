@@ -44,14 +44,14 @@ export interface DadosNFeCompletos {
     serie: number;
     natureza_operacao: string;
     valor_total: number;
-    data_emissao: string;
+    data_emissao: string; // ISO string esperado
     ambiente: 'homologacao' | 'producao';
-    freight_value?: number;
-    insurance_value?: number;
-    freight_mode?: string;
-    volume_quantity?: number;
-    weight_gross?: number;
-    weight_net?: number;
+    freight_value?: number;      // Valor do frete (opcional)
+    insurance_value?: number;   // Valor do seguro (opcional)
+    freight_mode?: string;      // Código modo de frete (opcional)
+    volume_quantity?: number;   // Quantidade de volumes (opcional)
+    weight_gross?: number;      // Peso bruto (opcional)
+    weight_net?: number;        // Peso líquido (opcional)
   };
   itens: Array<{
     codigo: string;
@@ -63,7 +63,7 @@ export interface DadosNFeCompletos {
     ncm?: string;
     unidade: string;
   }>;
-  transportadora?: TransportadoraData;
+  transportadora?: TransportadoraData; // Opcional
 }
 
 export interface RetornoNFe {
@@ -91,7 +91,7 @@ export interface RpsData {
   numero_nfse?: string;
   mensagem?: string;
   xml_rps: string;
-  // ... outros campos existentes
+  // demais campos podem ser adicionados conforme necessário
 }
 
 export interface NFSeSubmitResult {
@@ -99,7 +99,7 @@ export interface NFSeSubmitResult {
   mensagem?: string;
   numero_rps?: string;
   numero_nfse?: string;
-  // outros campos relevantes
+  // outros campos relevantes podem ser adicionados
 }
 
 export interface NFSeSubmitResponse {
