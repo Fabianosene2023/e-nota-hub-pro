@@ -54,109 +54,110 @@ export const DadosFreteSection = ({
       <CardHeader>
         <CardTitle>Dados de Frete e Transporte</CardTitle>
         <CardDescription>
-          Informações sobre o transporte e frete da mercadoria
+          Informações sobre transporte e frete da mercadoria
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="modalidade-frete">Modalidade do Frete</Label>
+          <div>
+            <Label htmlFor="modalidade_frete">Modalidade do Frete</Label>
             <Select value={modalidadeFrete} onValueChange={setModalidadeFrete}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione a modalidade" />
               </SelectTrigger>
               <SelectContent>
-                {modalidadesFreteOptions.map((opcao) => (
-                  <SelectItem key={opcao.value} value={opcao.value}>
-                    {opcao.label}
+                {modalidadesFreteOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="transportadora">Transportadora</Label>
-            <Select value={transportadoraId} onValueChange={setTransportadoraId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma transportadora" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Nenhuma</SelectItem>
-                {transportadoras?.map((transportadora) => (
-                  <SelectItem key={transportadora.id} value={transportadora.id}>
-                    {transportadora.nome_razao_social}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {modalidadeFrete !== "9" && (
+            <div>
+              <Label htmlFor="transportadora">Transportadora</Label>
+              <Select value={transportadoraId} onValueChange={setTransportadoraId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a transportadora" />
+                </SelectTrigger>
+                <SelectContent>
+                  {transportadoras?.map((transportadora) => (
+                    <SelectItem key={transportadora.id} value={transportadora.id}>
+                      {transportadora.nome_razao_social}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="valor_frete">Valor do Frete (R$)</Label>
+            <Input
+              id="valor_frete"
+              type="number"
+              value={valorFrete}
+              onChange={(e) => setValorFrete(e.target.value)}
+              placeholder="0,00"
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="valor_seguro">Valor do Seguro (R$)</Label>
+            <Input
+              id="valor_seguro"
+              type="number"
+              value={valorSeguro}
+              onChange={(e) => setValorSeguro(e.target.value)}
+              placeholder="0,00"
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="quantidade_volumes">Quantidade de Volumes</Label>
+            <Input
+              id="quantidade_volumes"
+              type="number"
+              value={quantidadeVolumes}
+              onChange={(e) => setQuantidadeVolumes(e.target.value)}
+              placeholder="1"
+              min="0"
+            />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="valor-frete">Valor do Frete (R$)</Label>
+          <div>
+            <Label htmlFor="peso_bruto">Peso Bruto (Kg)</Label>
             <Input
-              id="valor-frete"
+              id="peso_bruto"
               type="number"
-              step="0.01"
-              min="0"
-              value={valorFrete}
-              onChange={(e) => setValorFrete(e.target.value)}
-              placeholder="0,00"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="valor-seguro">Valor do Seguro (R$)</Label>
-            <Input
-              id="valor-seguro"
-              type="number"
-              step="0.01"
-              min="0"
-              value={valorSeguro}
-              onChange={(e) => setValorSeguro(e.target.value)}
-              placeholder="0,00"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="quantidade-volumes">Quantidade de Volumes</Label>
-            <Input
-              id="quantidade-volumes"
-              type="number"
-              min="0"
-              value={quantidadeVolumes}
-              onChange={(e) => setQuantidadeVolumes(e.target.value)}
-              placeholder="0"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="peso-bruto">Peso Bruto (kg)</Label>
-            <Input
-              id="peso-bruto"
-              type="number"
-              step="0.001"
-              min="0"
               value={pesoBruto}
               onChange={(e) => setPesoBruto(e.target.value)}
               placeholder="0,000"
+              min="0"
+              step="0.001"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="peso-liquido">Peso Líquido (kg)</Label>
+          <div>
+            <Label htmlFor="peso_liquido">Peso Líquido (Kg)</Label>
             <Input
-              id="peso-liquido"
+              id="peso_liquido"
               type="number"
-              step="0.001"
-              min="0"
               value={pesoLiquido}
               onChange={(e) => setPesoLiquido(e.target.value)}
               placeholder="0,000"
+              min="0"
+              step="0.001"
             />
           </div>
         </div>

@@ -1,30 +1,32 @@
 
-import React from "react";
-import { FileText, MapPin } from "lucide-react";
-import { useEmitirNfseUberaba } from "@/hooks/useNfseUberaba";
-import { NfseEmissaoForm } from "./NfseEmissaoForm";
-import { NfseResultCard } from "./NfseResultCard";
+import React, { useState } from 'react';
+import { NfseEmissaoPage } from '@/pages/NfseEmissaoPage';
+import { NfseResultCard } from './NfseResultCard';
+import { useEmitirNfseUberaba } from '@/hooks/useNfseUberaba';
 
-export const NfseEmissao: React.FC = () => {
+export const NfseEmissao = () => {
+  const [resultadoEmissao, setResultadoEmissao] = useState(null);
   const emitirNfse = useEmitirNfseUberaba();
 
+  React.useEffect(() => {
+    if (emitirNfse.isSuccess && emitirNfse.data) {
+      setResultadoEmissao(emitirNfse.data);
+    }
+  }, [emitirNfse.isSuccess, emitirNfse.data]);
+
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <FileText className="h-6 w-6 text-blue-600" />
-        <div>
-          <h1 className="text-2xl font-bold">Emissão de NFSe</h1>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4" />
-            <span>Uberaba - MG</span>
-          </div>
+    <div className="space-y-6">
+      <NfseEmissaoPage />
+      
+      {resultadoEmissao && (
+        <div className="mt-6">
+          <NfseResultCard data={{
+            numero_nfse: resultadoEmissao.numero_nfse,
+            codigo_verificacao: resultadoEmissao.codigo_verificacao,
+            valor_total: resultadoEmissao.valor_total,
+            data_emissao: resultadoEmissao.data_emissao
+          }} />
         </div>
-      </div>
-
-      <NfseEmissaoForm />
-
-      {emitirNfse.isSuccess && emitirNfse.data && (
-        <NfseResultCard data={emitirNfse.data} />
       )}
     </div>
   );

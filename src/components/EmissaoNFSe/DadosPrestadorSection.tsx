@@ -1,9 +1,9 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { usePrestadoresServico } from '@/hooks/usePrestadoresServico';
-import { useEmpresasManager } from '@/hooks/useEmpresasManager';
+import { Label } from "@/components/ui/label";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DadosPrestadorSectionProps {
   prestadorId: string;
@@ -11,33 +11,43 @@ interface DadosPrestadorSectionProps {
 }
 
 export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPrestadorSectionProps) => {
-  const { data: empresas } = useEmpresasManager();
-  const empresaId = empresas?.[0]?.id || '';
-  const { data: prestadores } = usePrestadoresServico(empresaId);
+  const { data: empresas } = useQuery({
+    queryKey: ['empresas-prestadoras'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('empresas')
+        .select('id, razao_social, cnpj, inscricao_municipal');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Dados do Prestador</CardTitle>
         <CardDescription>
-          Selecione o prestador de serviço para emissão da NFSe
+          Selecione a empresa prestadora de serviços
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="prestador">Prestador de Serviço *</Label>
-          <Select value={prestadorId} onValueChange={setPrestadorId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione o prestador" />
-            </SelectTrigger>
-            <SelectContent>
-              {prestadores?.map((prestador) => (
-                <SelectItem key={prestador.id} value={prestador.id}>
-                  {prestador.cnpj} - {prestador.inscricao_municipal || 'Sem IM'}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="prestador">Prestador de Serviços *</Label>
+            <Select value={prestadorId} onValueChange={setPrestadorId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o prestador" />
+              </SelectTrigger>
+              <SelectContent>
+                {empresas?.map((empresa) => (
+                  <SelectItem key={empresa.id} value={empresa.id}>
+                    {empresa.razao_social} - {empresa.cnpj}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardContent>
     </Card>

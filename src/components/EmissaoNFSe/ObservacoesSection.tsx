@@ -14,17 +14,17 @@ export const ObservacoesSection = ({ discriminacao, setDiscriminacao }: Observac
       <CardHeader>
         <CardTitle>Discriminação dos Serviços</CardTitle>
         <CardDescription>
-          Descreva detalhadamente os serviços prestados
+          Descrição detalhada dos serviços prestados (obrigatório para NFSe)
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div>
           <Label htmlFor="discriminacao">Discriminação *</Label>
           <Textarea
             id="discriminacao"
             value={discriminacao}
             onChange={(e) => setDiscriminacao(e.target.value)}
-            placeholder="Descreva os serviços prestados de forma detalhada..."
+            placeholder="Descreva detalhadamente os serviços prestados..."
             rows={4}
             required
           />
