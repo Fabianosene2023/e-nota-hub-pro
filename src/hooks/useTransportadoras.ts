@@ -3,6 +3,27 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
+export interface Transportadora {
+  id: string;
+  empresa_id: string;
+  nome_razao_social: string;
+  nome_fantasia?: string;
+  cpf_cnpj: string;
+  tipo_pessoa: 'fisica' | 'juridica';
+  inscricao_estadual?: string;
+  endereco: string;
+  cidade: string;
+  estado: string;
+  cep: string;
+  telefone?: string;
+  email?: string;
+  placa_veiculo?: string;
+  rntrc?: string;
+  ativo: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export const useTransportadoras = () => {
   return useQuery({
     queryKey: ['transportadoras'],
@@ -10,10 +31,11 @@ export const useTransportadoras = () => {
       const { data, error } = await supabase
         .from('transportadoras')
         .select('*')
+        .eq('ativo', true)
         .order('nome_razao_social');
       
       if (error) throw error;
-      return data;
+      return data as Transportadora[];
     },
   });
 };
@@ -22,10 +44,10 @@ export const useTransportadorasManager = () => {
   const queryClient = useQueryClient();
 
   const createTransportadora = useMutation({
-    mutationFn: async (transportadora: any) => {
+    mutationFn: async (transportadora: Omit<Transportadora, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('transportadoras')
-        .insert([transportadora])
+        .insert(transportadora)
         .select()
         .single();
       
@@ -36,24 +58,24 @@ export const useTransportadorasManager = () => {
       queryClient.invalidateQueries({ queryKey: ['transportadoras'] });
       toast({
         title: "Sucesso",
-        description: "Transportadora criada com sucesso",
+        description: "Transportadora cadastrada com sucesso",
       });
     },
     onError: (error) => {
       toast({
         title: "Erro",
-        description: "Erro ao criar transportadora: " + error.message,
+        description: error instanceof Error ? error.message : "Erro ao cadastrar transportadora",
         variant: "destructive",
       });
     },
   });
 
   const updateTransportadora = useMutation({
-    mutationFn: async ({ id, ...transportadora }: any) => {
+    mutationFn: async (transportadora: Partial<Transportadora> & { id: string }) => {
       const { data, error } = await supabase
         .from('transportadoras')
         .update(transportadora)
-        .eq('id', id)
+        .eq('id', transportadora.id)
         .select()
         .single();
       
@@ -70,7 +92,7 @@ export const useTransportadorasManager = () => {
     onError: (error) => {
       toast({
         title: "Erro",
-        description: "Erro ao atualizar transportadora: " + error.message,
+        description: error instanceof Error ? error.message : "Erro ao atualizar transportadora",
         variant: "destructive",
       });
     },
@@ -80,7 +102,7 @@ export const useTransportadorasManager = () => {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('transportadoras')
-        .delete()
+        .update({ ativo: false })
         .eq('id', id);
       
       if (error) throw error;
@@ -95,7 +117,7 @@ export const useTransportadorasManager = () => {
     onError: (error) => {
       toast({
         title: "Erro",
-        description: "Erro ao remover transportadora: " + error.message,
+        description: error instanceof Error ? error.message : "Erro ao remover transportadora",
         variant: "destructive",
       });
     },

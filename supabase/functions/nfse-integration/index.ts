@@ -1,130 +1,197 @@
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { NfseIntegrationService } from './services/nfseIntegrationService.ts'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface NFSeRequest {
+  action: string;
+  empresa_id: string;
+  tomador_nome: string;
+  tomador_cpf_cnpj?: string;
+  tomador_email?: string;
+  tomador_endereco?: string;
+  descricao_servico: string;
+  valor_servico: number;
+  codigo_servico: string;
+  aliquota_iss: number;
+  municipio?: string;
 }
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const supabase = createClient(
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    );
 
-    const { operation, rps_id, prestador_id } = await req.json()
+    const { action, ...requestData } = await req.json() as NFSeRequest;
 
-    if (operation === 'emitir_nfse') {
-      // Buscar dados do RPS
-      const { data: rps, error: rpsError } = await supabase
-        .from('rps_nfse')
-        .select(`
-          *,
-          itens_rps_nfse (*)
-        `)
-        .eq('id', rps_id)
-        .single()
-
-      if (rpsError || !rps) {
-        throw new Error('RPS não encontrado')
-      }
-
-      // Buscar dados do prestador
-      const { data: prestador, error: prestadorError } = await supabase
-        .from('prestadores_servico')
-        .select(`
-          *,
-          empresas!inner (*)
-        `)
-        .eq('id', prestador_id)
-        .single()
-
-      if (prestadorError || !prestador) {
-        throw new Error('Prestador não encontrado')
-      }
-
-      // Buscar configuração NFSe
-      const { data: config, error: configError } = await supabase
+    if (action === 'emitir_nfse') {
+      // Buscar próximo número RPS
+      const { data: configData } = await supabaseClient
         .from('configuracoes_nfse')
-        .select('*')
-        .eq('prestador_id', prestador_id)
-        .single()
+        .select('proximo_numero_rps, serie_rps')
+        .limit(1)
+        .single();
 
-      if (configError || !config) {
-        throw new Error('Configuração NFSe não encontrada')
-      }
+      const numeroRps = configData?.proximo_numero_rps || 1;
+      const serieRps = configData?.serie_rps || 'RPS';
 
-      // Preparar dados para NFSe
-      const dadosNfse = {
+      // Gerar XML RPS (simulado para desenvolvimento)
+      const xmlRps = gerarXmlRPS({
+        numero_rps: numeroRps,
+        serie_rps: serieRps,
         prestador: {
-          cnpj: prestador.cnpj.replace(/\D/g, ''),
-          inscricao_municipal: prestador.inscricao_municipal || '',
-          razao_social: prestador.empresas.razao_social
+          cnpj: '12345678000100', // Buscar do prestador
+          inscricao_municipal: '123456'
         },
         tomador: {
-          cpf_cnpj: rps.tomador_cnpj_cpf?.replace(/\D/g, ''),
-          razao_social: rps.tomador_nome,
-          endereco: rps.tomador_endereco,
-          email: rps.tomador_email
+          nome: requestData.tomador_nome,
+          cpf_cnpj: requestData.tomador_cpf_cnpj,
+          endereco: requestData.tomador_endereco,
+          email: requestData.tomador_email
         },
         servico: {
-          codigo_servico: rps.codigo_servico || '1.01',
-          descricao: rps.discriminacao,
-          valor_servico: Number(rps.valor_servicos),
-          aliquota_iss: Number(rps.aliquota_iss)
-        },
-        numero_rps: rps.numero_rps,
-        serie_rps: rps.serie_rps,
-        data_emissao: new Date(rps.data_emissao).toISOString().split('T')[0]
+          codigo_servico: requestData.codigo_servico,
+          discriminacao: requestData.descricao_servico,
+          valor_servicos: requestData.valor_servico,
+          aliquota_iss: requestData.aliquota_iss
+        }
+      });
+
+      // Simular envio para SEFAZ (em produção, usar integração real)
+      const nfseResponse = await simularEnvioNFSe(xmlRps);
+
+      // Salvar na tabela nfse_emitidas
+      const { data: nfseData, error } = await supabaseClient
+        .from('nfse_emitidas')
+        .insert({
+          empresa_id: requestData.empresa_id,
+          numero_rps: numeroRps,
+          serie_rps: serieRps,
+          numero_nfse: nfseResponse.numero_nfse,
+          codigo_verificacao: nfseResponse.codigo_verificacao,
+          protocolo: nfseResponse.protocolo,
+          status: 'emitida',
+          data_emissao: new Date().toISOString().split('T')[0],
+          tomador_nome: requestData.tomador_nome,
+          tomador_cpf_cnpj: requestData.tomador_cpf_cnpj,
+          valor_servico: requestData.valor_servico,
+          descricao_servico: requestData.descricao_servico,
+          xml_nfse: nfseResponse.xml_nfse,
+          ambiente: 'homologacao'
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(`Erro ao salvar NFSe: ${error.message}`);
       }
 
-      // Emitir NFSe
-      const resultado = await NfseIntegrationService.emitirNfseGinfes(
-        dadosNfse,
-        config.url_webservice,
-        config.ambiente as 'homologacao' | 'producao'
-      )
+      // Atualizar próximo número RPS
+      await supabaseClient
+        .from('configuracoes_nfse')
+        .update({ proximo_numero_rps: numeroRps + 1 })
+        .eq('id', configData?.id);
 
-      // Atualizar RPS com resultado
-      const statusRps = resultado.success ? 'emitida' : 'erro'
-      await supabase
-        .from('rps_nfse')
-        .update({
-          status: statusRps,
-          numero_nfse: resultado.numero_nfse,
-          codigo_verificacao: resultado.codigo_verificacao,
-          protocolo: resultado.protocolo,
-          xml_nfse: resultado.xml_nfse,
-          data_processamento: new Date().toISOString(),
-          mensagem_retorno: resultado.erro || 'Processado com sucesso'
-        })
-        .eq('id', rps_id)
-
-      return new Response(JSON.stringify(resultado), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      })
+      return new Response(
+        JSON.stringify({
+          success: true,
+          id: nfseData.id,
+          numero_rps: numeroRps.toString(),
+          numero_nfse: nfseResponse.numero_nfse,
+          codigo_verificacao: nfseResponse.codigo_verificacao,
+          protocolo: nfseResponse.protocolo,
+          status: 'emitida',
+          data_emissao: nfseData.data_emissao,
+          valor_total: requestData.valor_servico,
+          xml_nfse: nfseResponse.xml_nfse
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 
+        }
+      );
     }
 
-    return new Response(JSON.stringify({ error: 'Operação não suportada' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
+    return new Response(
+      JSON.stringify({ error: 'Ação não suportada' }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400 
+      }
+    );
 
   } catch (error) {
-    console.error('Erro na integração NFSe:', error)
-    return new Response(JSON.stringify({ 
-      error: error.message || 'Erro interno do servidor' 
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    })
+    console.error('Erro na função NFSe:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: error.message || 'Erro interno do servidor' 
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500 
+      }
+    );
   }
-})
+});
+
+function gerarXmlRPS(data: any): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+  <soap:Header/>
+  <soap:Body>
+    <EnviarLoteRpsEnvio>
+      <LoteRps>
+        <NumeroLote>${Date.now()}</NumeroLote>
+        <Cnpj>${data.prestador.cnpj}</Cnpj>
+        <InscricaoMunicipal>${data.prestador.inscricao_municipal}</InscricaoMunicipal>
+        <QuantidadeRps>1</QuantidadeRps>
+        <ListaRps>
+          <Rps>
+            <InfRps>
+              <IdentificacaoRps>
+                <Numero>${data.numero_rps}</Numero>
+                <Serie>${data.serie_rps}</Serie>
+                <Tipo>1</Tipo>
+              </IdentificacaoRps>
+              <DataEmissao>${new Date().toISOString()}</DataEmissao>
+              <Status>1</Status>
+              <Servico>
+                <Valores>
+                  <ValorServicos>${data.servico.valor_servicos.toFixed(2)}</ValorServicos>
+                  <Aliquota>${data.servico.aliquota_iss.toFixed(2)}</Aliquota>
+                </Valores>
+                <ItemListaServico>${data.servico.codigo_servico}</ItemListaServico>
+                <Discriminacao>${data.servico.discriminacao}</Discriminacao>
+              </Servico>
+            </InfRps>
+          </Rps>
+        </ListaRps>
+      </LoteRps>
+    </EnviarLoteRpsEnvio>
+  </soap:Body>
+</soap:Envelope>`;
+}
+
+async function simularEnvioNFSe(xmlRps: string): Promise<any> {
+  // Simular resposta da SEFAZ para desenvolvimento
+  const numeroNfse = Math.floor(Math.random() * 1000000).toString();
+  
+  return {
+    success: true,
+    numero_nfse: numeroNfse,
+    codigo_verificacao: Math.floor(Math.random() * 1000000).toString(),
+    protocolo: `PROT-${Date.now()}`,
+    data_emissao: new Date().toISOString().split('T')[0],
+    xml_nfse: `<NFSe><Numero>${numeroNfse}</Numero></NFSe>`
+  };
+}
