@@ -1,15 +1,8 @@
-
 import { DadosNFeCompletos } from './types';
 import { NFEUtils } from './nfeUtils';
 
-/**
- * Service for generating NFe XML
- */
 export class XMLGenerator {
   
-  /**
-   * Generate complete NFe XML
-   */
   public static gerarXMLNFe(dados: DadosNFeCompletos): string {
     const chaveAcesso = NFEUtils.gerarChaveAcesso(dados);
     const dataEmissao = new Date(dados.nota.data_emissao);
@@ -109,8 +102,8 @@ export class XMLGenerator {
   }
 
   private static gerarTagTotal(dados: DadosNFeCompletos): string {
-    const freightValue = dados.nota.freight_value || 0;
-    const insuranceValue = dados.nota.insurance_value || 0;
+    const freightValue = dados.nota.freight_value ?? 0;
+    const insuranceValue = dados.nota.insurance_value ?? 0;
     const totalValue = dados.nota.valor_total + freightValue + insuranceValue;
 
     return `<total>
@@ -134,28 +127,27 @@ export class XMLGenerator {
   }
 
   private static gerarTagTransp(dados: DadosNFeCompletos): string {
-    const freightMode = dados.nota.freight_mode || '9';
-    
+    const freightMode = dados.nota.freight_mode ?? '9';
+
     let transpXML = `<transp>
       <modFrete>${freightMode}</modFrete>`;
 
-    // Add transporter data if freight mode is not "9" (no transport) and transporter exists
     if (freightMode !== '9' && dados.transportadora) {
+      const transp = dados.transportadora;
       transpXML += `
       <transporta>
-        <CNPJ>${dados.transportadora.cpf_cnpj.replace(/\D/g, '')}</CNPJ>
-        <xNome>${dados.transportadora.nome_razao_social}</xNome>
-        ${dados.transportadora.inscricao_estadual ? `<IE>${dados.transportadora.inscricao_estadual}</IE>` : ''}
-        <xEnder>${dados.transportadora.endereco}</xEnder>
-        <xMun>${dados.transportadora.cidade}</xMun>
-        <UF>${dados.transportadora.estado}</UF>
+        <CNPJ>${transp.cpf_cnpj.replace(/\D/g, '')}</CNPJ>
+        <xNome>${transp.nome_razao_social}</xNome>
+        ${transp.inscricao_estadual ? `<IE>${transp.inscricao_estadual}</IE>` : ''}
+        <xEnder>${transp.endereco}</xEnder>
+        <xMun>${transp.cidade}</xMun>
+        <UF>${transp.estado}</UF>
       </transporta>`;
     }
 
-    // Add volume data if exists
-    const volumeQuantity = dados.nota.volume_quantity || 0;
-    const weightGross = dados.nota.weight_gross || 0;
-    const weightNet = dados.nota.weight_net || 0;
+    const volumeQuantity = dados.nota.volume_quantity ?? 0;
+    const weightGross = dados.nota.weight_gross ?? 0;
+    const weightNet = dados.nota.weight_net ?? 0;
 
     if (volumeQuantity > 0 || weightGross > 0 || weightNet > 0) {
       transpXML += `
