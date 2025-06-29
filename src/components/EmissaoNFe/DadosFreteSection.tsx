@@ -6,41 +6,41 @@ import { Label } from "@/components/ui/label";
 import { useTransportadoras } from "@/hooks/useTransportadoras";
 
 interface DadosFreteSectionProps {
-  modalidadeFrete: string;
-  setModalidadeFrete: (modalidade: string) => void;
-  valorFrete: string;
-  setValorFrete: (valor: string) => void;
-  valorSeguro: string;
-  setValorSeguro: (valor: string) => void;
-  quantidadeVolumes: string;
-  setQuantidadeVolumes: (quantidade: string) => void;
-  pesoBruto: string;
-  setPesoBruto: (peso: string) => void;
-  pesoLiquido: string;
-  setPesoLiquido: (peso: string) => void;
-  transportadoraId: string;
-  setTransportadoraId: (id: string) => void;
+  freightMode: string;
+  setFreightMode: (mode: string) => void;
+  freightValue: string;
+  setFreightValue: (value: string) => void;
+  insuranceValue: string;
+  setInsuranceValue: (value: string) => void;
+  volumeQuantity: string;
+  setVolumeQuantity: (quantity: string) => void;
+  weightGross: string;
+  setWeightGross: (weight: string) => void;
+  weightNet: string;
+  setWeightNet: (weight: string) => void;
+  transporterId: string;
+  setTransporterId: (id: string) => void;
 }
 
 export const DadosFreteSection = ({
-  modalidadeFrete,
-  setModalidadeFrete,
-  valorFrete,
-  setValorFrete,
-  valorSeguro,
-  setValorSeguro,
-  quantidadeVolumes,
-  setQuantidadeVolumes,
-  pesoBruto,
-  setPesoBruto,
-  pesoLiquido,
-  setPesoLiquido,
-  transportadoraId,
-  setTransportadoraId,
+  freightMode,
+  setFreightMode,
+  freightValue,
+  setFreightValue,
+  insuranceValue,
+  setInsuranceValue,
+  volumeQuantity,
+  setVolumeQuantity,
+  weightGross,
+  setWeightGross,
+  weightNet,
+  setWeightNet,
+  transporterId,
+  setTransporterId,
 }: DadosFreteSectionProps) => {
   const { data: transportadoras } = useTransportadoras();
 
-  const modalidadesFreteOptions = [
+  const freightModeOptions = [
     { value: "0", label: "0 - Contratação do Frete por conta do Remetente (CIF)" },
     { value: "1", label: "1 - Contratação do Frete por conta do Destinatário (FOB)" },
     { value: "2", label: "2 - Contratação do Frete por conta de Terceiros" },
@@ -54,19 +54,19 @@ export const DadosFreteSection = ({
       <CardHeader>
         <CardTitle>Dados de Frete e Transporte</CardTitle>
         <CardDescription>
-          Informações sobre transporte e frete da mercadoria
+          Informações sobre transporte e frete da mercadoria conforme padrão SEFAZ
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="modalidade_frete">Modalidade do Frete</Label>
-            <Select value={modalidadeFrete} onValueChange={setModalidadeFrete}>
+            <Label htmlFor="freight_mode">Modalidade do Frete *</Label>
+            <Select value={freightMode} onValueChange={setFreightMode}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione a modalidade" />
               </SelectTrigger>
               <SelectContent>
-                {modalidadesFreteOptions.map((option) => (
+                {freightModeOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -75,10 +75,10 @@ export const DadosFreteSection = ({
             </Select>
           </div>
 
-          {modalidadeFrete !== "9" && (
+          {freightMode !== "9" && (
             <div>
-              <Label htmlFor="transportadora">Transportadora</Label>
-              <Select value={transportadoraId} onValueChange={setTransportadoraId}>
+              <Label htmlFor="transporter">Transportadora</Label>
+              <Select value={transporterId} onValueChange={setTransporterId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a transportadora" />
                 </SelectTrigger>
@@ -96,12 +96,12 @@ export const DadosFreteSection = ({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label htmlFor="valor_frete">Valor do Frete (R$)</Label>
+            <Label htmlFor="freight_value">Valor do Frete (R$)</Label>
             <Input
-              id="valor_frete"
+              id="freight_value"
               type="number"
-              value={valorFrete}
-              onChange={(e) => setValorFrete(e.target.value)}
+              value={freightValue}
+              onChange={(e) => setFreightValue(e.target.value)}
               placeholder="0,00"
               min="0"
               step="0.01"
@@ -109,12 +109,12 @@ export const DadosFreteSection = ({
           </div>
 
           <div>
-            <Label htmlFor="valor_seguro">Valor do Seguro (R$)</Label>
+            <Label htmlFor="insurance_value">Valor do Seguro (R$)</Label>
             <Input
-              id="valor_seguro"
+              id="insurance_value"
               type="number"
-              value={valorSeguro}
-              onChange={(e) => setValorSeguro(e.target.value)}
+              value={insuranceValue}
+              onChange={(e) => setInsuranceValue(e.target.value)}
               placeholder="0,00"
               min="0"
               step="0.01"
@@ -122,12 +122,12 @@ export const DadosFreteSection = ({
           </div>
 
           <div>
-            <Label htmlFor="quantidade_volumes">Quantidade de Volumes</Label>
+            <Label htmlFor="volume_quantity">Quantidade de Volumes</Label>
             <Input
-              id="quantidade_volumes"
+              id="volume_quantity"
               type="number"
-              value={quantidadeVolumes}
-              onChange={(e) => setQuantidadeVolumes(e.target.value)}
+              value={volumeQuantity}
+              onChange={(e) => setVolumeQuantity(e.target.value)}
               placeholder="1"
               min="0"
             />
@@ -136,12 +136,12 @@ export const DadosFreteSection = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="peso_bruto">Peso Bruto (Kg)</Label>
+            <Label htmlFor="weight_gross">Peso Bruto (Kg)</Label>
             <Input
-              id="peso_bruto"
+              id="weight_gross"
               type="number"
-              value={pesoBruto}
-              onChange={(e) => setPesoBruto(e.target.value)}
+              value={weightGross}
+              onChange={(e) => setWeightGross(e.target.value)}
               placeholder="0,000"
               min="0"
               step="0.001"
@@ -149,12 +149,12 @@ export const DadosFreteSection = ({
           </div>
 
           <div>
-            <Label htmlFor="peso_liquido">Peso Líquido (Kg)</Label>
+            <Label htmlFor="weight_net">Peso Líquido (Kg)</Label>
             <Input
-              id="peso_liquido"
+              id="weight_net"
               type="number"
-              value={pesoLiquido}
-              onChange={(e) => setPesoLiquido(e.target.value)}
+              value={weightNet}
+              onChange={(e) => setWeightNet(e.target.value)}
               placeholder="0,000"
               min="0"
               step="0.001"

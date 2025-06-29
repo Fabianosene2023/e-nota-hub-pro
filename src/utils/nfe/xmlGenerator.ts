@@ -22,7 +22,7 @@ export class XMLGenerator {
     ${this.gerarTagDest(dados)}
     ${this.gerarTagDet(dados)}
     ${this.gerarTagTotal(dados)}
-    ${this.gerarTagTransp()}
+    ${this.gerarTagTransp(dados)}
     ${this.gerarTagPag(dados)}
   </infNFe>
 </NFe>`;
@@ -109,6 +109,10 @@ export class XMLGenerator {
   }
 
   private static gerarTagTotal(dados: DadosNFeCompletos): string {
+    const freightValue = dados.nota.freight_value || 0;
+    const insuranceValue = dados.nota.insurance_value || 0;
+    const totalValue = dados.nota.valor_total + freightValue + insuranceValue;
+
     return `<total>
       <ICMSTot>
         <vBC>0.00</vBC>
@@ -116,23 +120,56 @@ export class XMLGenerator {
         <vBCST>0.00</vBCST>
         <vST>0.00</vST>
         <vProd>${dados.nota.valor_total.toFixed(2)}</vProd>
-        <vFrete>0.00</vFrete>
-        <vSeg>0.00</vSeg>
+        <vFrete>${freightValue.toFixed(2)}</vFrete>
+        <vSeg>${insuranceValue.toFixed(2)}</vSeg>
         <vDesc>0.00</vDesc>
         <vII>0.00</vII>
         <vIPI>0.00</vIPI>
         <vPIS>0.00</vPIS>
         <vCOFINS>0.00</vCOFINS>
         <vOutro>0.00</vOutro>
-        <vNF>${dados.nota.valor_total.toFixed(2)}</vNF>
+        <vNF>${totalValue.toFixed(2)}</vNF>
       </ICMSTot>
     </total>`;
   }
 
-  private static gerarTagTransp(): string {
-    return `<transp>
-      <modFrete>9</modFrete>
+  private static gerarTagTransp(dados: DadosNFeCompletos): string {
+    const freightMode = dados.nota.freight_mode || '9';
+    
+    let transpXML = `<transp>
+      <modFrete>${freightMode}</modFrete>`;
+
+    // Add transporter data if freight mode is not "9" (no transport) and transporter exists
+    if (freightMode !== '9' && dados.transportadora) {
+      transpXML += `
+      <transporta>
+        <CNPJ>${dados.transportadora.cpf_cnpj.replace(/\D/g, '')}</CNPJ>
+        <xNome>${dados.transportadora.nome_razao_social}</xNome>
+        ${dados.transportadora.inscricao_estadual ? `<IE>${dados.transportadora.inscricao_estadual}</IE>` : ''}
+        <xEnder>${dados.transportadora.endereco}</xEnder>
+        <xMun>${dados.transportadora.cidade}</xMun>
+        <UF>${dados.transportadora.estado}</UF>
+      </transporta>`;
+    }
+
+    // Add volume data if exists
+    const volumeQuantity = dados.nota.volume_quantity || 0;
+    const weightGross = dados.nota.weight_gross || 0;
+    const weightNet = dados.nota.weight_net || 0;
+
+    if (volumeQuantity > 0 || weightGross > 0 || weightNet > 0) {
+      transpXML += `
+      <vol>
+        <qVol>${volumeQuantity}</qVol>
+        <pesoL>${weightNet.toFixed(3)}</pesoL>
+        <pesoB>${weightGross.toFixed(3)}</pesoB>
+      </vol>`;
+    }
+
+    transpXML += `
     </transp>`;
+
+    return transpXML;
   }
 
   private static gerarTagPag(dados: DadosNFeCompletos): string {

@@ -1430,7 +1430,10 @@ export type Database = {
           data_cancelamento: string | null
           data_emissao: string
           empresa_id: string
+          freight_mode: string | null
+          freight_value: number | null
           id: string
+          insurance_value: number | null
           justificativa_cancelamento: string | null
           mensagem_retorno_sefaz: string | null
           modalidade_frete: string | null
@@ -1441,12 +1444,16 @@ export type Database = {
           serie: number
           status: string
           transportadora_id: string | null
+          transporter_id: string | null
           updated_at: string
           valor_cofins: number | null
           valor_icms: number | null
           valor_ipi: number | null
           valor_pis: number | null
           valor_total: number
+          volume_quantity: number | null
+          weight_gross: number | null
+          weight_net: number | null
           xml_nfe: string | null
           xml_url: string | null
         }
@@ -1461,7 +1468,10 @@ export type Database = {
           data_cancelamento?: string | null
           data_emissao?: string
           empresa_id: string
+          freight_mode?: string | null
+          freight_value?: number | null
           id?: string
+          insurance_value?: number | null
           justificativa_cancelamento?: string | null
           mensagem_retorno_sefaz?: string | null
           modalidade_frete?: string | null
@@ -1472,12 +1482,16 @@ export type Database = {
           serie?: number
           status?: string
           transportadora_id?: string | null
+          transporter_id?: string | null
           updated_at?: string
           valor_cofins?: number | null
           valor_icms?: number | null
           valor_ipi?: number | null
           valor_pis?: number | null
           valor_total?: number
+          volume_quantity?: number | null
+          weight_gross?: number | null
+          weight_net?: number | null
           xml_nfe?: string | null
           xml_url?: string | null
         }
@@ -1492,7 +1506,10 @@ export type Database = {
           data_cancelamento?: string | null
           data_emissao?: string
           empresa_id?: string
+          freight_mode?: string | null
+          freight_value?: number | null
           id?: string
+          insurance_value?: number | null
           justificativa_cancelamento?: string | null
           mensagem_retorno_sefaz?: string | null
           modalidade_frete?: string | null
@@ -1503,12 +1520,16 @@ export type Database = {
           serie?: number
           status?: string
           transportadora_id?: string | null
+          transporter_id?: string | null
           updated_at?: string
           valor_cofins?: number | null
           valor_icms?: number | null
           valor_ipi?: number | null
           valor_pis?: number | null
           valor_total?: number
+          volume_quantity?: number | null
+          weight_gross?: number | null
+          weight_net?: number | null
           xml_nfe?: string | null
           xml_url?: string | null
         }
@@ -1532,6 +1553,13 @@ export type Database = {
             columns: ["transportadora_id"]
             isOneToOne: false
             referencedRelation: "contatos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notas_fiscais_transporter_id_fkey"
+            columns: ["transporter_id"]
+            isOneToOne: false
+            referencedRelation: "transportadoras"
             referencedColumns: ["id"]
           },
         ]

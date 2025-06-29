@@ -45,14 +45,14 @@ export const EmissaoNFeForm = () => {
     data_cancelamento: '',
   });
 
-  // Estados para dados de frete
-  const [modalidadeFrete, setModalidadeFrete] = useState('9');
-  const [valorFrete, setValorFrete] = useState('');
-  const [valorSeguro, setValorSeguro] = useState('');
-  const [quantidadeVolumes, setQuantidadeVolumes] = useState('');
-  const [pesoBruto, setPesoBruto] = useState('');
-  const [pesoLiquido, setPesoLiquido] = useState('');
-  const [transportadoraId, setTransportadoraId] = useState('');
+  // Estados para dados de frete - updated field names
+  const [freightMode, setFreightMode] = useState('9');
+  const [freightValue, setFreightValue] = useState('');
+  const [insuranceValue, setInsuranceValue] = useState('');
+  const [volumeQuantity, setVolumeQuantity] = useState('');
+  const [weightGross, setWeightGross] = useState('');
+  const [weightNet, setWeightNet] = useState('');
+  const [transporterId, setTransporterId] = useState('');
 
   // Estados para itens
   const [itens, setItens] = useState<ItemNFe[]>([]);
@@ -75,16 +75,16 @@ export const EmissaoNFeForm = () => {
       return;
     }
 
-    // Incluir dados de frete no payload
+    // Include freight data in payload using new field names
     const nfeData = {
       ...formData,
-      modalidade_frete: parseInt(modalidadeFrete),
-      valor_frete: parseFloat(valorFrete) || 0,
-      valor_seguro: parseFloat(valorSeguro) || 0,
-      quantidade_volumes: parseInt(quantidadeVolumes) || 0,
-      peso_bruto: parseFloat(pesoBruto) || 0,
-      peso_liquido: parseFloat(pesoLiquido) || 0,
-      transportadora_id: transportadoraId || null,
+      freight_mode: freightMode,
+      freight_value: parseFloat(freightValue) || 0,
+      insurance_value: parseFloat(insuranceValue) || 0,
+      volume_quantity: parseInt(volumeQuantity) || 0,
+      weight_gross: parseFloat(weightGross) || 0,
+      weight_net: parseFloat(weightNet) || 0,
+      transporter_id: transporterId || null,
     };
 
     const success = await submitNFe(nfeData, itens, valorTotalNota);
@@ -111,13 +111,13 @@ export const EmissaoNFeForm = () => {
         data_cancelamento: '',
       });
       setItens([]);
-      setModalidadeFrete('9');
-      setValorFrete('');
-      setValorSeguro('');
-      setQuantidadeVolumes('');
-      setPesoBruto('');
-      setPesoLiquido('');
-      setTransportadoraId('');
+      setFreightMode('9');
+      setFreightValue('');
+      setInsuranceValue('');
+      setVolumeQuantity('');
+      setWeightGross('');
+      setWeightNet('');
+      setTransporterId('');
     }
   };
 
@@ -149,20 +149,20 @@ export const EmissaoNFeForm = () => {
       />
 
       <DadosFreteSection
-        modalidadeFrete={modalidadeFrete}
-        setModalidadeFrete={setModalidadeFrete}
-        valorFrete={valorFrete}
-        setValorFrete={setValorFrete}
-        valorSeguro={valorSeguro}
-        setValorSeguro={setValorSeguro}
-        quantidadeVolumes={quantidadeVolumes}
-        setQuantidadeVolumes={setQuantidadeVolumes}
-        pesoBruto={pesoBruto}
-        setPesoBruto={setPesoBruto}
-        pesoLiquido={pesoLiquido}
-        setPesoLiquido={setPesoLiquido}
-        transportadoraId={transportadoraId}
-        setTransportadoraId={setTransportadoraId}
+        freightMode={freightMode}
+        setFreightMode={setFreightMode}
+        freightValue={freightValue}
+        setFreightValue={setFreightValue}
+        insuranceValue={insuranceValue}
+        setInsuranceValue={setInsuranceValue}
+        volumeQuantity={volumeQuantity}
+        setVolumeQuantity={setVolumeQuantity}
+        weightGross={weightGross}
+        setWeightGross={setWeightGross}
+        weightNet={weightNet}
+        setWeightNet={setWeightNet}
+        transporterId={transporterId}
+        setTransporterId={setTransporterId}
       />
       
       <ObservacoesSection 
