@@ -1,5 +1,5 @@
-import { XMLGenerator } from '../nfe/xmlGenerator'
-import type { DadosNFeCompletos } from '../nfe/types'
+import { XMLGenerator } from '../nfe/xmlGenerator';
+import type { DadosNFeCompletos } from '../nfe/types';
 
 describe('XMLGenerator', () => {
   it('gera XML de uma NFe básica', () => {
@@ -12,8 +12,7 @@ describe('XMLGenerator', () => {
         cidade: 'São Paulo',
         estado: 'SP',
         cep: '01001000',
-        inscricao_estadual: '123456789'
-        // ❌ Não incluir `id` aqui se não estiver no tipo
+        inscricao_estadual: '123456789' // id removido
       },
       cliente: {
         cpf_cnpj: '12345678901',
@@ -22,8 +21,7 @@ describe('XMLGenerator', () => {
         cidade: 'Rio de Janeiro',
         estado: 'RJ',
         cep: '20000000',
-        inscricao_estadual: '987654321'
-        // ❌ Não incluir `id` aqui se não estiver no tipo
+        inscricao_estadual: '987654321' // id removido
       },
       nota: {
         numero: 1,
@@ -31,8 +29,7 @@ describe('XMLGenerator', () => {
         natureza_operacao: 'Venda',
         valor_total: 100.0,
         data_emissao: '2024-01-01',
-        ambiente: 'homologacao'
-        // ❌ Não incluir `id` aqui se não estiver no tipo
+        ambiente: 'homologacao' // id removido
       },
       itens: [
         {
@@ -45,12 +42,12 @@ describe('XMLGenerator', () => {
           unidade: 'UN'
         }
       ]
-      // Se desejar testar transportadora, adicionar aqui respeitando o tipo
-    }
+      // Caso queira testar transportadora, adicione-a aqui conforme o tipo
+    };
 
-    const xml = XMLGenerator.gerar(nfe)
-    expect(xml).toMatch(/<NFe>/)
-  })
+    const xml = XMLGenerator.gerar(nfe);
+    expect(xml).toMatch(/<NFe>/);
+  });
 
   // Outros testes...
-})
+});
