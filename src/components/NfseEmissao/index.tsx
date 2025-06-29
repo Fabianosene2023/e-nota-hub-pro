@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { NfseEmissaoPage } from '@/pages/NfseEmissaoPage';
+import NfseEmissaoPage from '@/pages/NfseEmissaoPage';
 import { NfseResultCard } from './NfseResultCard';
 import { useEmitirNfseUberaba } from '@/hooks/useNfseUberaba';
 
