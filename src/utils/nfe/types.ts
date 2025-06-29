@@ -1,3 +1,23 @@
+export interface TransportadoraData {
+  id: string;
+  empresa_id: string;
+  nome_razao_social: string;
+  nome_fantasia?: string;
+  cpf_cnpj: string;
+  tipo_pessoa: 'fisica' | 'juridica';
+  inscricao_estadual?: string;
+  endereco: string;
+  cidade: string;
+  estado: string;
+  cep: string;
+  telefone?: string;
+  email?: string;
+  placa_veiculo?: string;
+  rntrc?: string;
+  ativo: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface DadosNFeCompletos {
   empresa: {
@@ -26,6 +46,12 @@ export interface DadosNFeCompletos {
     valor_total: number;
     data_emissao: string;
     ambiente: 'homologacao' | 'producao';
+    freight_value?: number;
+    insurance_value?: number;
+    freight_mode?: string;
+    volume_quantity?: number;
+    weight_gross?: number;
+    weight_net?: number;
   };
   itens: Array<{
     codigo: string;
@@ -37,6 +63,7 @@ export interface DadosNFeCompletos {
     ncm?: string;
     unidade: string;
   }>;
+  transportadora?: TransportadoraData;
 }
 
 export interface RetornoNFe {
@@ -48,4 +75,34 @@ export interface RetornoNFe {
   codigo_retorno?: string;
   mensagem_retorno?: string;
   error?: string;
+}
+
+export interface RpsData {
+  aliquota_iss: number;
+  codigo_servico: string;
+  codigo_verificacao: string;
+  created_at: string;
+  data_emissao: string;
+  data_processamento: string;
+  discriminacao: string;
+  id: string;
+  iss_retido: boolean;
+  numero_rps: string;
+  numero_nfse?: string;
+  mensagem?: string;
+  xml_rps: string;
+  // ... outros campos existentes
+}
+
+export interface NFSeSubmitResult {
+  success?: boolean;
+  mensagem?: string;
+  numero_rps?: string;
+  numero_nfse?: string;
+  // outros campos relevantes
+}
+
+export interface NFSeSubmitResponse {
+  rps: RpsData;
+  nfseResult: NFSeSubmitResult;
 }
