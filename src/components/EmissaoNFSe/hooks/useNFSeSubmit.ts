@@ -1,7 +1,7 @@
-
 import { useEmitirRpsNfse } from '@/hooks/useRpsNfse';
 import { useCreateLog } from '@/hooks/useLogsOperacoes';
 import { toast } from '@/hooks/use-toast';
+import type { NFSeSubmitResponse } from '@/utils/nfe/types';
 
 interface ItemNFSe {
   servico_id?: string;
@@ -30,13 +30,11 @@ export const useNFSeSubmit = () => {
     try {
       console.log('Emitindo NFSe com dados:', { formData, itens });
 
-      // Calculate totals
+      // Calcular totais
       const valorTotalServicos = itens.reduce((total, item) => total + item.valor_total, 0);
-      const valorTotalISS = itens.reduce((total, item) => {
-        return total + (item.valor_total * item.aliquota_iss / 100);
-      }, 0);
+      const valorTotalISS = itens.reduce((total, item) => total + (item.valor_total * item.aliquota_iss / 100), 0);
 
-      // Prepare NFSe data
+      // Preparar dados para emissão
       const nfseData = {
         prestador_id: formData.prestador_id,
         tomador_nome: formData.tomador_nome,
@@ -54,48 +52,48 @@ export const useNFSeSubmit = () => {
           valor_unitario: item.valor_unitario,
           valor_total: item.valor_total,
           codigo_servico: item.codigo_servico,
-          aliquota_iss: item.aliquota_iss
-        }))
+          aliquota_iss: item.aliquota_iss,
+        })),
       };
 
-      const resultado = await emitirRps.mutateAsync(nfseData);
-      
-      if (resultado?.success) {
-        // Log success
+      const resultado: NFSeSubmitResponse = await emitirRps.mutateAsync(nfseData);
+
+      if (resultado?.nfseResult?.success) {
+        // Log de sucesso
         await createLog.mutateAsync({
-          empresa_id: 'system', // TODO: Get from context
+          empresa_id: 'system', // TODO: Pegar do contexto
           tipo_operacao: 'nfse_emissao',
-          descricao: `NFSe emitida com sucesso - RPS ${resultado.numero_rps}`,
-          dados_operacao: { 
-            numero_rps: resultado.numero_rps,
+          descricao: `NFSe emitida com sucesso - RPS ${resultado.nfseResult.numero_rps}`,
+          dados_operacao: {
+            numero_rps: resultado.nfseResult.numero_rps,
             valor_total: valorTotalServicos,
             tomador: formData.tomador_nome,
-            prestador_id: formData.prestador_id
-          }
+            prestador_id: formData.prestador_id,
+          },
         });
 
         toast({
           title: "NFSe Emitida com Sucesso!",
-          description: `RPS ${resultado.numero_rps} processado. ${resultado.numero_nfse ? `NFSe: ${resultado.numero_nfse}` : 'Aguardando processamento.'}`,
+          description: `RPS ${resultado.nfseResult.numero_rps} processado. ${resultado.nfseResult.numero_nfse ? `NFSe: ${resultado.nfseResult.numero_nfse}` : 'Aguardando processamento.'}`,
         });
 
         return true;
-      } else {
-        throw new Error(resultado?.mensagem || 'Erro desconhecido na emissão');
       }
+
+      throw new Error(resultado?.nfseResult?.mensagem || 'Erro desconhecido na emissão');
     } catch (error) {
       console.error('Erro ao emitir NFSe:', error);
-      
-      // Log error
+
+      // Log de erro
       await createLog.mutateAsync({
-        empresa_id: 'system', // TODO: Get from context
+        empresa_id: 'system', // TODO: Pegar do contexto
         tipo_operacao: 'nfse_emissao_erro',
         descricao: `Erro ao emitir NFSe`,
-        dados_operacao: { 
+        dados_operacao: {
           erro: error instanceof Error ? error.message : 'Erro desconhecido',
           tomador: formData.tomador_nome,
-          prestador_id: formData.prestador_id
-        }
+          prestador_id: formData.prestador_id,
+        },
       });
 
       toast({
@@ -108,8 +106,8 @@ export const useNFSeSubmit = () => {
     }
   };
 
-  return { 
-    submitNFSe, 
-    isSubmitting: emitirRps.isPending 
+  return {
+    submitNFSe,
+    isSubmitting: emitirRps.isPending,
   };
 };
