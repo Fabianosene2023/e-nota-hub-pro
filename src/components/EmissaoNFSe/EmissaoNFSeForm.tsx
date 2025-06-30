@@ -87,11 +87,6 @@ export const EmissaoNFSeForm = () => {
     }
   };
 
-  // Handler function that matches the expected signature
-  const handleFormDataChange = (newData: FormData) => {
-    setFormData(newData);
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -111,7 +106,7 @@ export const EmissaoNFSeForm = () => {
 
         <DadosTomadorSection 
           formData={formData}
-          setFormData={handleFormDataChange}
+          setFormData={setFormData}
         />
 
         <ItensServicoSection 

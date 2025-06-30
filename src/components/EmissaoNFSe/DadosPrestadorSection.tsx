@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
 
 interface DadosPrestadorSectionProps {
   prestadorId: string;
@@ -86,7 +87,10 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
       <Card>
         <CardHeader>
           <CardTitle>Dados do Prestador</CardTitle>
-          <CardDescription>Carregando prestadores de serviço...</CardDescription>
+          <CardDescription className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Carregando prestadores de serviço...
+          </CardDescription>
         </CardHeader>
       </Card>
     );
@@ -98,7 +102,9 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
       <Card>
         <CardHeader>
           <CardTitle>Dados do Prestador</CardTitle>
-          <CardDescription>Erro ao carregar prestadores de serviço</CardDescription>
+          <CardDescription className="text-red-600">
+            Erro ao carregar prestadores de serviço. Verifique sua conexão.
+          </CardDescription>
         </CardHeader>
       </Card>
     );
@@ -109,7 +115,9 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
       <Card>
         <CardHeader>
           <CardTitle>Dados do Prestador</CardTitle>
-          <CardDescription>Nenhum prestador de serviços encontrado. Cadastre um prestador primeiro.</CardDescription>
+          <CardDescription className="text-yellow-600">
+            Nenhum prestador de serviços encontrado. Cadastre um prestador primeiro.
+          </CardDescription>
         </CardHeader>
       </Card>
     );
@@ -120,7 +128,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
       <CardHeader>
         <CardTitle>Dados do Prestador</CardTitle>
         <CardDescription>
-          Selecione o prestador de serviços
+          Selecione o prestador de serviços responsável pela emissão
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -140,6 +148,23 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
               </SelectContent>
             </Select>
           </div>
+          
+          {prestadorId && (
+            <div className="text-sm text-muted-foreground">
+              {(() => {
+                const selectedPrestador = prestadores.find(p => p.id === prestadorId);
+                return selectedPrestador ? (
+                  <div className="space-y-1">
+                    <p><strong>CNPJ:</strong> {selectedPrestador.cnpj}</p>
+                    {selectedPrestador.inscricao_municipal && (
+                      <p><strong>Inscrição Municipal:</strong> {selectedPrestador.inscricao_municipal}</p>
+                    )}
+                    <p><strong>Regime Tributário:</strong> {selectedPrestador.regime_tributario.replace('_', ' ')}</p>
+                  </div>
+                ) : null;
+              })()}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

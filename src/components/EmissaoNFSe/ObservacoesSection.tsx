@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -12,21 +13,20 @@ export const ObservacoesSection = ({ discriminacao, setDiscriminacao }: Observac
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Discriminação dos Serviços</CardTitle>
+        <CardTitle>Observações</CardTitle>
         <CardDescription>
-          Descrição detalhada dos serviços prestados (obrigatório para NFSe)
+          Informações complementares sobre os serviços
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div>
-          <Label htmlFor="discriminacao">Discriminação *</Label>
+          <Label htmlFor="observacoes">Observações Gerais</Label>
           <Textarea
-            id="discriminacao"
+            id="observacoes"
             value={discriminacao}
             onChange={(e) => setDiscriminacao(e.target.value)}
-            placeholder="Descreva detalhadamente os serviços prestados..."
+            placeholder="Informações adicionais sobre os serviços prestados"
             rows={4}
-            required
           />
         </div>
       </CardContent>
