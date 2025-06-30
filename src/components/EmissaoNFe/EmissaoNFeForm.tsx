@@ -1,69 +1,89 @@
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { toast } from '@/hooks/use-toast';
-import { DadosGeraisSection } from './DadosGeraisSection';
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Loader2, FileText } from "lucide-react";
+import { DadosBasicosCard } from './DadosBasicosCard';
 import { DadosClienteCard } from './DadosClienteCard';
-import { EnderecosCard } from './EnderecosCard';
 import { ItensSection } from './ItensSection';
 import { DadosFreteSection } from './DadosFreteSection';
 import { ObservacoesSection } from './ObservacoesSection';
-import { useNFeSubmit } from './hooks/useNFeSubmit';
 import { useFormValidation } from './hooks/useFormValidation';
+import { useNFeSubmit } from './hooks/useNFeSubmit';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ItemNFe {
   produto_id: string;
-  item_nome: string;
   quantidade: number;
-  preco_unitario: number;
   valor_unitario: number;
   valor_total: number;
   cfop: string;
-  ncm: string;
-  tipo: 'produto';
+}
+
+interface FormData {
+  empresa_id: string;
+  cliente_id: string;
+  natureza_operacao: string;
+  modalidade_frete: string;
+  transportadora_id: string;
+  peso_bruto: number;
+  peso_liquido: number;
+  volume_quantidade: number;
+  valor_seguro: number;
+  valor_frete: number;
+  observacoes: string;
+  email_cliente: string;
+  telefone_cliente: string;
+  cnpj_cpf_entrega: string;
+  inscricao_estadual_cliente: string;
 }
 
 export const EmissaoNFeForm = () => {
-  // Estados para dados gerais
-  const [formData, setFormData] = useState({
+  const { profile } = useAuth();
+  
+  const [formData, setFormData] = useState<FormData>({
     empresa_id: '',
     cliente_id: '',
-    numero: '',
-    serie: 1,
-    natureza_operacao: 'Venda de mercadoria',
+    natureza_operacao: 'Venda de mercadoria adquirida ou produzida pelo estabelecimento',
+    modalidade_frete: 'sem_frete',
+    transportadora_id: '',
+    peso_bruto: 0,
+    peso_liquido: 0,
+    volume_quantidade: 0,
+    valor_seguro: 0,
+    valor_frete: 0,
     observacoes: '',
-    tipo_pessoa: 'juridica' as 'fisica' | 'juridica',
     email_cliente: '',
     telefone_cliente: '',
     cnpj_cpf_entrega: '',
-    inscricao_estadual_cliente: '',
-    endereco_faturamento: '',
-    endereco_entrega: '',
-    tipo_nota: 'saida' as 'entrada' | 'saida',
-    data_emissao: new Date().toISOString().split('T')[0],
-    data_entrega: '',
-    data_cancelamento: '',
+    inscricao_estadual_cliente: ''
+  });
+  
+  const [itens, setItens] = useState<ItemNFe[]>([]);
+  const { validateForm } = useFormValidation();
+  const { submitNFe, isSubmitting } = useNFeSubmit();
+
+  // Fetch empresas
+  const { data: empresas, isLoading: loadingEmpresas } = useQuery({
+    queryKey: ['empresas'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('empresas')
+        .select('*')
+        .order('razao_social');
+      
+      if (error) throw error;
+      return data;
+    },
   });
 
-  // Estados para dados de frete
-  const [freightMode, setFreightMode] = useState('9');
-  const [freightValue, setFreightValue] = useState('');
-  const [insuranceValue, setInsuranceValue] = useState('');
-  const [volumeQuantity, setVolumeQuantity] = useState('');
-  const [weightGross, setWeightGross] = useState('');
-  const [weightNet, setWeightNet] = useState('');
-  const [transporterId, setTransporterId] = useState('');
-
-  // Estados para itens
-  const [itens, setItens] = useState<ItemNFe[]>([]);
-
-  // Query para clientes
-  const { data: clientes = [], isLoading: loadingClientes } = useQuery({
+  // Fetch clientes based on selected empresa
+  const { data: clientes, isLoading: loadingClientes } = useQuery({
     queryKey: ['clientes', formData.empresa_id],
     queryFn: async () => {
       if (!formData.empresa_id) return [];
+      
       const { data, error } = await supabase
         .from('clientes')
         .select('*')
@@ -76,129 +96,125 @@ export const EmissaoNFeForm = () => {
     enabled: !!formData.empresa_id,
   });
 
-  const { submitNFe, isSubmitting } = useNFeSubmit();
-  const { validateForm } = useFormValidation();
+  // Auto-select empresa if user has only one
+  React.useEffect(() => {
+    if (empresas && empresas.length === 1 && !formData.empresa_id) {
+      handleInputChange('empresa_id', empresas[0].id);
+    }
+  }, [empresas, formData.empresa_id]);
 
   const valorTotalNota = itens.reduce((total, item) => total + item.valor_total, 0);
+
+  const handleInputChange = (field: string, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const resetForm = () => {
+    setFormData({
+      empresa_id: '',
+      cliente_id: '',
+      natureza_operacao: 'Venda de mercadoria adquirida ou produzida pelo estabelecimento',
+      modalidade_frete: 'sem_frete',
+      transportadora_id: '',
+      peso_bruto: 0,
+      peso_liquido: 0,
+      volume_quantidade: 0,
+      valor_seguro: 0,
+      valor_frete: 0,
+      observacoes: '',
+      email_cliente: '',
+      telefone_cliente: '',
+      cnpj_cpf_entrega: '',
+      inscricao_estadual_cliente: ''
+    });
+    setItens([]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const validationError = validateForm(formData, itens);
     if (validationError) {
-      toast({
-        title: "Erro de Validação",
-        description: validationError,
-        variant: "destructive",
-      });
       return;
     }
 
-    // Preparar dados de frete
-    const freightData = {
-      freight_mode: freightMode,
-      freight_value: parseFloat(freightValue) || 0,
-      insurance_value: parseFloat(insuranceValue) || 0,
-      volume_quantity: parseInt(volumeQuantity) || 0,
-      weight_gross: parseFloat(weightGross) || 0,
-      weight_net: parseFloat(weightNet) || 0,
-      transporter_id: transporterId || undefined,
-    };
-
-    console.log('Dados de frete preparados:', freightData);
-
-    const success = await submitNFe(formData, itens, valorTotalNota, freightData);
-    
-    if (success) {
-      // Reset form
-      setFormData({
-        empresa_id: '',
-        cliente_id: '',
-        numero: '',
-        serie: 1,
-        natureza_operacao: 'Venda de mercadoria',
-        observacoes: '',
-        tipo_pessoa: 'juridica',
-        email_cliente: '',
-        telefone_cliente: '',
-        cnpj_cpf_entrega: '',
-        inscricao_estadual_cliente: '',
-        endereco_faturamento: '',
-        endereco_entrega: '',
-        tipo_nota: 'saida',
-        data_emissao: new Date().toISOString().split('T')[0],
-        data_entrega: '',
-        data_cancelamento: '',
+    try {
+      await submitNFe({
+        ...formData,
+        itens,
+        valor_total: valorTotalNota
       });
-      setItens([]);
-      setFreightMode('9');
-      setFreightValue('');
-      setInsuranceValue('');
-      setVolumeQuantity('');
-      setWeightGross('');
-      setWeightNet('');
-      setTransporterId('');
+      
+      resetForm();
+    } catch (error) {
+      // Error handling is done in the hook
     }
   };
 
-  const handleInputChange = (field: string, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <DadosGeraisSection formData={formData} setFormData={setFormData} />
-      
-      <DadosClienteCard 
-        formData={formData} 
-        clientes={clientes} 
-        loadingClientes={loadingClientes}
-        onInputChange={handleInputChange}
-      />
-      
-      <EnderecosCard 
-        formData={formData} 
-        onInputChange={handleInputChange}
-      />
-      
-      <ItensSection 
-        itens={itens} 
-        setItens={setItens} 
-        empresaId={formData.empresa_id}
-        valorTotalNota={valorTotalNota}
-      />
-
-      <DadosFreteSection
-        freightMode={freightMode}
-        setFreightMode={setFreightMode}
-        freightValue={freightValue}
-        setFreightValue={setFreightValue}
-        insuranceValue={insuranceValue}
-        setInsuranceValue={setInsuranceValue}
-        volumeQuantity={volumeQuantity}
-        setVolumeQuantity={setVolumeQuantity}
-        weightGross={weightGross}
-        setWeightGross={setWeightGross}
-        weightNet={weightNet}
-        setWeightNet={setWeightNet}
-        transporterId={transporterId}
-        setTransporterId={setTransporterId}
-      />
-      
-      <ObservacoesSection 
-        observacoes={formData.observacoes}
-        setObservacoes={(observacoes) => setFormData({ ...formData, observacoes })}
-      />
-
-      <div className="flex justify-end space-x-4">
-        <Button
-          type="submit"
-          disabled={isSubmitting || itens.length === 0}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          {isSubmitting ? 'Emitindo...' : 'Emitir NFe'}
-        </Button>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Emissão de NFe</h2>
+          <p className="text-muted-foreground">
+            Emita notas fiscais eletrônicas
+          </p>
+        </div>
       </div>
-    </form>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <DadosBasicosCard 
+          formData={formData}
+          empresas={empresas || []}
+          loadingEmpresas={loadingEmpresas}
+          onInputChange={handleInputChange}
+        />
+
+        <DadosClienteCard 
+          formData={formData}
+          clientes={clientes || []}
+          loadingClientes={loadingClientes}
+          onInputChange={handleInputChange}
+        />
+
+        <ItensSection 
+          itens={itens}
+          setItens={setItens}
+          valorTotalNota={valorTotalNota}
+          empresaId={formData.empresa_id}
+        />
+
+        <DadosFreteSection 
+          formData={formData}
+          onInputChange={handleInputChange}
+          empresaId={formData.empresa_id}
+        />
+
+        <ObservacoesSection 
+          observacoes={formData.observacoes}
+          setObservacoes={(observacoes) => handleInputChange('observacoes', observacoes)}
+        />
+
+        <div className="flex justify-end gap-4">
+          <Button 
+            type="submit" 
+            disabled={isSubmitting || itens.length === 0}
+            className="min-w-[150px]"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Emitindo...
+              </>
+            ) : (
+              <>
+                <FileText className="mr-2 h-4 w-4" />
+                Emitir NFe
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
