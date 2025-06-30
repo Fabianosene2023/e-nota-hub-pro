@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Trash2 } from "lucide-react";
 import { useServicos } from "@/hooks/useServicos";
-import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 interface ItemNFSe {
@@ -26,10 +27,10 @@ interface ItensServicoSectionProps {
   itens: ItemNFSe[];
   setItens: (itens: ItemNFSe[]) => void;
   valorTotalNota: number;
+  prestadorId: string;
 }
 
-export const ItensServicoSection = ({ itens, setItens, valorTotalNota }: ItensServicoSectionProps) => {
-  const { profile } = useAuth();
+export const ItensServicoSection = ({ itens, setItens, valorTotalNota, prestadorId }: ItensServicoSectionProps) => {
   const [novoItem, setNovoItem] = useState<Partial<ItemNFSe>>({
     descricao: '',
     quantidade: 1,
@@ -37,7 +38,24 @@ export const ItensServicoSection = ({ itens, setItens, valorTotalNota }: ItensSe
     aliquota_iss: 5,
   });
 
-  const { data: servicos, isLoading } = useServicos(profile?.empresa_id || '');
+  // Buscar empresa_id do prestador selecionado
+  const { data: prestadorData } = useQuery({
+    queryKey: ['prestador-empresa', prestadorId],
+    queryFn: async () => {
+      if (!prestadorId) return null;
+      const { data, error } = await supabase
+        .from('prestadores_servico')
+        .select('empresa_id')
+        .eq('id', prestadorId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!prestadorId,
+  });
+
+  const { data: servicos, isLoading } = useServicos(prestadorData?.empresa_id || '');
 
   const adicionarItem = () => {
     if (!novoItem.descricao || !novoItem.valor_unitario) {
@@ -100,6 +118,17 @@ export const ItensServicoSection = ({ itens, setItens, valorTotalNota }: ItensSe
       });
     }
   };
+
+  if (!prestadorId) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Serviços da NFSe</CardTitle>
+          <CardDescription>Selecione um prestador primeiro</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (

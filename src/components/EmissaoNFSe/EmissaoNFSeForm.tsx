@@ -118,6 +118,7 @@ export const EmissaoNFSeForm = () => {
           itens={itens}
           setItens={setItens}
           valorTotalNota={valorTotalNota}
+          prestadorId={formData.prestador_id}
         />
 
         <ObservacoesSection 

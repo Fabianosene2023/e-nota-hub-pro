@@ -10,6 +10,8 @@ import { DadosFreteSection } from './DadosFreteSection';
 import { ObservacoesSection } from './ObservacoesSection';
 import { useNFeSubmit } from './hooks/useNFeSubmit';
 import { useFormValidation } from './hooks/useFormValidation';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ItemNFe {
   produto_id: string;
@@ -56,6 +58,23 @@ export const EmissaoNFeForm = () => {
 
   // Estados para itens
   const [itens, setItens] = useState<ItemNFe[]>([]);
+
+  // Query para clientes
+  const { data: clientes = [], isLoading: loadingClientes } = useQuery({
+    queryKey: ['clientes', formData.empresa_id],
+    queryFn: async () => {
+      if (!formData.empresa_id) return [];
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('*')
+        .eq('empresa_id', formData.empresa_id)
+        .order('nome_razao_social');
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!formData.empresa_id,
+  });
 
   const { submitNFe, isSubmitting } = useNFeSubmit();
   const { validateForm } = useFormValidation();
@@ -132,8 +151,8 @@ export const EmissaoNFeForm = () => {
       
       <DadosClienteCard 
         formData={formData} 
-        clientes={[]} 
-        loadingClientes={false}
+        clientes={clientes} 
+        loadingClientes={loadingClientes}
         onInputChange={handleInputChange}
       />
       

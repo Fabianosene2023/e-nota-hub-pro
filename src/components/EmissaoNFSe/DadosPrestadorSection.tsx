@@ -15,13 +15,20 @@ interface DadosPrestadorSectionProps {
 export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPrestadorSectionProps) => {
   const { profile } = useAuth();
   
-  const { data: empresas, isLoading } = useQuery({
-    queryKey: ['empresas-prestadoras', profile?.empresa_id],
+  const { data: prestadores, isLoading } = useQuery({
+    queryKey: ['prestadores-servico', profile?.empresa_id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('empresas')
-        .select('id, razao_social, cnpj, inscricao_municipal')
-        .eq('id', profile?.empresa_id || '');
+        .from('prestadores_servico')
+        .select(`
+          id, 
+          cnpj, 
+          inscricao_municipal,
+          regime_tributario,
+          empresas!inner(razao_social, nome_fantasia)
+        `)
+        .eq('empresa_id', profile?.empresa_id || '')
+        .eq('ativo', true);
       
       if (error) throw error;
       return data;
@@ -29,19 +36,19 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
     enabled: !!profile?.empresa_id,
   });
 
-  // Auto-select if only one company
+  // Auto-select if only one prestador
   React.useEffect(() => {
-    if (empresas && empresas.length === 1 && !prestadorId) {
-      setPrestadorId(empresas[0].id);
+    if (prestadores && prestadores.length === 1 && !prestadorId) {
+      setPrestadorId(prestadores[0].id);
     }
-  }, [empresas, prestadorId, setPrestadorId]);
+  }, [prestadores, prestadorId, setPrestadorId]);
 
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Dados do Prestador</CardTitle>
-          <CardDescription>Carregando dados da empresa...</CardDescription>
+          <CardDescription>Carregando prestadores de serviço...</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -52,7 +59,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
       <CardHeader>
         <CardTitle>Dados do Prestador</CardTitle>
         <CardDescription>
-          Selecione a empresa prestadora de serviços
+          Selecione o prestador de serviços
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -64,9 +71,9 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
                 <SelectValue placeholder="Selecione o prestador" />
               </SelectTrigger>
               <SelectContent>
-                {empresas?.map((empresa) => (
-                  <SelectItem key={empresa.id} value={empresa.id}>
-                    {empresa.razao_social} - {empresa.cnpj}
+                {prestadores?.map((prestador) => (
+                  <SelectItem key={prestador.id} value={prestador.id}>
+                    {prestador.empresas.razao_social} - {prestador.cnpj}
                   </SelectItem>
                 ))}
               </SelectContent>
