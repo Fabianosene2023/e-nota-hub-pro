@@ -15,10 +15,14 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface ItemNFe {
   produto_id: string;
+  item_nome: string;
   quantidade: number;
+  preco_unitario: number;
   valor_unitario: number;
   valor_total: number;
   cfop: string;
+  ncm: string;
+  tipo: 'produto';
 }
 
 interface FormData {
@@ -191,15 +195,20 @@ export const EmissaoNFeForm = () => {
         />
 
         <DadosFreteSection 
-          modalidade_frete={formData.modalidade_frete}
-          transportadora_id={formData.transportadora_id}
-          peso_bruto={formData.peso_bruto}
-          peso_liquido={formData.peso_liquido}
-          volume_quantidade={formData.volume_quantidade}
-          valor_seguro={formData.valor_seguro}
-          valor_frete={formData.valor_frete}
-          onInputChange={handleInputChange}
-          empresaId={formData.empresa_id}
+          freightMode={formData.modalidade_frete}
+          setFreightMode={(value) => handleInputChange('modalidade_frete', value)}
+          freightValue={formData.valor_frete.toString()}
+          setFreightValue={(value) => handleInputChange('valor_frete', parseFloat(value) || 0)}
+          insuranceValue={formData.valor_seguro.toString()}
+          setInsuranceValue={(value) => handleInputChange('valor_seguro', parseFloat(value) || 0)}
+          volumeQuantity={formData.volume_quantidade.toString()}
+          setVolumeQuantity={(value) => handleInputChange('volume_quantidade', parseInt(value) || 0)}
+          weightGross={formData.peso_bruto.toString()}
+          setWeightGross={(value) => handleInputChange('peso_bruto', parseFloat(value) || 0)}
+          weightNet={formData.peso_liquido.toString()}
+          setWeightNet={(value) => handleInputChange('peso_liquido', parseFloat(value) || 0)}
+          transporterId={formData.transportadora_id}
+          setTransporterId={(value) => handleInputChange('transportadora_id', value)}
         />
 
         <ObservacoesSection 
