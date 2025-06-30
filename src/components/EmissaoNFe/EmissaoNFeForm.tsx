@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Loader2, FileText } from "lucide-react";
 import { DadosBasicosCard } from './DadosBasicosCard';
@@ -24,6 +24,8 @@ interface ItemNFe {
 interface FormData {
   empresa_id: string;
   cliente_id: string;
+  numero: string;
+  serie: number;
   natureza_operacao: string;
   modalidade_frete: string;
   transportadora_id: string;
@@ -45,6 +47,8 @@ export const EmissaoNFeForm = () => {
   const [formData, setFormData] = useState<FormData>({
     empresa_id: '',
     cliente_id: '',
+    numero: '',
+    serie: 1,
     natureza_operacao: 'Venda de mercadoria adquirida ou produzida pelo estabelecimento',
     modalidade_frete: 'sem_frete',
     transportadora_id: '',
@@ -113,6 +117,8 @@ export const EmissaoNFeForm = () => {
     setFormData({
       empresa_id: '',
       cliente_id: '',
+      numero: '',
+      serie: 1,
       natureza_operacao: 'Venda de mercadoria adquirida ou produzida pelo estabelecimento',
       modalidade_frete: 'sem_frete',
       transportadora_id: '',
@@ -185,7 +191,13 @@ export const EmissaoNFeForm = () => {
         />
 
         <DadosFreteSection 
-          formData={formData}
+          modalidade_frete={formData.modalidade_frete}
+          transportadora_id={formData.transportadora_id}
+          peso_bruto={formData.peso_bruto}
+          peso_liquido={formData.peso_liquido}
+          volume_quantidade={formData.volume_quantidade}
+          valor_seguro={formData.valor_seguro}
+          valor_frete={formData.valor_frete}
           onInputChange={handleInputChange}
           empresaId={formData.empresa_id}
         />
