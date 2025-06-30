@@ -29,7 +29,7 @@ export const DadosClienteCard = ({ formData, clientes, loadingClientes, onInputC
         <div className="space-y-2">
           <Label htmlFor="cliente">Cliente/Destinatário *</Label>
           <Select 
-            value={formData.cliente_id} 
+            value={formData.cliente_id || ""} 
             onValueChange={(value) => onInputChange('cliente_id', value)}
             disabled={!formData.empresa_id || loadingClientes}
           >

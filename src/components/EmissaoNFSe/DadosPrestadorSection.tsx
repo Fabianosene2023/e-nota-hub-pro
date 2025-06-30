@@ -18,15 +18,18 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
   const { data: prestadores, isLoading } = useQuery({
     queryKey: ['prestadores-servico', profile?.empresa_id],
     queryFn: async () => {
+      if (!profile?.empresa_id) return [];
+      
       const { data: prestadoresData, error: prestadoresError } = await supabase
         .from('prestadores_servico')
         .select('id, cnpj, inscricao_municipal, regime_tributario, empresa_id')
-        .eq('empresa_id', profile?.empresa_id || '')
+        .eq('empresa_id', profile.empresa_id)
         .eq('ativo', true);
       
       if (prestadoresError) throw prestadoresError;
+      if (!prestadoresData || prestadoresData.length === 0) return [];
 
-      // Get empresa data separately for each prestador
+      // Get empresa data for each prestador
       const prestadoresWithEmpresa = await Promise.all(
         prestadoresData.map(async (prestador) => {
           const { data: empresaData, error: empresaError } = await supabase
@@ -36,7 +39,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
             .single();
           
           if (empresaError) {
-            console.error('Error fetching empresa:', empresaError);
+            console.error('Error fetching empresa for prestador:', prestador.id, empresaError);
             return {
               ...prestador,
               empresa: { razao_social: 'Empresa não encontrada', nome_fantasia: null }
@@ -73,6 +76,17 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
     );
   }
 
+  if (!prestadores || prestadores.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Dados do Prestador</CardTitle>
+          <CardDescription>Nenhum prestador de serviços encontrado</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -90,7 +104,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
                 <SelectValue placeholder="Selecione o prestador" />
               </SelectTrigger>
               <SelectContent>
-                {prestadores?.map((prestador) => (
+                {prestadores.map((prestador) => (
                   <SelectItem key={prestador.id} value={prestador.id}>
                     {prestador.empresa.razao_social} - {prestador.cnpj}
                   </SelectItem>

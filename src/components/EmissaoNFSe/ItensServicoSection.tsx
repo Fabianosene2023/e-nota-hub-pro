@@ -49,7 +49,10 @@ export const ItensServicoSection = ({ itens, setItens, valorTotalNota, prestador
         .eq('id', prestadorId)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching prestador:', error);
+        return null;
+      }
       return data;
     },
     enabled: !!prestadorId,
