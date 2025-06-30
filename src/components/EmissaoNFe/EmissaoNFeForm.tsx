@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Loader2, FileText } from "lucide-react";
@@ -42,6 +43,12 @@ interface FormData {
   telefone_cliente: string;
   cnpj_cpf_entrega: string;
   inscricao_estadual_cliente: string;
+  endereco_faturamento: string;
+  endereco_entrega: string;
+  tipo_nota: 'entrada' | 'saida';
+  data_emissao: string;
+  data_entrega: string;
+  data_cancelamento: string;
 }
 
 export const EmissaoNFeForm = () => {
@@ -64,7 +71,13 @@ export const EmissaoNFeForm = () => {
     email_cliente: '',
     telefone_cliente: '',
     cnpj_cpf_entrega: '',
-    inscricao_estadual_cliente: ''
+    inscricao_estadual_cliente: '',
+    endereco_faturamento: '',
+    endereco_entrega: '',
+    tipo_nota: 'saida',
+    data_emissao: new Date().toISOString().split('T')[0],
+    data_entrega: '',
+    data_cancelamento: ''
   });
   
   const [itens, setItens] = useState<ItemNFe[]>([]);
@@ -134,7 +147,13 @@ export const EmissaoNFeForm = () => {
       email_cliente: '',
       telefone_cliente: '',
       cnpj_cpf_entrega: '',
-      inscricao_estadual_cliente: ''
+      inscricao_estadual_cliente: '',
+      endereco_faturamento: '',
+      endereco_entrega: '',
+      tipo_nota: 'saida',
+      data_emissao: new Date().toISOString().split('T')[0],
+      data_entrega: '',
+      data_cancelamento: ''
     });
     setItens([]);
   };
@@ -142,17 +161,26 @@ export const EmissaoNFeForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const validationError = validateForm(formData, itens, valorTotalNota);
+    const validationError = validateForm(formData, itens);
     if (validationError) {
       return;
     }
 
     try {
-      await submitNFe({
-        ...formData,
+      await submitNFe(
+        formData,
         itens,
-        valor_total: valorTotalNota
-      });
+        valorTotalNota,
+        {
+          freight_mode: formData.modalidade_frete,
+          freight_value: formData.valor_frete,
+          insurance_value: formData.valor_seguro,
+          volume_quantity: formData.volume_quantidade,
+          weight_gross: formData.peso_bruto,
+          weight_net: formData.peso_liquido,
+          transporter_id: formData.transportadora_id || undefined
+        }
+      );
       
       resetForm();
     } catch (error) {
