@@ -45,7 +45,7 @@ export const EmissaoNFeForm = () => {
     data_cancelamento: '',
   });
 
-  // Estados para dados de frete - updated field names
+  // Estados para dados de frete
   const [freightMode, setFreightMode] = useState('9');
   const [freightValue, setFreightValue] = useState('');
   const [insuranceValue, setInsuranceValue] = useState('');
@@ -75,19 +75,20 @@ export const EmissaoNFeForm = () => {
       return;
     }
 
-    // Include freight data in payload using new field names
-    const nfeData = {
-      ...formData,
+    // Preparar dados de frete
+    const freightData = {
       freight_mode: freightMode,
       freight_value: parseFloat(freightValue) || 0,
       insurance_value: parseFloat(insuranceValue) || 0,
       volume_quantity: parseInt(volumeQuantity) || 0,
       weight_gross: parseFloat(weightGross) || 0,
       weight_net: parseFloat(weightNet) || 0,
-      transporter_id: transporterId || null,
+      transporter_id: transporterId || undefined,
     };
 
-    const success = await submitNFe(nfeData, itens, valorTotalNota);
+    console.log('Dados de frete preparados:', freightData);
+
+    const success = await submitNFe(formData, itens, valorTotalNota, freightData);
     
     if (success) {
       // Reset form

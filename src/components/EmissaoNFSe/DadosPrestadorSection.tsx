@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface DadosPrestadorSectionProps {
   prestadorId: string;
@@ -11,17 +12,39 @@ interface DadosPrestadorSectionProps {
 }
 
 export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPrestadorSectionProps) => {
-  const { data: empresas } = useQuery({
-    queryKey: ['empresas-prestadoras'],
+  const { profile } = useAuth();
+  
+  const { data: empresas, isLoading } = useQuery({
+    queryKey: ['empresas-prestadoras', profile?.empresa_id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('empresas')
-        .select('id, razao_social, cnpj, inscricao_municipal');
+        .select('id, razao_social, cnpj, inscricao_municipal')
+        .eq('id', profile?.empresa_id || '');
       
       if (error) throw error;
       return data;
     },
+    enabled: !!profile?.empresa_id,
   });
+
+  // Auto-select if only one company
+  React.useEffect(() => {
+    if (empresas && empresas.length === 1 && !prestadorId) {
+      setPrestadorId(empresas[0].id);
+    }
+  }, [empresas, prestadorId, setPrestadorId]);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Dados do Prestador</CardTitle>
+          <CardDescription>Carregando dados da empresa...</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
     <Card>

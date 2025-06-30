@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Trash2 } from "lucide-react";
 import { useServicos } from "@/hooks/useServicos";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
 interface ItemNFSe {
@@ -28,6 +29,7 @@ interface ItensServicoSectionProps {
 }
 
 export const ItensServicoSection = ({ itens, setItens, valorTotalNota }: ItensServicoSectionProps) => {
+  const { profile } = useAuth();
   const [novoItem, setNovoItem] = useState<Partial<ItemNFSe>>({
     descricao: '',
     quantidade: 1,
@@ -35,7 +37,7 @@ export const ItensServicoSection = ({ itens, setItens, valorTotalNota }: ItensSe
     aliquota_iss: 5,
   });
 
-  const { data: servicos } = useServicos(''); // Em produção, usar empresa_id do contexto
+  const { data: servicos, isLoading } = useServicos(profile?.empresa_id || '');
 
   const adicionarItem = () => {
     if (!novoItem.descricao || !novoItem.valor_unitario) {
@@ -98,6 +100,17 @@ export const ItensServicoSection = ({ itens, setItens, valorTotalNota }: ItensSe
       });
     }
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Serviços da NFSe</CardTitle>
+          <CardDescription>Carregando serviços...</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
     <Card>

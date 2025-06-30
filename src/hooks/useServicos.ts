@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -27,7 +28,7 @@ export const useServicos = (empresaId: string) => {
         .select('*')
         .eq('empresa_id', empresaId)
         .eq('ativo', true)
-        .order('nome', { ascending: true }); // explicita ordenação ascendente
+        .order('nome', { ascending: true });
 
       if (error) throw error;
       return data as Servico[];
@@ -35,31 +36,6 @@ export const useServicos = (empresaId: string) => {
     enabled: !!empresaId,
   });
 };
-// Na mutação deleteServico, modificar para receber também empresaId para invalidar cache correto
-const deleteServico = useMutation({
-  mutationFn: async ({ id, empresaId }: { id: string; empresaId: string }) => {
-    const { error } = await supabase
-      .from('servicos')
-      .update({ ativo: false })
-      .eq('id', id);
-
-    if (error) throw error;
-  },
-  onSuccess: (_, variables) => {
-    queryClient.invalidateQueries({ queryKey: ['servicos', variables.empresaId] });
-    toast({
-      title: "Sucesso",
-      description: "Serviço removido com sucesso",
-    });
-  },
-  onError: (error) => {
-    toast({
-      title: "Erro",
-      description: error instanceof Error ? error.message : "Erro ao remover serviço",
-      variant: "destructive",
-    });
-  },
-});
 
 export const useServicosManager = () => {
   const queryClient = useQueryClient();
@@ -120,7 +96,7 @@ export const useServicosManager = () => {
   });
 
   const deleteServico = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async ({ id, empresaId }: { id: string; empresaId: string }) => {
       const { error } = await supabase
         .from('servicos')
         .update({ ativo: false })
@@ -128,8 +104,8 @@ export const useServicosManager = () => {
       
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['servicos'] });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['servicos', variables.empresaId] });
       toast({
         title: "Sucesso",
         description: "Serviço removido com sucesso",

@@ -37,8 +37,23 @@ export const useNFeSubmit = () => {
   const createNotaFiscal = useCreateNotaFiscalMutation();
   const createLog = useCreateLog();
 
-  const submitNFe = async (formData: FormData, itens: ItemNFe[], valorTotalNota: number) => {
+  const submitNFe = async (
+    formData: FormData, 
+    itens: ItemNFe[], 
+    valorTotalNota: number,
+    freightData?: {
+      freight_mode: string;
+      freight_value: number;
+      insurance_value: number;
+      volume_quantity: number;
+      weight_gross: number;
+      weight_net: number;
+      transporter_id?: string;
+    }
+  ) => {
     try {
+      console.log('Iniciando emissão de NFe com dados:', { formData, itens, freightData });
+
       // Preparar dados para emissão
       const dadosNFe = {
         empresa_id: formData.empresa_id,
@@ -58,6 +73,14 @@ export const useNFeSubmit = () => {
         data_emissao: formData.data_emissao,
         data_entrega: formData.data_entrega,
         data_cancelamento: formData.data_cancelamento,
+        // Dados de frete
+        freight_mode: freightData?.freight_mode || '9',
+        freight_value: freightData?.freight_value || 0,
+        insurance_value: freightData?.insurance_value || 0,
+        volume_quantity: freightData?.volume_quantity || 0,
+        weight_gross: freightData?.weight_gross || 0,
+        weight_net: freightData?.weight_net || 0,
+        transporter_id: freightData?.transporter_id || null,
         itens: itens.map(item => ({
           ...(item.produto_id ? { produto_id: item.produto_id } : {}),
           ...(item.servico_id ? { servico_id: item.servico_id } : {}),
@@ -68,7 +91,7 @@ export const useNFeSubmit = () => {
         }))
       };
 
-      console.log('Emitindo NFe com dados:', dadosNFe);
+      console.log('Dados preparados para envio:', dadosNFe);
 
       const resultado = await createNotaFiscal.mutateAsync(dadosNFe);
       
@@ -82,7 +105,9 @@ export const useNFeSubmit = () => {
             numero: formData.numero,
             valor_total: valorTotalNota,
             cliente_id: formData.cliente_id,
-            tipo_nota: formData.tipo_nota
+            tipo_nota: formData.tipo_nota,
+            freight_mode: freightData?.freight_mode,
+            transporter_id: freightData?.transporter_id
           }
         });
 
@@ -97,18 +122,28 @@ export const useNFeSubmit = () => {
       console.error('Erro ao emitir NFe:', error);
       
       // Log do erro
-      await createLog.mutateAsync({
-        empresa_id: formData.empresa_id || 'unknown',
-        tipo_operacao: 'nfe_emissao_erro',
-        descricao: `Erro ao emitir NFe ${formData.numero}`,
-        dados_operacao: { 
-          erro: error instanceof Error ? error.message : 'Erro desconhecido',
-          numero: formData.numero,
-          tipo_nota: formData.tipo_nota
-        }
+      try {
+        await createLog.mutateAsync({
+          empresa_id: formData.empresa_id || 'unknown',
+          tipo_operacao: 'nfe_emissao_erro',
+          descricao: `Erro ao emitir NFe ${formData.numero}`,
+          dados_operacao: { 
+            erro: error instanceof Error ? error.message : 'Erro desconhecido',
+            numero: formData.numero,
+            tipo_nota: formData.tipo_nota
+          }
+        });
+      } catch (logError) {
+        console.error('Erro ao registrar log:', logError);
+      }
+
+      toast({
+        title: "Erro na emissão",
+        description: error instanceof Error ? error.message : "Erro desconhecido ao emitir NFe",
+        variant: "destructive",
       });
 
-      throw error;
+      return false;
     }
   };
 
