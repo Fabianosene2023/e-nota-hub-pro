@@ -15,10 +15,15 @@ interface DadosPrestadorSectionProps {
 export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPrestadorSectionProps) => {
   const { profile } = useAuth();
   
-  const { data: prestadores, isLoading } = useQuery({
+  const { data: prestadores, isLoading, error } = useQuery({
     queryKey: ['prestadores-servico', profile?.empresa_id],
     queryFn: async () => {
-      if (!profile?.empresa_id) return [];
+      if (!profile?.empresa_id) {
+        console.log('No empresa_id found in profile');
+        return [];
+      }
+      
+      console.log('Fetching prestadores for empresa_id:', profile.empresa_id);
       
       const { data: prestadoresData, error: prestadoresError } = await supabase
         .from('prestadores_servico')
@@ -26,8 +31,17 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
         .eq('empresa_id', profile.empresa_id)
         .eq('ativo', true);
       
-      if (prestadoresError) throw prestadoresError;
-      if (!prestadoresData || prestadoresData.length === 0) return [];
+      if (prestadoresError) {
+        console.error('Error fetching prestadores:', prestadoresError);
+        throw prestadoresError;
+      }
+      
+      console.log('Prestadores data:', prestadoresData);
+      
+      if (!prestadoresData || prestadoresData.length === 0) {
+        console.log('No prestadores found');
+        return [];
+      }
 
       // Get empresa data for each prestador
       const prestadoresWithEmpresa = await Promise.all(
@@ -53,6 +67,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
         })
       );
       
+      console.log('Prestadores with empresa:', prestadoresWithEmpresa);
       return prestadoresWithEmpresa;
     },
     enabled: !!profile?.empresa_id,
@@ -61,6 +76,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
   // Auto-select if only one prestador
   React.useEffect(() => {
     if (prestadores && prestadores.length === 1 && !prestadorId) {
+      console.log('Auto-selecting single prestador:', prestadores[0].id);
       setPrestadorId(prestadores[0].id);
     }
   }, [prestadores, prestadorId, setPrestadorId]);
@@ -76,12 +92,24 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
     );
   }
 
+  if (error) {
+    console.error('Query error:', error);
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Dados do Prestador</CardTitle>
+          <CardDescription>Erro ao carregar prestadores de serviço</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   if (!prestadores || prestadores.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Dados do Prestador</CardTitle>
-          <CardDescription>Nenhum prestador de serviços encontrado</CardDescription>
+          <CardDescription>Nenhum prestador de serviços encontrado. Cadastre um prestador primeiro.</CardDescription>
         </CardHeader>
       </Card>
     );

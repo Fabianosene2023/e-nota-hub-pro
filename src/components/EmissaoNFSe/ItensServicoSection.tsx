@@ -43,6 +43,9 @@ export const ItensServicoSection = ({ itens, setItens, valorTotalNota, prestador
     queryKey: ['prestador-empresa', prestadorId],
     queryFn: async () => {
       if (!prestadorId) return null;
+      
+      console.log('Fetching prestador data for:', prestadorId);
+      
       const { data, error } = await supabase
         .from('prestadores_servico')
         .select('empresa_id')
@@ -53,12 +56,16 @@ export const ItensServicoSection = ({ itens, setItens, valorTotalNota, prestador
         console.error('Error fetching prestador:', error);
         return null;
       }
+      
+      console.log('Prestador data:', data);
       return data;
     },
     enabled: !!prestadorId,
   });
 
-  const { data: servicos, isLoading } = useServicos(prestadorData?.empresa_id || '');
+  const { data: servicos, isLoading: loadingServicos } = useServicos(prestadorData?.empresa_id || '');
+
+  console.log('Servicos loaded:', servicos);
 
   const adicionarItem = () => {
     if (!novoItem.descricao || !novoItem.valor_unitario) {
@@ -133,7 +140,7 @@ export const ItensServicoSection = ({ itens, setItens, valorTotalNota, prestador
     );
   }
 
-  if (isLoading) {
+  if (loadingServicos) {
     return (
       <Card>
         <CardHeader>
