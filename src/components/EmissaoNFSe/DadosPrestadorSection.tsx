@@ -18,20 +18,39 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
   const { data: prestadores, isLoading } = useQuery({
     queryKey: ['prestadores-servico', profile?.empresa_id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: prestadoresData, error: prestadoresError } = await supabase
         .from('prestadores_servico')
-        .select(`
-          id, 
-          cnpj, 
-          inscricao_municipal,
-          regime_tributario,
-          empresas!inner(razao_social, nome_fantasia)
-        `)
+        .select('id, cnpj, inscricao_municipal, regime_tributario, empresa_id')
         .eq('empresa_id', profile?.empresa_id || '')
         .eq('ativo', true);
       
-      if (error) throw error;
-      return data;
+      if (prestadoresError) throw prestadoresError;
+
+      // Get empresa data separately for each prestador
+      const prestadoresWithEmpresa = await Promise.all(
+        prestadoresData.map(async (prestador) => {
+          const { data: empresaData, error: empresaError } = await supabase
+            .from('empresas')
+            .select('razao_social, nome_fantasia')
+            .eq('id', prestador.empresa_id)
+            .single();
+          
+          if (empresaError) {
+            console.error('Error fetching empresa:', empresaError);
+            return {
+              ...prestador,
+              empresa: { razao_social: 'Empresa não encontrada', nome_fantasia: null }
+            };
+          }
+          
+          return {
+            ...prestador,
+            empresa: empresaData
+          };
+        })
+      );
+      
+      return prestadoresWithEmpresa;
     },
     enabled: !!profile?.empresa_id,
   });
@@ -73,7 +92,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
               <SelectContent>
                 {prestadores?.map((prestador) => (
                   <SelectItem key={prestador.id} value={prestador.id}>
-                    {prestador.empresas.razao_social} - {prestador.cnpj}
+                    {prestador.empresa.razao_social} - {prestador.cnpj}
                   </SelectItem>
                 ))}
               </SelectContent>
