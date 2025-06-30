@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Loader2, FileText } from "lucide-react";
@@ -143,7 +142,7 @@ export const EmissaoNFeForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const validationError = validateForm(formData, itens);
+    const validationError = validateForm(formData, itens, valorTotalNota);
     if (validationError) {
       return;
     }
