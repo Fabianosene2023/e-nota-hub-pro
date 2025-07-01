@@ -1,4 +1,5 @@
 
+import { describe, test, expect } from 'vitest';
 import { XMLGenerator } from '../nfe/xmlGenerator';
 import { SignatureService } from '../nfe/signatureService';
 import { XSDValidator } from '../nfe/validation/xsdValidator';
