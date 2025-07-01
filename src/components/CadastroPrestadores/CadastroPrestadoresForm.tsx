@@ -5,16 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEmpresasManager } from '@/hooks/useEmpresasManager';
 import { useCreatePrestadorServico } from '@/hooks/usePrestadoresServico';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 export const CadastroPrestadoresForm = () => {
-  const { data: empresas } = useEmpresasManager();
+  const { profile } = useAuth();
   const createPrestador = useCreatePrestadorServico();
   
   const [formData, setFormData] = useState({
-    empresa_id: '',
     cnpj: '',
     inscricao_municipal: '',
     regime_tributario: 'simples_nacional'
@@ -23,25 +22,39 @@ export const CadastroPrestadoresForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.empresa_id || !formData.cnpj) {
+    if (!profile?.empresa_id) {
       toast({
         title: "Erro",
-        description: "Empresa e CNPJ são obrigatórios",
+        description: "Empresa não encontrada. Faça login novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.cnpj) {
+      toast({
+        title: "Erro",
+        description: "CNPJ é obrigatório",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      await createPrestador.mutateAsync(formData);
+      await createPrestador.mutateAsync({
+        ...formData,
+        empresa_id: profile.empresa_id
+      });
+      
+      // Reset form on success
       setFormData({
-        empresa_id: '',
         cnpj: '',
         inscricao_municipal: '',
         regime_tributario: 'simples_nacional'
       });
     } catch (error) {
-      // Error handled by hook
+      // Error already handled by hook
+      console.error('Error in form submission:', error);
     }
   };
 
@@ -56,24 +69,6 @@ export const CadastroPrestadoresForm = () => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="empresa">Empresa *</Label>
-              <Select value={formData.empresa_id} onValueChange={(value) => 
-                setFormData({...formData, empresa_id: value})
-              }>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a empresa" />
-                </SelectTrigger>
-                <SelectContent>
-                  {empresas?.map((empresa) => (
-                    <SelectItem key={empresa.id} value={empresa.id}>
-                      {empresa.razao_social}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="cnpj">CNPJ *</Label>
               <Input

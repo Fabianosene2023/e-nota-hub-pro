@@ -4,12 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { usePrestadoresServico } from '@/hooks/usePrestadoresServico';
-import { useEmpresasManager } from '@/hooks/useEmpresasManager';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const PrestadoresTable = () => {
-  const { data: empresas } = useEmpresasManager();
-  const empresaId = empresas?.[0]?.id || '';
-  const { data: prestadores, isLoading } = usePrestadoresServico(empresaId);
+  const { profile } = useAuth();
+  const { data: prestadores, isLoading } = usePrestadoresServico(profile?.empresa_id);
 
   if (isLoading) {
     return <div>Carregando prestadores...</div>;
