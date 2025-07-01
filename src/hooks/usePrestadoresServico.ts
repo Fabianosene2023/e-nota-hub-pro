@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -24,7 +23,7 @@ export const usePrestadoresServico = (empresaId?: string) => {
     queryKey: ['prestadores-servico', effectiveEmpresaId],
     queryFn: async () => {
       if (!effectiveEmpresaId) {
-        console.log('No empresa_id provided');
+        console.log('No empresa_id provided for prestadores query');
         return [];
       }
 
@@ -42,7 +41,7 @@ export const usePrestadoresServico = (empresaId?: string) => {
         throw error;
       }
       
-      console.log('Prestadores fetched:', data);
+      console.log('Prestadores fetched successfully:', data);
       return data as PrestadorServico[];
     },
     enabled: !!effectiveEmpresaId,

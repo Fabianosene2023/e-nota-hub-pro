@@ -3,8 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { usePrestadoresServico } from "@/hooks/usePrestadoresServico";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
@@ -15,64 +14,10 @@ interface DadosPrestadorSectionProps {
 
 export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPrestadorSectionProps) => {
   const { profile } = useAuth();
-  
-  const { data: prestadores, isLoading, error } = useQuery({
-    queryKey: ['prestadores-servico', profile?.empresa_id],
-    queryFn: async () => {
-      if (!profile?.empresa_id) {
-        console.log('No empresa_id found in profile');
-        return [];
-      }
-      
-      console.log('Fetching prestadores for empresa_id:', profile.empresa_id);
-      
-      const { data: prestadoresData, error: prestadoresError } = await supabase
-        .from('prestadores_servico')
-        .select('id, cnpj, inscricao_municipal, regime_tributario, empresa_id')
-        .eq('empresa_id', profile.empresa_id)
-        .eq('ativo', true);
-      
-      if (prestadoresError) {
-        console.error('Error fetching prestadores:', prestadoresError);
-        throw prestadoresError;
-      }
-      
-      console.log('Prestadores data:', prestadoresData);
-      
-      if (!prestadoresData || prestadoresData.length === 0) {
-        console.log('No prestadores found');
-        return [];
-      }
+  const { data: prestadores, isLoading, error } = usePrestadoresServico(profile?.empresa_id);
 
-      // Get empresa data for each prestador
-      const prestadoresWithEmpresa = await Promise.all(
-        prestadoresData.map(async (prestador) => {
-          const { data: empresaData, error: empresaError } = await supabase
-            .from('empresas')
-            .select('razao_social, nome_fantasia')
-            .eq('id', prestador.empresa_id)
-            .single();
-          
-          if (empresaError) {
-            console.error('Error fetching empresa for prestador:', prestador.id, empresaError);
-            return {
-              ...prestador,
-              empresa: { razao_social: 'Empresa não encontrada', nome_fantasia: null }
-            };
-          }
-          
-          return {
-            ...prestador,
-            empresa: empresaData
-          };
-        })
-      );
-      
-      console.log('Prestadores with empresa:', prestadoresWithEmpresa);
-      return prestadoresWithEmpresa;
-    },
-    enabled: !!profile?.empresa_id,
-  });
+  console.log('Profile empresa_id:', profile?.empresa_id);
+  console.log('Prestadores data:', prestadores);
 
   // Auto-select if only one prestador
   React.useEffect(() => {
@@ -142,7 +87,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
               <SelectContent>
                 {prestadores.map((prestador) => (
                   <SelectItem key={prestador.id} value={prestador.id}>
-                    {prestador.empresa.razao_social} - {prestador.cnpj}
+                    {prestador.cnpj} {prestador.inscricao_municipal && `- IM: ${prestador.inscricao_municipal}`}
                   </SelectItem>
                 ))}
               </SelectContent>
