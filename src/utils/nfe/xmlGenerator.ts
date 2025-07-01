@@ -19,6 +19,7 @@ export class XMLGenerator {
     ${this.gerarTagTransp(dados)}
     ${this.gerarTagPag(dados)}
     ${this.gerarTagInfAdic(dados)}
+    ${this.gerarTagInfRespTec()}
   </infNFe>
 </NFe>`;
 
@@ -26,9 +27,11 @@ export class XMLGenerator {
   }
 
   private static gerarTagIde(dados: DadosNFeCompletos, chaveAcesso: string, dataEmissao: Date): string {
+    const cNF = chaveAcesso.substring(25, 33); // Código numérico da NFe
+    
     return `<ide>
       <cUF>${NFEUtils.obterCodigoUF(dados.empresa.estado)}</cUF>
-      <cNF>${chaveAcesso.slice(-8)}</cNF>
+      <cNF>${cNF}</cNF>
       <natOp>${dados.nota.natureza_operacao}</natOp>
       <mod>55</mod>
       <serie>${dados.nota.serie}</serie>
@@ -45,6 +48,8 @@ export class XMLGenerator {
       <indFinal>${this.obterIndFinal(dados)}</indFinal>
       <indPres>1</indPres>
       <indIntermed>0</indIntermed>
+      <procEmi>0</procEmi>
+      <verProc>1.0</verProc>
     </ide>`;
   }
 
@@ -179,53 +184,9 @@ export class XMLGenerator {
 
   private static gerarTagTransp(dados: DadosNFeCompletos): string {
     const freightMode = dados.nota.freight_mode ?? '9';
-
-    let transpXML = `<transp>
-      <modFrete>${freightMode}</modFrete>`;
-
-    if (freightMode !== '9' && dados.transportadora) {
-      const transp = dados.transportadora;
-      const cnpjCpf = transp.cpf_cnpj.replace(/\D/g, '');
-      const docTag = cnpjCpf.length === 11 ? `<CPF>${cnpjCpf}</CPF>` : `<CNPJ>${cnpjCpf}</CNPJ>`;
-      
-      transpXML += `
-      <transporta>
-        ${docTag}
-        <xNome>${this.escaparXML(transp.nome_razao_social)}</xNome>
-        ${transp.inscricao_estadual ? `<IE>${transp.inscricao_estadual}</IE>` : ''}
-        <xEnder>${this.escaparXML(transp.endereco)}</xEnder>
-        <xMun>${this.escaparXML(transp.cidade)}</xMun>
-        <UF>${transp.estado}</UF>
-      </transporta>`;
-      
-      if (transp.placa_veiculo) {
-        transpXML += `
-        <veicTransp>
-          <placa>${transp.placa_veiculo}</placa>
-          <UF>${transp.estado}</UF>
-          ${transp.rntrc ? `<RNTRC>${transp.rntrc}</RNTRC>` : ''}
-        </veicTransp>`;
-      }
-    }
-
-    const volumeQuantity = dados.nota.volume_quantity ?? 0;
-    const weightGross = dados.nota.weight_gross ?? 0;
-    const weightNet = dados.nota.weight_net ?? 0;
-
-    if (volumeQuantity > 0 || weightGross > 0 || weightNet > 0) {
-      transpXML += `
-      <vol>
-        <qVol>${volumeQuantity}</qVol>
-        <esp>VOLUMES</esp>
-        <pesoL>${weightNet.toFixed(3)}</pesoL>
-        <pesoB>${weightGross.toFixed(3)}</pesoB>
-      </vol>`;
-    }
-
-    transpXML += `
+    return `<transp>
+      <modFrete>${freightMode}</modFrete>
     </transp>`;
-
-    return transpXML;
   }
 
   private static gerarTagPag(dados: DadosNFeCompletos): string {
@@ -245,6 +206,15 @@ export class XMLGenerator {
     return `<infAdic>
       <infCpl>${this.escaparXML(observacoes)}</infCpl>
     </infAdic>`;
+  }
+
+  private static gerarTagInfRespTec(): string {
+    return `<infRespTec>
+      <CNPJ>07952851000168</CNPJ>
+      <xContato>Suporte Técnico</xContato>
+      <email>suporte@sistema.com.br</email>
+      <fone>1133334444</fone>
+    </infRespTec>`;
   }
 
   private static obterIdDest(dados: DadosNFeCompletos): string {

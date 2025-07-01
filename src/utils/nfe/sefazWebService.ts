@@ -1,4 +1,6 @@
 
+import { SoapClient } from './soapClient';
+
 export interface ConfiguracaoSEFAZ {
   ambiente: 'homologacao' | 'producao';
   uf: string;
@@ -23,20 +25,20 @@ export interface RetornoSEFAZ {
 export class SefazWebService {
   
   private static readonly ENDPOINTS_HOMOLOGACAO = {
-    'SP': 'https://homologacao.nfe.fazenda.sp.gov.br/ws/nfeautorizacaolote.asmx',
-    'RJ': 'https://homologacao.nfe.fazenda.rj.gov.br/ws/nfeautorizacaolote.asmx',
-    'MG': 'https://homologacao.nfe.fazenda.mg.gov.br/ws/nfeautorizacaolote.asmx',
-    'RS': 'https://homologacao.nfe.fazenda.rs.gov.br/ws/nfeautorizacaolote.asmx',
-    'PR': 'https://homologacao.nfe.fazenda.pr.gov.br/ws/nfeautorizacaolote.asmx',
+    'SP': 'https://homologacao.nfe.fazenda.sp.gov.br/ws/nfeautorizacao4.asmx',
+    'RJ': 'https://nfe.fazenda.rj.gov.br/service/NfeAutorizacao4.asmx',
+    'MG': 'https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeAutorizacao4',
+    'RS': 'https://nfe-homologacao.sefazrs.rs.gov.br/ws/NfeAutorizacao/NfeAutorizacao4.asmx',
+    'PR': 'https://homologacao.nfe.sefa.pr.gov.br/nfe/NFeAutorizacao4',
     // Adicionar outros estados conforme necessário
   };
 
   private static readonly ENDPOINTS_PRODUCAO = {
-    'SP': 'https://nfe.fazenda.sp.gov.br/ws/nfeautorizacaolote.asmx',
-    'RJ': 'https://nfe.fazenda.rj.gov.br/ws/nfeautorizacaolote.asmx',
-    'MG': 'https://nfe.fazenda.mg.gov.br/ws/nfeautorizacaolote.asmx',
-    'RS': 'https://nfe.fazenda.rs.gov.br/ws/nfeautorizacaolote.asmx',
-    'PR': 'https://nfe.fazenda.pr.gov.br/ws/nfeautorizacaolote.asmx',
+    'SP': 'https://nfe.fazenda.sp.gov.br/ws/nfeautorizacao4.asmx',
+    'RJ': 'https://nfe.fazenda.rj.gov.br/service/NfeAutorizacao4.asmx',
+    'MG': 'https://nfe.fazenda.mg.gov.br/nfe2/services/NFeAutorizacao4',
+    'RS': 'https://nfe.sefazrs.rs.gov.br/ws/NfeAutorizacao/NfeAutorizacao4.asmx',
+    'PR': 'https://nfe.sefa.pr.gov.br/nfe/NFeAutorizacao4',
     // Adicionar outros estados conforme necessário
   };
 
@@ -61,20 +63,46 @@ export class SefazWebService {
       }
 
       const loteId = this.gerarNumeroLote();
-      const soapEnvelope = this.criarEnvelopeSOAP(xmlNFe, loteId);
+      const soapEnvelope = SoapClient.criarEnvelopeAutorizacao(xmlNFe, loteId);
+      const soapAction = 'http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4/nfeAutorizacaoLote';
 
       console.log(`Enviando NFe para SEFAZ - Ambiente: ${configuracao.ambiente}, UF: ${configuracao.uf}`);
 
-      // Em produção, aqui seria feita a requisição SOAP real
-      // Por enquanto, simular resposta para desenvolvimento
-      const resposta = await this.simularRespostaSefaz(startTime);
-
-      // Se sucesso, gerar XML nfeProc
-      if (resposta.success && resposta.protocolo) {
-        resposta.xml_nfe_proc = this.gerarXMLNFeProc(xmlNFe, resposta.protocolo, resposta.chave_acesso!);
+      const soapResponse = await SoapClient.enviarSOAP(endpoint, soapEnvelope, soapAction, configuracao);
+      
+      if (!soapResponse.success) {
+        return {
+          success: false,
+          codigo_retorno: '999',
+          mensagem_retorno: soapResponse.error || 'Erro na comunicação SOAP',
+          tempo_resposta: Date.now() - startTime
+        };
       }
 
-      return resposta;
+      // Parsear resposta da SEFAZ
+      const dadosResposta = SoapClient.parsearRespostaSEFAZ(soapResponse.responseBody || '');
+      
+      const retorno: RetornoSEFAZ = {
+        success: dadosResposta.cStat === '100',
+        protocolo: dadosResposta.protocolo,
+        chave_acesso: dadosResposta.chaveAcesso,
+        codigo_retorno: dadosResposta.cStat,
+        mensagem_retorno: dadosResposta.xMotivo,
+        xml_retorno: dadosResposta.xmlRetorno,
+        tempo_resposta: Date.now() - startTime
+      };
+
+      // Se sucesso, gerar XML nfeProc
+      if (retorno.success && retorno.protocolo && retorno.chave_acesso) {
+        retorno.xml_nfe_proc = this.gerarXMLNFeProc(
+          xmlNFe, 
+          retorno.protocolo, 
+          retorno.chave_acesso,
+          dadosResposta.dhRecbto || new Date().toISOString()
+        );
+      }
+
+      return retorno;
 
     } catch (error) {
       return {
@@ -96,17 +124,40 @@ export class SefazWebService {
     const startTime = Date.now();
     
     try {
+      const endpoint = this.obterEndpointConsulta(configuracao.ambiente, configuracao.uf);
+      if (!endpoint) {
+        return {
+          success: false,
+          codigo_retorno: '999',
+          mensagem_retorno: `Endpoint de consulta não configurado para UF: ${configuracao.uf}`,
+          tempo_resposta: Date.now() - startTime
+        };
+      }
+
       console.log(`Consultando NFe na SEFAZ - Chave: ${chaveAcesso}`);
       
-      // Simular consulta para desenvolvimento
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const soapEnvelope = SoapClient.criarEnvelopeConsulta(chaveAcesso);
+      const soapAction = 'http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsultaProtocolo4/nfeConsultaNF';
 
+      const soapResponse = await SoapClient.enviarSOAP(endpoint, soapEnvelope, soapAction, configuracao);
+      
+      if (!soapResponse.success) {
+        return {
+          success: false,
+          codigo_retorno: '999',
+          mensagem_retorno: soapResponse.error || 'Erro na comunicação SOAP',
+          tempo_resposta: Date.now() - startTime
+        };
+      }
+
+      const dadosResposta = SoapClient.parsearRespostaSEFAZ(soapResponse.responseBody || '');
+      
       return {
-        success: true,
+        success: dadosResposta.cStat === '100',
         chave_acesso: chaveAcesso,
-        codigo_retorno: '100',
-        mensagem_retorno: 'Autorizado o uso da NF-e',
-        xml_retorno: `<consultaResponse><chave>${chaveAcesso}</chave><status>100</status><dhRecbto>${new Date().toISOString()}</dhRecbto></consultaResponse>`,
+        codigo_retorno: dadosResposta.cStat,
+        mensagem_retorno: dadosResposta.xMotivo,
+        xml_retorno: dadosResposta.xmlRetorno,
         tempo_resposta: Date.now() - startTime
       };
 
@@ -140,17 +191,40 @@ export class SefazWebService {
         };
       }
 
+      const endpoint = this.obterEndpointEvento(configuracao.ambiente, configuracao.uf);
+      if (!endpoint) {
+        return {
+          success: false,
+          codigo_retorno: '999',
+          mensagem_retorno: `Endpoint de evento não configurado para UF: ${configuracao.uf}`,
+          tempo_resposta: Date.now() - startTime
+        };
+      }
+
       console.log(`Cancelando NFe na SEFAZ - Chave: ${chaveAcesso}`);
       
-      // Simular cancelamento para desenvolvimento
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const soapEnvelope = SoapClient.criarEnvelopeCancelamento(chaveAcesso, justificativa, '1');
+      const soapAction = 'http://www.portalfiscal.inf.br/nfe/wsdl/NFeRecepcaoEvento4/nfeRecepcaoEvento';
 
+      const soapResponse = await SoapClient.enviarSOAP(endpoint, soapEnvelope, soapAction, configuracao);
+      
+      if (!soapResponse.success) {
+        return {
+          success: false,
+          codigo_retorno: '999',
+          mensagem_retorno: soapResponse.error || 'Erro na comunicação SOAP',
+          tempo_resposta: Date.now() - startTime
+        };
+      }
+
+      const dadosResposta = SoapClient.parsearRespostaSEFAZ(soapResponse.responseBody || '');
+      
       return {
-        success: true,
+        success: dadosResposta.cStat === '135',
         chave_acesso: chaveAcesso,
-        codigo_retorno: '135',
-        mensagem_retorno: 'Evento registrado e vinculado a NF-e',
-        xml_retorno: `<cancelamentoResponse><chave>${chaveAcesso}</chave><status>135</status><dhEvento>${new Date().toISOString()}</dhEvento></cancelamentoResponse>`,
+        codigo_retorno: dadosResposta.cStat,
+        mensagem_retorno: dadosResposta.xMotivo,
+        xml_retorno: dadosResposta.xmlRetorno,
         tempo_resposta: Date.now() - startTime
       };
 
@@ -169,40 +243,30 @@ export class SefazWebService {
     return endpoints[uf as keyof typeof endpoints];
   }
 
+  private static obterEndpointConsulta(ambiente: 'homologacao' | 'producao', uf: string): string | undefined {
+    // Em produção, usar endpoints específicos de consulta
+    return this.obterEndpoint(ambiente, uf);
+  }
+
+  private static obterEndpointEvento(ambiente: 'homologacao' | 'producao', uf: string): string | undefined {
+    // Em produção, usar endpoints específicos de evento
+    return this.obterEndpoint(ambiente, uf);
+  }
+
   private static gerarNumeroLote(): string {
     return Date.now().toString().slice(-10);
   }
 
-  private static criarEnvelopeSOAP(xmlNFe: string, loteId: string): string {
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:nfe="http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4">
-  <soap:Header/>
-  <soap:Body>
-    <nfe:nfeAutorizacaoLote>
-      <nfe:nfeDadosMsg>
-        <enviNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
-          <idLote>${loteId}</idLote>
-          <indSinc>1</indSinc>
-          ${xmlNFe}
-        </enviNFe>
-      </nfe:nfeDadosMsg>
-    </nfe:nfeAutorizacaoLote>
-  </soap:Body>
-</soap:Envelope>`;
-  }
-
-  private static gerarXMLNFeProc(xmlNFe: string, protocolo: string, chaveAcesso: string): string {
-    const dataProcessamento = new Date().toISOString();
-    
+  private static gerarXMLNFeProc(xmlNFe: string, protocolo: string, chaveAcesso: string, dhRecbto: string): string {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
   ${xmlNFe}
   <protNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
     <infProt>
-      <tpEvent>110111</tpEvent>
+      <tpAmb>2</tpAmb>
       <verAplic>SP_NFE_PL_008i2</verAplic>
       <chNFe>${chaveAcesso}</chNFe>
-      <dhRecbto>${dataProcessamento}</dhRecbto>
+      <dhRecbto>${dhRecbto}</dhRecbto>
       <nProt>${protocolo}</nProt>
       <digVal>DIGEST_VALUE_PLACEHOLDER</digVal>
       <cStat>100</cStat>
@@ -210,35 +274,5 @@ export class SefazWebService {
     </infProt>
   </protNFe>
 </nfeProc>`;
-  }
-
-  private static async simularRespostaSefaz(startTime: number): Promise<RetornoSEFAZ> {
-    // Simular tempo de resposta da SEFAZ
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-
-    const sucesso = Math.random() > 0.05; // 95% de sucesso para desenvolvimento
-    const tempoResposta = Date.now() - startTime;
-    
-    if (sucesso) {
-      const protocolo = `135${Date.now().toString().slice(-10)}`;
-      const chaveAcesso = `35${new Date().getFullYear().toString().slice(-2)}${(new Date().getMonth() + 1).toString().padStart(2, '0')}12345678000195550010000000011234567890`;
-      
-      return {
-        success: true,
-        protocolo,
-        chave_acesso: chaveAcesso,
-        codigo_retorno: '100',
-        mensagem_retorno: 'Autorizado o uso da NF-e',
-        xml_retorno: `<retEnviNFe><infRec><nRec>${protocolo}</nRec><dhRecbto>${new Date().toISOString()}</dhRecbto><tMed>1</tMed></infRec></retEnviNFe>`,
-        tempo_resposta: tempoResposta
-      };
-    } else {
-      return {
-        success: false,
-        codigo_retorno: '539',
-        mensagem_retorno: 'Rejeição: CNPJ do emitente inválido',
-        tempo_resposta: tempoResposta
-      };
-    }
   }
 }
