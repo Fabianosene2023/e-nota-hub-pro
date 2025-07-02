@@ -68,6 +68,8 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
     );
   }
 
+  const selectedPrestador = prestadores.find(p => p.id === prestadorId);
+
   return (
     <Card>
       <CardHeader>
@@ -87,27 +89,74 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
               <SelectContent>
                 {prestadores.map((prestador) => (
                   <SelectItem key={prestador.id} value={prestador.id}>
-                    {prestador.cnpj} {prestador.inscricao_municipal && `- IM: ${prestador.inscricao_municipal}`}
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        {prestador.empresa?.razao_social || 'Empresa não encontrada'}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        CNPJ: {prestador.cnpj}
+                        {prestador.inscricao_municipal && ` - IM: ${prestador.inscricao_municipal}`}
+                      </span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           
-          {prestadorId && (
-            <div className="text-sm text-muted-foreground">
-              {(() => {
-                const selectedPrestador = prestadores.find(p => p.id === prestadorId);
-                return selectedPrestador ? (
-                  <div className="space-y-1">
-                    <p><strong>CNPJ:</strong> {selectedPrestador.cnpj}</p>
-                    {selectedPrestador.inscricao_municipal && (
-                      <p><strong>Inscrição Municipal:</strong> {selectedPrestador.inscricao_municipal}</p>
-                    )}
-                    <p><strong>Regime Tributário:</strong> {selectedPrestador.regime_tributario.replace('_', ' ')}</p>
+          {selectedPrestador && selectedPrestador.empresa && (
+            <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+              <h4 className="font-medium text-sm">Dados da Empresa:</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="font-medium">Razão Social:</span>
+                  <p className="text-muted-foreground">{selectedPrestador.empresa.razao_social}</p>
+                </div>
+                {selectedPrestador.empresa.nome_fantasia && (
+                  <div>
+                    <span className="font-medium">Nome Fantasia:</span>
+                    <p className="text-muted-foreground">{selectedPrestador.empresa.nome_fantasia}</p>
                   </div>
-                ) : null;
-              })()}
+                )}
+                <div>
+                  <span className="font-medium">CNPJ:</span>
+                  <p className="text-muted-foreground font-mono">{selectedPrestador.cnpj}</p>
+                </div>
+                {selectedPrestador.inscricao_municipal && (
+                  <div>
+                    <span className="font-medium">Inscrição Municipal:</span>
+                    <p className="text-muted-foreground">{selectedPrestador.inscricao_municipal}</p>
+                  </div>
+                )}
+                {selectedPrestador.empresa.inscricao_estadual && (
+                  <div>
+                    <span className="font-medium">Inscrição Estadual:</span>
+                    <p className="text-muted-foreground">{selectedPrestador.empresa.inscricao_estadual}</p>
+                  </div>
+                )}
+                <div>
+                  <span className="font-medium">Regime Tributário:</span>
+                  <p className="text-muted-foreground capitalize">{selectedPrestador.regime_tributario.replace('_', ' ')}</p>
+                </div>
+                <div className="col-span-full">
+                  <span className="font-medium">Endereço:</span>
+                  <p className="text-muted-foreground">
+                    {selectedPrestador.empresa.endereco}, {selectedPrestador.empresa.cidade} - {selectedPrestador.empresa.estado}, CEP: {selectedPrestador.empresa.cep}
+                  </p>
+                </div>
+                {selectedPrestador.empresa.email && (
+                  <div>
+                    <span className="font-medium">E-mail:</span>
+                    <p className="text-muted-foreground">{selectedPrestador.empresa.email}</p>
+                  </div>
+                )}
+                {selectedPrestador.empresa.telefone && (
+                  <div>
+                    <span className="font-medium">Telefone:</span>
+                    <p className="text-muted-foreground">{selectedPrestador.empresa.telefone}</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

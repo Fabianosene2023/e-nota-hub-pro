@@ -1,7 +1,7 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { usePrestadoresServico } from './usePrestadoresServico';
 
 interface EmitirRpsData {
   prestador_id: string;
@@ -57,7 +57,31 @@ export const useEmitirRpsNfse = () => {
     mutationFn: async (dados: EmitirRpsData) => {
       console.log('Emitindo RPS NFSe com dados:', dados);
       
-      // 1. Criar RPS no banco
+      // Buscar dados completos do prestador
+      const { data: prestadorCompleto, error: prestadorError } = await supabase
+        .from('prestadores_servico')
+        .select(`
+          *,
+          empresa:empresas!prestadores_servico_empresa_id_fkey (
+            razao_social,
+            nome_fantasia,
+            endereco,
+            cidade,
+            estado,
+            cep,
+            telefone,
+            email,
+            inscricao_estadual
+          )
+        `)
+        .eq('id', dados.prestador_id)
+        .single();
+
+      if (prestadorError || !prestadorCompleto) {
+        throw new Error('Prestador não encontrado: ' + prestadorError?.message);
+      }
+
+      // 1. Criar RPS no banco com dados completos do prestador
       const rpsData = {
         prestador_id: dados.prestador_id,
         numero_rps: Math.floor(Math.random() * 999999) + 1,
@@ -90,8 +114,9 @@ export const useEmitirRpsNfse = () => {
       }
 
       console.log('RPS criado:', rps);
+      console.log('Dados do prestador:', prestadorCompleto);
 
-      // 2. Simular processamento NFSe (em produção, aqui seria feita a integração real)
+      // 2. Simular processamento NFSe com dados completos do prestador
       const nfseResult = await processarNfse(rps, dados);
 
       // 3. Atualizar status do RPS
@@ -111,7 +136,8 @@ export const useEmitirRpsNfse = () => {
 
       return {
         rps: { ...rps, status: nfseResult.success ? 'autorizada' : 'rejeitada' },
-        nfseResult
+        nfseResult,
+        prestador: prestadorCompleto
       };
     },
 
@@ -122,7 +148,7 @@ export const useEmitirRpsNfse = () => {
       if (data.nfseResult.success) {
         toast({
           title: "RPS Emitido com Sucesso!",
-          description: `RPS ${data.nfseResult.numero_rps} processado. NFSe: ${data.nfseResult.numero_nfse}`,
+          description: `RPS ${data.nfseResult.numero_rps} processado para ${data.prestador.empresa?.razao_social}. NFSe: ${data.nfseResult.numero_nfse}`,
         });
       } else {
         toast({

@@ -27,6 +27,7 @@ export const PrestadoresTable = () => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Empresa</TableHead>
             <TableHead>CNPJ</TableHead>
             <TableHead>Inscrição Municipal</TableHead>
             <TableHead>Regime Tributário</TableHead>
@@ -37,6 +38,14 @@ export const PrestadoresTable = () => {
         <TableBody>
           {prestadores.map((prestador) => (
             <TableRow key={prestador.id}>
+              <TableCell>
+                <div className="flex flex-col">
+                  <span className="font-medium">{prestador.empresa?.razao_social || 'N/A'}</span>
+                  {prestador.empresa?.nome_fantasia && (
+                    <span className="text-sm text-muted-foreground">{prestador.empresa.nome_fantasia}</span>
+                  )}
+                </div>
+              </TableCell>
               <TableCell className="font-mono">{prestador.cnpj}</TableCell>
               <TableCell>{prestador.inscricao_municipal || '-'}</TableCell>
               <TableCell className="capitalize">

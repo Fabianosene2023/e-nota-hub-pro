@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface PrestadorServico {
+interface PrestadorServicoCompleto {
   id: string;
   empresa_id: string;
   cnpj: string;
@@ -13,6 +13,20 @@ interface PrestadorServico {
   ativo: boolean;
   created_at: string;
   updated_at: string;
+  // Dados da empresa
+  empresa?: {
+    id: string;
+    razao_social: string;
+    nome_fantasia?: string;
+    endereco: string;
+    cidade: string;
+    estado: string;
+    cep: string;
+    telefone?: string;
+    email?: string;
+    inscricao_estadual?: string;
+    inscricao_municipal?: string;
+  };
 }
 
 export const usePrestadoresServico = (empresaId?: string) => {
@@ -31,7 +45,22 @@ export const usePrestadoresServico = (empresaId?: string) => {
       
       const { data, error } = await supabase
         .from('prestadores_servico')
-        .select('*')
+        .select(`
+          *,
+          empresa:empresas!prestadores_servico_empresa_id_fkey (
+            id,
+            razao_social,
+            nome_fantasia,
+            endereco,
+            cidade,
+            estado,
+            cep,
+            telefone,
+            email,
+            inscricao_estadual,
+            inscricao_municipal
+          )
+        `)
         .eq('empresa_id', effectiveEmpresaId)
         .eq('ativo', true)
         .order('created_at', { ascending: false });
@@ -42,7 +71,7 @@ export const usePrestadoresServico = (empresaId?: string) => {
       }
       
       console.log('Prestadores fetched successfully:', data);
-      return data as PrestadorServico[];
+      return data as PrestadorServicoCompleto[];
     },
     enabled: !!effectiveEmpresaId,
   });
