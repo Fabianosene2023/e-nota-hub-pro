@@ -1,86 +1,88 @@
 
-import { ConfiguracaoSEFAZ } from '../sefazWebService';
-
 /**
- * SEFAZ Validation utilities
+ * SEFAZ Validators for common validations
  */
 export class SefazValidators {
-  /**
-   * Validates digital certificate
-   */
-  static validarCertificado(certificado: { conteudo: string; senha: string }): { 
-    valido: boolean; 
-    erro?: string 
-  } {
-    try {
-      if (!certificado.conteudo || !certificado.senha) {
-        return { valido: false, erro: 'Certificado ou senha não informados' };
-      }
-
-      // TODO: Implementar validação real do certificado A1/A3
-      const agora = new Date();
-      const validadeInicio = new Date('2024-01-01');
-      const validadeFim = new Date('2025-12-31');
-      
-      if (agora < validadeInicio || agora > validadeFim) {
-        return { valido: false, erro: 'Certificado digital expirado ou ainda não válido' };
-      }
-
-      return { valido: true };
-    } catch (error) {
-      return { 
-        valido: false, 
-        erro: `Erro ao validar certificado: ${error instanceof Error ? error.message : 'Erro desconhecido'}` 
-      };
+  
+  public static validarChaveAcesso(chave: string): boolean {
+    if (!chave || chave.length !== 44) {
+      return false;
     }
-  }
-
-  /**
-   * Validates NFe access key format
-   */
-  static validarChaveAcesso(chaveAcesso: string): boolean {
-    return chaveAcesso && chaveAcesso.length === 44;
-  }
-
-  /**
-   * Validates cancellation justification
-   */
-  static validarJustificativaCancelamento(justificativa: string): boolean {
-    return justificativa && justificativa.trim().length >= 15;
-  }
-
-  /**
-   * Generates temporary access key for development
-   */
-  static gerarChaveAcessoTemp(): string {
-    const uf = '35'; // SP como padrão
-    const aamm = new Date().getFullYear().toString().substr(2) + 
-                 (new Date().getMonth() + 1).toString().padStart(2, '0');
-    const cnpj = '12345678000190'; // CNPJ exemplo
-    const mod = '55';
-    const serie = '001';
-    const nNF = Math.floor(Math.random() * 999999999).toString().padStart(9, '0');
-    const tpEmis = '1';
-    const cNF = Math.floor(Math.random() * 99999999).toString().padStart(8, '0');
     
-    const chaveBase = uf + aamm + cnpj + mod + serie + nNF + tpEmis + cNF;
-    const dv = this.calcularDVChaveAcesso(chaveBase);
+    if (!/^\d{44}$/.test(chave)) {
+      return false;
+    }
     
-    return chaveBase + dv;
+    // Validar dígito verificador
+    const chaveBase = chave.substring(0, 43);
+    const dvInformado = chave.substring(43);
+    const dvCalculado = this.calcularDVChaveAcesso(chaveBase);
+    
+    return dvInformado === dvCalculado;
   }
+  
+  public static validarCNPJ(cnpj: string): boolean {
+    const cnpjNumeros = cnpj.replace(/\D/g, '');
+    
+    if (cnpjNumeros.length !== 14) return false;
+    if (/^(\d)\1{13}$/.test(cnpjNumeros)) return false;
 
-  /**
-   * Calculates access key verification digit
-   */
-  private static calcularDVChaveAcesso(chave: string): string {
-    const sequencia = '4329876543298765432987654329876543298765432';
+    // Validação dos dígitos verificadores
     let soma = 0;
+    let peso = 2;
+    for (let i = 11; i >= 0; i--) {
+      soma += parseInt(cnpjNumeros[i]) * peso;
+      peso = peso === 9 ? 2 : peso + 1;
+    }
+    const dv1 = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+    
+    if (parseInt(cnpjNumeros[12]) !== dv1) return false;
+
+    soma = 0;
+    peso = 2;
+    for (let i = 12; i >= 0; i--) {
+      soma += parseInt(cnpjNumeros[i]) * peso;
+      peso = peso === 9 ? 2 : peso + 1;
+    }
+    const dv2 = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+    
+    return parseInt(cnpjNumeros[13]) === dv2;
+  }
+  
+  public static validarCPF(cpf: string): boolean {
+    const cpfNumeros = cpf.replace(/\D/g, '');
+    
+    if (cpfNumeros.length !== 11) return false;
+    if (/^(\d)\1{10}$/.test(cpfNumeros)) return false;
+
+    let soma = 0;
+    for (let i = 0; i < 9; i++) {
+      soma += parseInt(cpfNumeros[i]) * (10 - i);
+    }
+    let dv1 = 11 - (soma % 11);
+    if (dv1 >= 10) dv1 = 0;
+    
+    if (parseInt(cpfNumeros[9]) !== dv1) return false;
+
+    soma = 0;
+    for (let i = 0; i < 10; i++) {
+      soma += parseInt(cpfNumeros[i]) * (11 - i);
+    }
+    let dv2 = 11 - (soma % 11);
+    if (dv2 >= 10) dv2 = 0;
+    
+    return parseInt(cpfNumeros[10]) === dv2;
+  }
+  
+  private static calcularDVChaveAcesso(chave: string): string {
+    const sequence = '4329876543298765432987654329876543298765432';
+    let sum = 0;
     
     for (let i = 0; i < chave.length; i++) {
-      soma += parseInt(chave[i]) * parseInt(sequencia[i]);
+      sum += parseInt(chave[i]) * parseInt(sequence[i]);
     }
     
-    const resto = soma % 11;
-    return resto < 2 ? '0' : (11 - resto).toString();
+    const remainder = sum % 11;
+    return remainder < 2 ? '0' : (11 - remainder).toString();
   }
 }

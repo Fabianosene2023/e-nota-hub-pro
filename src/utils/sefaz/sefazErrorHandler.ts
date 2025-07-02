@@ -1,22 +1,53 @@
 
-import { ERROS_SEFAZ } from './sefazConfig';
+import { RetornoSEFAZ } from '../sefazWebService';
 
 /**
- * SEFAZ error handling utilities
+ * SEFAZ Error Handler
  */
 export class SefazErrorHandler {
-  /**
-   * Treats SEFAZ errors in a standardized way
-   */
-  static tratarErroSEFAZ(codigoRetorno: string, mensagemRetorno: string): string {
-    const mensagemAmigavel = ERROS_SEFAZ[codigoRetorno as keyof typeof ERROS_SEFAZ];
-    return mensagemAmigavel || mensagemRetorno || 'Erro desconhecido na comunicação com SEFAZ';
+  
+  public static obterEndpoint(
+    ambiente: 'homologacao' | 'producao', 
+    uf: string, 
+    endpoints: Record<string, string>
+  ): string | undefined {
+    return endpoints[uf as keyof typeof endpoints];
   }
-
-  /**
-   * Gets endpoint based on environment and UF
-   */
-  static obterEndpoint(ambiente: 'homologacao' | 'producao', uf: string, endpoints: Record<string, string>): string | null {
-    return endpoints[uf] || null;
+  
+  public static tratarErroSefaz(error: unknown): string {
+    if (error instanceof Error) {
+      // Tratar erros específicos da SEFAZ
+      if (error.message.includes('timeout')) {
+        return 'Timeout na comunicação com SEFAZ';
+      }
+      
+      if (error.message.includes('ENOTFOUND')) {
+        return 'Erro de conectividade com SEFAZ';
+      }
+      
+      if (error.message.includes('certificate')) {
+        return 'Erro no certificado digital';
+      }
+      
+      return error.message;
+    }
+    
+    return 'Erro desconhecido na comunicação com SEFAZ';
+  }
+  
+  public static interpretarStatusSefaz(cStat: string): string {
+    const statusMap: Record<string, string> = {
+      '100': 'NFe autorizada com sucesso',
+      '101': 'Cancelamento autorizado',
+      '102': 'Inutilização autorizada',
+      '103': 'Lote recebido com sucesso',
+      '104': 'Lote processado',
+      '105': 'Lote em processamento',
+      '110': 'Uso denegado',
+      '135': 'Evento registrado e vinculado',
+      '999': 'Erro interno'
+    };
+    
+    return statusMap[cStat] || `Status desconhecido: ${cStat}`;
   }
 }

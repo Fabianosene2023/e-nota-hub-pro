@@ -1,8 +1,7 @@
 
 import { SEFAZ_CONFIG } from '../sefazConfig';
 import { SefazErrorHandler } from '../sefazErrorHandler';
-import { SefazValidators } from '../sefazValidators';
-import { SefazLogger, LogSEFAZ } from '../sefazLogger';
+import { SefazLogger } from '../sefazLogger';
 import { RetornoSEFAZ, ConfiguracaoSEFAZ } from '../../sefazWebService';
 
 export class SefazOperationService {
@@ -73,45 +72,8 @@ export class SefazOperationService {
   }
 
   static handleError(error: unknown, startTime: number): RetornoSEFAZ {
-    const tempoResposta = Date.now() - startTime;
-    const mensagemErro = error instanceof Error ? error.message : 'Erro desconhecido';
-    
-    return {
-      success: false,
-      codigo_retorno: '999',
-      mensagem_retorno: `Erro na comunicação com SEFAZ: ${mensagemErro}`,
-      tempo_resposta: tempoResposta
-    };
-  }
-
-  private static simularRespostaSefaz(startTime: number, chaveAcesso?: string): RetornoSEFAZ {
-    const sucesso = Math.random() > 0.05; // 95% success rate for development
-    const tempoResposta = Date.now() - startTime;
-    
-    if (sucesso) {
-      const protocolo = `135${Date.now().toString().slice(-10)}`;
-      const chaveGerada = chaveAcesso || SefazValidators.gerarChaveAcessoTemp();
-      
-      return {
-        success: true,
-        protocolo,
-        chave_acesso: chaveGerada,
-        codigo_retorno: '100',
-        mensagem_retorno: 'Autorizado o uso da NF-e',
-        xml_retorno: `<retEnviNFe><infRec><nRec>${protocolo}</nRec><dhRecbto>${new Date().toISOString()}</dhRecbto><tMed>1</tMed></infRec></retEnviNFe>`,
-        tempo_resposta: tempoResposta
-      };
-    } else {
-      const codigosErro = ['539', '540', '999'];
-      const codigoErro = codigosErro[Math.floor(Math.random() * codigosErro.length)];
-      
-      return {
-        success: false,
-        codigo_retorno: codigoErro,
-        mensagem_retorno: SefazErrorHandler.tratarErroSEFAZ(codigoErro, ''),
-        tempo_resposta: tempoResposta
-      };
-    }
+    const mensagem = SefazErrorHandler.tratarErroSefaz(error);
+    return this.createErrorResponse(mensagem, startTime);
   }
 
   static async logOperation(
@@ -121,19 +83,102 @@ export class SefazOperationService {
     xmlEnviado: string | undefined,
     resultado: RetornoSEFAZ
   ): Promise<void> {
-    const log: LogSEFAZ = {
-      operacao,
-      empresa_id: empresaId,
-      chave_acesso: chaveAcesso,
-      xml_enviado: xmlEnviado?.substring(0, 1000),
-      xml_retorno: resultado.xml_retorno?.substring(0, 1000),
-      codigo_retorno: resultado.codigo_retorno,
-      mensagem_retorno: resultado.mensagem_retorno,
-      tempo_resposta_ms: resultado.tempo_resposta || 0,
-      timestamp: new Date().toISOString(),
-      status_operacao: resultado.success ? 'sucesso' : 'erro'
-    };
+    await SefazLogger.logOperacao(operacao, empresaId, chaveAcesso, xmlEnviado, resultado);
+  }
 
-    await SefazLogger.gravarLog(log);
+  private static simularRespostaSefaz(startTime: number, chaveAcesso?: string): RetornoSEFAZ {
+    // Simular diferentes cenários de resposta
+    const scenarios = ['success', 'processing', 'error'];
+    const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+    
+    const tempoResposta = Date.now() - startTime;
+    const chave = chaveAcesso || this.gerarChaveAcessoTeste();
+    
+    switch (scenario) {
+      case 'success':
+        return {
+          success: true,
+          chave_acesso: chave,
+          protocolo: `${Date.now()}${Math.floor(Math.random() * 1000)}`,
+          codigo_retorno: '100',
+          mensagem_retorno: 'Autorizado o uso da NF-e',
+          xml_retorno: this.gerarXMLRetornoSucesso(chave),
+          tempo_resposta: tempoResposta
+        };
+      
+      case 'processing':
+        return {
+          success: false,
+          chave_acesso: chave,
+          codigo_retorno: '105',
+          mensagem_retorno: 'Lote em processamento',
+          tempo_resposta: tempoResposta
+        };
+      
+      default:
+        return {
+          success: false,
+          chave_acesso: chave,
+          codigo_retorno: '999',
+          mensagem_retorno: 'Erro interno do sistema (simulação)',
+          tempo_resposta: tempoResposta
+        };
+    }
+  }
+
+  private static gerarChaveAcessoTeste(): string {
+    const uf = '35'; // SP
+    const aamm = new Date().getFullYear().toString().substr(2) + 
+                (new Date().getMonth() + 1).toString().padStart(2, '0');
+    const cnpj = '12345678000195';
+    const mod = '55';
+    const serie = '001';
+    const numero = Date.now().toString().slice(-9);
+    const tpEmis = '1';
+    const cNF = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+    
+    const chaveBase = uf + aamm + cnpj + mod + serie + numero + tpEmis + cNF;
+    const dv = this.calcularDVChaveAcesso(chaveBase);
+    
+    return chaveBase + dv;
+  }
+
+  private static calcularDVChaveAcesso(chave: string): string {
+    const sequence = '4329876543298765432987654329876543298765432';
+    let sum = 0;
+    
+    for (let i = 0; i < chave.length; i++) {
+      sum += parseInt(chave[i]) * parseInt(sequence[i]);
+    }
+    
+    const remainder = sum % 11;
+    return remainder < 2 ? '0' : (11 - remainder).toString();
+  }
+
+  private static gerarXMLRetornoSucesso(chaveAcesso: string): string {
+    const protocolo = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+    const dhRecbto = new Date().toISOString();
+    
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<retEnviNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+  <tpAmb>2</tpAmb>
+  <verAplic>SP_NFE_PL_008i2</verAplic>
+  <cStat>100</cStat>
+  <xMotivo>Autorizado o uso da NF-e</xMotivo>
+  <cUF>35</cUF>
+  <dhRecbto>${dhRecbto}</dhRecbto>
+  <protNFe versao="4.00">
+    <infProt>
+      <tpAmb>2</tpAmb>
+      <verAplic>SP_NFE_PL_008i2</verAplic>
+      <chNFe>${chaveAcesso}</chNFe>
+      <dhRecbto>${dhRecbto}</dhRecbto>
+      <nProt>${protocolo}</nProt>
+      <digVal>DIGEST_VALUE_PLACEHOLDER</digVal>
+      <cStat>100</cStat>
+      <xMotivo>Autorizado o uso da NF-e</xMotivo>
+    </infProt>
+  </protNFe>
+</retEnviNFe>`;
   }
 }
