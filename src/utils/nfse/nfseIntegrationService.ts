@@ -9,6 +9,7 @@ export interface NfseResponse {
   data_emissao?: string;
   valor_total?: number;
   xml_nfse?: string;
+  pdf_url?: string;
   erro?: string;
 }
 

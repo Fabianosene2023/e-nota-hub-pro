@@ -41,6 +41,16 @@ export interface DadosNFeCompletos {
     insurance_value?: number;
     freight_mode?: string;
   };
+  transportadora?: {
+    cpf_cnpj: string;
+    nome_razao_social: string;
+    inscricao_estadual?: string;
+    endereco: string;
+    cidade: string;
+    estado: string;
+    placa_veiculo?: string;
+    rntrc?: string;
+  };
 }
 
 export interface RetornoNFe {
