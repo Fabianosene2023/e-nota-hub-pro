@@ -8,10 +8,22 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export const PrestadoresTable = () => {
   const { profile } = useAuth();
-  const { data: prestadores, isLoading } = usePrestadoresServico(profile?.empresa_id);
+  const { data: prestadores, isLoading, error } = usePrestadoresServico(profile?.empresa_id);
 
   if (isLoading) {
-    return <div>Carregando prestadores...</div>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-muted-foreground">Carregando prestadores...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-red-600">Erro ao carregar prestadores de serviço</div>
+      </div>
+    );
   }
 
   if (!prestadores?.length) {
@@ -40,9 +52,13 @@ export const PrestadoresTable = () => {
             <TableRow key={prestador.id}>
               <TableCell>
                 <div className="flex flex-col">
-                  <span className="font-medium">{prestador.empresas?.razao_social || 'N/A'}</span>
+                  <span className="font-medium">
+                    {prestador.empresas?.razao_social || 'Empresa não encontrada'}
+                  </span>
                   {prestador.empresas?.nome_fantasia && (
-                    <span className="text-sm text-muted-foreground">{prestador.empresas.nome_fantasia}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {prestador.empresas.nome_fantasia}
+                    </span>
                   )}
                 </div>
               </TableCell>

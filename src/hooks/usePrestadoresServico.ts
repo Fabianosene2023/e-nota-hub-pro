@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -14,7 +15,7 @@ interface PrestadorServicoCompleto {
   created_at: string;
   updated_at: string;
   // Dados da empresa
-  empresas?: {
+  empresas: {
     id: string;
     razao_social: string;
     nome_fantasia?: string;
@@ -72,10 +73,10 @@ export const usePrestadoresServico = (empresaId?: string) => {
       
       console.log('Prestadores fetched successfully:', data);
       
-      // Transform data to match our interface
+      // Ensure proper data structure
       const transformedData: PrestadorServicoCompleto[] = data?.map(item => ({
         ...item,
-        empresas: Array.isArray(item.empresas) ? item.empresas[0] : item.empresas
+        empresas: item.empresas // Should already be correctly structured from the join
       })) || [];
       
       return transformedData;
