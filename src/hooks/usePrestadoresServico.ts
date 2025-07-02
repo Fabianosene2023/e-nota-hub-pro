@@ -47,7 +47,7 @@ export const usePrestadoresServico = (empresaId?: string) => {
         .from('prestadores_servico')
         .select(`
           *,
-          empresas!prestadores_servico_empresa_id_fkey (
+          empresa:empresa_id (
             id,
             razao_social,
             nome_fantasia,
@@ -75,7 +75,7 @@ export const usePrestadoresServico = (empresaId?: string) => {
       // Transform data to match our interface
       const transformedData: PrestadorServicoCompleto[] = data?.map(item => ({
         ...item,
-        empresa: Array.isArray(item.empresas) ? item.empresas[0] : item.empresas
+        empresa: item.empresa || null
       })) || [];
       
       return transformedData;

@@ -57,12 +57,12 @@ export const useEmitirRpsNfse = () => {
     mutationFn: async (dados: EmitirRpsData) => {
       console.log('Emitindo RPS NFSe com dados:', dados);
       
-      // Buscar dados completos do prestador
+      // Buscar dados completos do prestador com empresa
       const { data: prestadorCompleto, error: prestadorError } = await supabase
         .from('prestadores_servico')
         .select(`
           *,
-          empresas!prestadores_servico_empresa_id_fkey (
+          empresa:empresa_id (
             razao_social,
             nome_fantasia,
             endereco,
@@ -82,9 +82,7 @@ export const useEmitirRpsNfse = () => {
       }
 
       // Verificar se empresa existe
-      const empresa = Array.isArray(prestadorCompleto.empresas) 
-        ? prestadorCompleto.empresas[0] 
-        : prestadorCompleto.empresas;
+      const empresa = prestadorCompleto.empresa;
 
       if (!empresa) {
         throw new Error('Dados da empresa não encontrados para o prestador');
