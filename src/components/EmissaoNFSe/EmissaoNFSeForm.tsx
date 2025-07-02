@@ -70,6 +70,11 @@ export const EmissaoNFSeForm = () => {
       return;
     }
 
+    // Calcular valores totais
+    const valorServicos = itens.reduce((total, item) => total + item.valor_total, 0);
+    const valorIss = itens.reduce((total, item) => total + (item.valor_total * item.aliquota_iss / 100), 0);
+    const valorLiquido = valorServicos - valorIss;
+
     try {
       await emitirRps.mutateAsync({
         prestador_id: formData.prestador_id,
@@ -78,6 +83,9 @@ export const EmissaoNFSeForm = () => {
         tomador_endereco: formData.tomador_endereco,
         tomador_email: formData.tomador_email,
         discriminacao: formData.discriminacao,
+        valor_servicos: valorServicos,
+        valor_iss: valorIss,
+        valor_liquido: valorLiquido,
         itens
       });
       

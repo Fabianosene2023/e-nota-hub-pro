@@ -83,10 +83,7 @@ describe('XMLGenerator', () => {
         ambiente: 'homologacao',
         freight_mode: '1',
         freight_value: 15.50,
-        insurance_value: 5.00,
-        volume_quantity: 2,
-        weight_gross: 10.5,
-        weight_net: 9.0
+        insurance_value: 5.00
       },
       itens: [
         {

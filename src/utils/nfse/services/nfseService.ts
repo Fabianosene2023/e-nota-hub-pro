@@ -1,4 +1,3 @@
-
 import { NfseXmlGenerator, DadosNfse } from '../nfseXmlGenerator';
 import { NfseIntegrationService, NfseResponse } from '../nfseIntegrationService';
 
@@ -91,7 +90,7 @@ export class NfseService {
     try {
       switch (configuracao.padraoMunicipal) {
         case 'GINFES':
-          return await NfseIntegrationService.consultarNfseGinfes(
+          return await NfseIntegrationService.consultarNFSe(
             numeroNfse,
             cnpjPrestador,
             configuracao.urlWebservice
@@ -115,7 +114,7 @@ export class NfseService {
     dados: DadosNfse,
     configuracao: ConfiguracaoNfse
   ): Promise<NfseResponse> {
-    return await NfseIntegrationService.emitirNfseGinfes(
+    return await NfseIntegrationService.emitirNFSe(
       dados,
       configuracao.urlWebservice,
       configuracao.ambiente
@@ -224,6 +223,7 @@ export class NfseService {
         valor_liquido: valorServico - totalRetencoes,
         retencoes: {
           ir: valorIR,
+          iss: retencoes.iss ? (valorServico * retencoes.iss / 100) : 0,
           inss: valorINSS,
           csll: valorCSLL,
           cofins: valorCOFINS,

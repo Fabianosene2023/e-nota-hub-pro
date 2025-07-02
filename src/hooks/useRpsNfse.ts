@@ -24,6 +24,32 @@ interface EmitirRpsData {
   }>;
 }
 
+const processarNfse = async (rps: any, dados: EmitirRpsData) => {
+  console.log('Processando NFSe para RPS:', rps.numero_rps);
+  
+  // Simular processamento da NFSe
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  // Simular diferentes cenários
+  const success = Math.random() > 0.1; // 90% de sucesso
+  
+  if (success) {
+    return {
+      success: true,
+      numero_rps: rps.numero_rps.toString(),
+      numero_nfse: `NFSE-${Date.now()}`,
+      mensagem: 'NFSe processada com sucesso',
+      xml_nfse: `<nfse><numero>${Date.now()}</numero><rps>${rps.numero_rps}</rps></nfse>`
+    };
+  } else {
+    return {
+      success: false,
+      numero_rps: rps.numero_rps.toString(),
+      mensagem: 'Erro no processamento da NFSe (simulação)'
+    };
+  }
+};
+
 export const useEmitirRpsNfse = () => {
   const queryClient = useQueryClient();
 
@@ -66,7 +92,7 @@ export const useEmitirRpsNfse = () => {
       console.log('RPS criado:', rps);
 
       // 2. Simular processamento NFSe (em produção, aqui seria feita a integração real)
-      const nfseResult = await this.processarNfse(rps, dados);
+      const nfseResult = await processarNfse(rps, dados);
 
       // 3. Atualizar status do RPS
       const { error: updateError } = await supabase
@@ -87,32 +113,6 @@ export const useEmitirRpsNfse = () => {
         rps: { ...rps, status: nfseResult.success ? 'autorizada' : 'rejeitada' },
         nfseResult
       };
-    },
-
-    processarNfse: async (rps: any, dados: EmitirRpsData) => {
-      console.log('Processando NFSe para RPS:', rps.numero_rps);
-      
-      // Simular processamento da NFSe
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Simular diferentes cenários
-      const success = Math.random() > 0.1; // 90% de sucesso
-      
-      if (success) {
-        return {
-          success: true,
-          numero_rps: rps.numero_rps.toString(),
-          numero_nfse: `NFSE-${Date.now()}`,
-          mensagem: 'NFSe processada com sucesso',
-          xml_nfse: `<nfse><numero>${Date.now()}</numero><rps>${rps.numero_rps}</rps></nfse>`
-        };
-      } else {
-        return {
-          success: false,
-          numero_rps: rps.numero_rps.toString(),
-          mensagem: 'Erro no processamento da NFSe (simulação)'
-        };
-      }
     },
 
     onSuccess: (data) => {
