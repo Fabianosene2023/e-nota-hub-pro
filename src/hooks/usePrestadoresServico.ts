@@ -14,7 +14,7 @@ interface PrestadorServicoCompleto {
   created_at: string;
   updated_at: string;
   // Dados da empresa
-  empresa?: {
+  empresas?: {
     id: string;
     razao_social: string;
     nome_fantasia?: string;
@@ -47,7 +47,7 @@ export const usePrestadoresServico = (empresaId?: string) => {
         .from('prestadores_servico')
         .select(`
           *,
-          empresa:empresa_id (
+          empresas!prestadores_servico_empresa_id_fkey (
             id,
             razao_social,
             nome_fantasia,
@@ -75,7 +75,7 @@ export const usePrestadoresServico = (empresaId?: string) => {
       // Transform data to match our interface
       const transformedData: PrestadorServicoCompleto[] = data?.map(item => ({
         ...item,
-        empresa: item.empresa || null
+        empresas: Array.isArray(item.empresas) ? item.empresas[0] : item.empresas
       })) || [];
       
       return transformedData;

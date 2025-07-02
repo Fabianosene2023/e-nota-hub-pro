@@ -40,9 +40,9 @@ export const PrestadoresTable = () => {
             <TableRow key={prestador.id}>
               <TableCell>
                 <div className="flex flex-col">
-                  <span className="font-medium">{prestador.empresa?.razao_social || 'N/A'}</span>
-                  {prestador.empresa?.nome_fantasia && (
-                    <span className="text-sm text-muted-foreground">{prestador.empresa.nome_fantasia}</span>
+                  <span className="font-medium">{prestador.empresas?.razao_social || 'N/A'}</span>
+                  {prestador.empresas?.nome_fantasia && (
+                    <span className="text-sm text-muted-foreground">{prestador.empresas.nome_fantasia}</span>
                   )}
                 </div>
               </TableCell>

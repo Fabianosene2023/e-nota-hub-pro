@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -62,7 +61,7 @@ export const useEmitirRpsNfse = () => {
         .from('prestadores_servico')
         .select(`
           *,
-          empresa:empresa_id (
+          empresas!prestadores_servico_empresa_id_fkey (
             razao_social,
             nome_fantasia,
             endereco,
@@ -82,7 +81,9 @@ export const useEmitirRpsNfse = () => {
       }
 
       // Verificar se empresa existe
-      const empresa = prestadorCompleto.empresa;
+      const empresa = Array.isArray(prestadorCompleto.empresas) 
+        ? prestadorCompleto.empresas[0] 
+        : prestadorCompleto.empresas;
 
       if (!empresa) {
         throw new Error('Dados da empresa não encontrados para o prestador');
