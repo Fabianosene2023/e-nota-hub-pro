@@ -26,7 +26,7 @@ interface PrestadorServicoCompleto {
     email?: string;
     inscricao_estadual?: string;
     inscricao_municipal?: string;
-  };
+  } | null;
 }
 
 export const usePrestadoresServico = (empresaId?: string) => {
@@ -47,7 +47,7 @@ export const usePrestadoresServico = (empresaId?: string) => {
         .from('prestadores_servico')
         .select(`
           *,
-          empresa:empresas!prestadores_servico_empresa_id_fkey (
+          empresas!prestadores_servico_empresa_id_fkey (
             id,
             razao_social,
             nome_fantasia,
@@ -71,7 +71,14 @@ export const usePrestadoresServico = (empresaId?: string) => {
       }
       
       console.log('Prestadores fetched successfully:', data);
-      return data as PrestadorServicoCompleto[];
+      
+      // Transform data to match our interface
+      const transformedData: PrestadorServicoCompleto[] = data?.map(item => ({
+        ...item,
+        empresa: Array.isArray(item.empresas) ? item.empresas[0] : item.empresas
+      })) || [];
+      
+      return transformedData;
     },
     enabled: !!effectiveEmpresaId,
   });

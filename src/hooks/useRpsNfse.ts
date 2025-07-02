@@ -1,7 +1,7 @@
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { usePrestadoresServico } from './usePrestadoresServico';
 
 interface EmitirRpsData {
   prestador_id: string;
@@ -62,7 +62,7 @@ export const useEmitirRpsNfse = () => {
         .from('prestadores_servico')
         .select(`
           *,
-          empresa:empresas!prestadores_servico_empresa_id_fkey (
+          empresas!prestadores_servico_empresa_id_fkey (
             razao_social,
             nome_fantasia,
             endereco,
@@ -79,6 +79,15 @@ export const useEmitirRpsNfse = () => {
 
       if (prestadorError || !prestadorCompleto) {
         throw new Error('Prestador não encontrado: ' + prestadorError?.message);
+      }
+
+      // Verificar se empresa existe
+      const empresa = Array.isArray(prestadorCompleto.empresas) 
+        ? prestadorCompleto.empresas[0] 
+        : prestadorCompleto.empresas;
+
+      if (!empresa) {
+        throw new Error('Dados da empresa não encontrados para o prestador');
       }
 
       // 1. Criar RPS no banco com dados completos do prestador
@@ -137,7 +146,7 @@ export const useEmitirRpsNfse = () => {
       return {
         rps: { ...rps, status: nfseResult.success ? 'autorizada' : 'rejeitada' },
         nfseResult,
-        prestador: prestadorCompleto
+        prestador: { ...prestadorCompleto, empresa }
       };
     },
 
@@ -146,9 +155,10 @@ export const useEmitirRpsNfse = () => {
       queryClient.invalidateQueries({ queryKey: ['rps-nfse'] });
       
       if (data.nfseResult.success) {
+        const empresaName = data.prestador.empresa?.razao_social || 'Empresa não identificada';
         toast({
           title: "RPS Emitido com Sucesso!",
-          description: `RPS ${data.nfseResult.numero_rps} processado para ${data.prestador.empresa?.razao_social}. NFSe: ${data.nfseResult.numero_nfse}`,
+          description: `RPS ${data.nfseResult.numero_rps} processado para ${empresaName}. NFSe: ${data.nfseResult.numero_nfse}`,
         });
       } else {
         toast({
