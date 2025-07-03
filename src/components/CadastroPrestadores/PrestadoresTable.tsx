@@ -10,6 +10,9 @@ export const PrestadoresTable = () => {
   const { profile } = useAuth();
   const { data: prestadores, isLoading, error } = usePrestadoresServico(profile?.empresa_id);
 
+  console.log('PrestadoresTable - Profile empresa_id:', profile?.empresa_id);
+  console.log('PrestadoresTable - Prestadores data:', prestadores);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -19,6 +22,7 @@ export const PrestadoresTable = () => {
   }
 
   if (error) {
+    console.error('Error in PrestadoresTable:', error);
     return (
       <div className="flex items-center justify-center py-8">
         <div className="text-red-600">Erro ao carregar prestadores de serviço</div>
@@ -48,37 +52,45 @@ export const PrestadoresTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {prestadores.map((prestador) => (
-            <TableRow key={prestador.id}>
-              <TableCell>
-                <div className="flex flex-col">
-                  <span className="font-medium">
-                    {prestador.empresas?.razao_social || 'Empresa não encontrada'}
-                  </span>
-                  {prestador.empresas?.nome_fantasia && (
-                    <span className="text-sm text-muted-foreground">
-                      {prestador.empresas.nome_fantasia}
+          {prestadores.map((prestador) => {
+            console.log('Rendering prestador:', prestador.id, 'empresa data:', prestador.empresas);
+            return (
+              <TableRow key={prestador.id}>
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span className="font-medium">
+                      {prestador.empresas?.razao_social || 'Empresa não encontrada'}
                     </span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell className="font-mono">{prestador.cnpj}</TableCell>
-              <TableCell>{prestador.inscricao_municipal || '-'}</TableCell>
-              <TableCell className="capitalize">
-                {prestador.regime_tributario.replace('_', ' ')}
-              </TableCell>
-              <TableCell>
-                <Badge variant={prestador.ativo ? "default" : "secondary"}>
-                  {prestador.ativo ? 'Ativo' : 'Inativo'}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Button variant="ghost" size="sm">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+                    {prestador.empresas?.nome_fantasia && (
+                      <span className="text-sm text-muted-foreground">
+                        {prestador.empresas.nome_fantasia}
+                      </span>
+                    )}
+                    {prestador.empresas && (
+                      <span className="text-xs text-muted-foreground">
+                        {prestador.empresas.cidade} - {prestador.empresas.estado}
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="font-mono">{prestador.cnpj}</TableCell>
+                <TableCell>{prestador.inscricao_municipal || '-'}</TableCell>
+                <TableCell className="capitalize">
+                  {prestador.regime_tributario.replace('_', ' ')}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={prestador.ativo ? "default" : "secondary"}>
+                    {prestador.ativo ? 'Ativo' : 'Inativo'}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Button variant="ghost" size="sm">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

@@ -14,7 +14,7 @@ interface PrestadorServicoCompleto {
   ativo: boolean;
   created_at: string;
   updated_at: string;
-  // Dados da empresa
+  // Dados da empresa vinculada
   empresas: {
     id: string;
     razao_social: string;
@@ -72,12 +72,16 @@ export const usePrestadoresServico = (empresaId?: string) => {
       }
       
       console.log('Prestadores fetched successfully:', data);
+      console.log('Sample prestador with empresa data:', data?.[0]);
       
-      // Ensure proper data structure
-      const transformedData: PrestadorServicoCompleto[] = data?.map(item => ({
-        ...item,
-        empresas: item.empresas // Should already be correctly structured from the join
-      })) || [];
+      // Garantir que os dados da empresa estão sendo carregados corretamente
+      const transformedData: PrestadorServicoCompleto[] = data?.map(item => {
+        console.log('Processing prestador:', item.id, 'with empresa:', item.empresas);
+        return {
+          ...item,
+          empresas: item.empresas // Os dados da empresa já vêm estruturados do join
+        };
+      }) || [];
       
       return transformedData;
     },

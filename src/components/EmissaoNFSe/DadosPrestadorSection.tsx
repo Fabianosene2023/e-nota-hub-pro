@@ -16,8 +16,8 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
   const { profile } = useAuth();
   const { data: prestadores, isLoading, error } = usePrestadoresServico(profile?.empresa_id);
 
-  console.log('Profile empresa_id:', profile?.empresa_id);
-  console.log('Prestadores data:', prestadores);
+  console.log('DadosPrestadorSection - Profile empresa_id:', profile?.empresa_id);
+  console.log('DadosPrestadorSection - Prestadores data:', prestadores);
 
   // Auto-select if only one prestador
   React.useEffect(() => {
@@ -42,7 +42,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
   }
 
   if (error) {
-    console.error('Query error:', error);
+    console.error('DadosPrestadorSection - Query error:', error);
     return (
       <Card>
         <CardHeader>
@@ -69,6 +69,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
   }
 
   const selectedPrestador = prestadores.find(p => p.id === prestadorId);
+  console.log('Selected prestador:', selectedPrestador);
 
   return (
     <Card>
@@ -106,7 +107,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
           
           {selectedPrestador && selectedPrestador.empresas && (
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-              <h4 className="font-medium text-sm">Dados da Empresa:</h4>
+              <h4 className="font-medium text-sm">Dados Completos da Empresa:</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                 <div>
                   <span className="font-medium">Razão Social:</span>
@@ -139,7 +140,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
                   <p className="text-muted-foreground capitalize">{selectedPrestador.regime_tributario.replace('_', ' ')}</p>
                 </div>
                 <div className="col-span-full">
-                  <span className="font-medium">Endereço:</span>
+                  <span className="font-medium">Endereço Completo:</span>
                   <p className="text-muted-foreground">
                     {selectedPrestador.empresas.endereco}, {selectedPrestador.empresas.cidade} - {selectedPrestador.empresas.estado}, CEP: {selectedPrestador.empresas.cep}
                   </p>
