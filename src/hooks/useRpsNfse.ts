@@ -57,42 +57,20 @@ export const useEmitirRpsNfse = () => {
     mutationFn: async (dados: EmitirRpsData) => {
       console.log('Emitindo RPS NFSe com dados:', dados);
       
-      // Buscar dados completos do prestador com empresa
-      const { data: prestadorCompleto, error: prestadorError } = await supabase
-        .from('prestadores_servico')
-        .select(`
-          *,
-          empresas!prestadores_servico_empresa_id_fkey (
-            razao_social,
-            nome_fantasia,
-            endereco,
-            cidade,
-            estado,
-            cep,
-            telefone,
-            email,
-            inscricao_estadual
-          )
-        `)
+      // Buscar dados completos da empresa
+      const { data: empresaCompleta, error: empresaError } = await supabase
+        .from('empresas')
+        .select('*')
         .eq('id', dados.prestador_id)
         .single();
 
-      if (prestadorError || !prestadorCompleto) {
-        throw new Error('Prestador não encontrado: ' + prestadorError?.message);
+      if (empresaError || !empresaCompleta) {
+        throw new Error('Empresa não encontrada: ' + empresaError?.message);
       }
 
-      // Verificar se empresa existe e tratar estrutura de dados
-      const empresa = Array.isArray(prestadorCompleto.empresas) 
-        ? prestadorCompleto.empresas[0] 
-        : prestadorCompleto.empresas;
+      console.log('Dados da empresa carregados:', empresaCompleta);
 
-      if (!empresa) {
-        throw new Error('Dados da empresa não encontrados para o prestador');
-      }
-
-      console.log('Dados do prestador e empresa carregados:', { prestadorCompleto, empresa });
-
-      // 1. Criar RPS no banco com dados completos do prestador
+      // 1. Criar RPS no banco com dados completos da empresa
       const rpsData = {
         prestador_id: dados.prestador_id,
         numero_rps: Math.floor(Math.random() * 999999) + 1,
@@ -126,7 +104,7 @@ export const useEmitirRpsNfse = () => {
 
       console.log('RPS criado:', rps);
 
-      // 2. Simular processamento NFSe com dados completos do prestador
+      // 2. Simular processamento NFSe com dados completos da empresa
       const nfseResult = await processarNfse(rps, dados);
 
       // 3. Atualizar status do RPS
@@ -147,7 +125,7 @@ export const useEmitirRpsNfse = () => {
       return {
         rps: { ...rps, status: nfseResult.success ? 'autorizada' : 'rejeitada' },
         nfseResult,
-        prestador: { ...prestadorCompleto, empresa }
+        empresa: empresaCompleta
       };
     },
 
@@ -156,7 +134,7 @@ export const useEmitirRpsNfse = () => {
       queryClient.invalidateQueries({ queryKey: ['rps-nfse'] });
       
       if (data.nfseResult.success) {
-        const empresaName = data.prestador.empresa?.razao_social || 'Empresa não identificada';
+        const empresaName = data.empresa?.razao_social || 'Empresa não identificada';
         toast({
           title: "RPS Emitido com Sucesso!",
           description: `RPS ${data.nfseResult.numero_rps} processado para ${empresaName}. NFSe: ${data.nfseResult.numero_nfse}`,
