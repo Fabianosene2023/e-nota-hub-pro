@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -50,7 +51,6 @@ const navigation = [
     current: false,
     submenu: [
       { name: "Clientes", href: "/clientes" },
-      { name: "Prestadores de Serviço", href: "/prestadores" },
       { name: "Produtos", href: "/produtos/lista" },
       { name: "Serviços", href: "/produtos/servicos" },
       { name: "Marcas", href: "/produtos/marcas" },
