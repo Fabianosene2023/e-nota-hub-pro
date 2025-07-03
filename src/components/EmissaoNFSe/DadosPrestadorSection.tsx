@@ -92,7 +92,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
                   <SelectItem key={prestador.id} value={prestador.id}>
                     <div className="flex flex-col">
                       <span className="font-medium">
-                        {prestador.empresas?.razao_social || 'Empresa não encontrada'}
+                        {prestador.empresa?.razao_social || 'Empresa não encontrada'}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         CNPJ: {prestador.cnpj}
@@ -105,18 +105,18 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
             </Select>
           </div>
           
-          {selectedPrestador && selectedPrestador.empresas && (
+          {selectedPrestador && selectedPrestador.empresa && (
             <div className="bg-muted/50 p-4 rounded-lg space-y-2">
               <h4 className="font-medium text-sm">Dados Completos da Empresa:</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                 <div>
                   <span className="font-medium">Razão Social:</span>
-                  <p className="text-muted-foreground">{selectedPrestador.empresas.razao_social}</p>
+                  <p className="text-muted-foreground">{selectedPrestador.empresa.razao_social}</p>
                 </div>
-                {selectedPrestador.empresas.nome_fantasia && (
+                {selectedPrestador.empresa.nome_fantasia && (
                   <div>
                     <span className="font-medium">Nome Fantasia:</span>
-                    <p className="text-muted-foreground">{selectedPrestador.empresas.nome_fantasia}</p>
+                    <p className="text-muted-foreground">{selectedPrestador.empresa.nome_fantasia}</p>
                   </div>
                 )}
                 <div>
@@ -129,10 +129,10 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
                     <p className="text-muted-foreground">{selectedPrestador.inscricao_municipal}</p>
                   </div>
                 )}
-                {selectedPrestador.empresas.inscricao_estadual && (
+                {selectedPrestador.empresa.inscricao_estadual && (
                   <div>
                     <span className="font-medium">Inscrição Estadual:</span>
-                    <p className="text-muted-foreground">{selectedPrestador.empresas.inscricao_estadual}</p>
+                    <p className="text-muted-foreground">{selectedPrestador.empresa.inscricao_estadual}</p>
                   </div>
                 )}
                 <div>
@@ -142,19 +142,19 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
                 <div className="col-span-full">
                   <span className="font-medium">Endereço Completo:</span>
                   <p className="text-muted-foreground">
-                    {selectedPrestador.empresas.endereco}, {selectedPrestador.empresas.cidade} - {selectedPrestador.empresas.estado}, CEP: {selectedPrestador.empresas.cep}
+                    {selectedPrestador.empresa.endereco}, {selectedPrestador.empresa.cidade} - {selectedPrestador.empresa.estado}, CEP: {selectedPrestador.empresa.cep}
                   </p>
                 </div>
-                {selectedPrestador.empresas.email && (
+                {selectedPrestador.empresa.email && (
                   <div>
                     <span className="font-medium">E-mail:</span>
-                    <p className="text-muted-foreground">{selectedPrestador.empresas.email}</p>
+                    <p className="text-muted-foreground">{selectedPrestador.empresa.email}</p>
                   </div>
                 )}
-                {selectedPrestador.empresas.telefone && (
+                {selectedPrestador.empresa.telefone && (
                   <div>
                     <span className="font-medium">Telefone:</span>
-                    <p className="text-muted-foreground">{selectedPrestador.empresas.telefone}</p>
+                    <p className="text-muted-foreground">{selectedPrestador.empresa.telefone}</p>
                   </div>
                 )}
               </div>

@@ -1,3 +1,4 @@
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -80,7 +81,7 @@ export const useEmitirRpsNfse = () => {
         throw new Error('Prestador não encontrado: ' + prestadorError?.message);
       }
 
-      // Verificar se empresa existe
+      // Verificar se empresa existe e tratar estrutura de dados
       const empresa = Array.isArray(prestadorCompleto.empresas) 
         ? prestadorCompleto.empresas[0] 
         : prestadorCompleto.empresas;
@@ -88,6 +89,8 @@ export const useEmitirRpsNfse = () => {
       if (!empresa) {
         throw new Error('Dados da empresa não encontrados para o prestador');
       }
+
+      console.log('Dados do prestador e empresa carregados:', { prestadorCompleto, empresa });
 
       // 1. Criar RPS no banco com dados completos do prestador
       const rpsData = {
@@ -122,7 +125,6 @@ export const useEmitirRpsNfse = () => {
       }
 
       console.log('RPS criado:', rps);
-      console.log('Dados do prestador:', prestadorCompleto);
 
       // 2. Simular processamento NFSe com dados completos do prestador
       const nfseResult = await processarNfse(rps, dados);

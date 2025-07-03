@@ -53,22 +53,22 @@ export const PrestadoresTable = () => {
         </TableHeader>
         <TableBody>
           {prestadores.map((prestador) => {
-            console.log('Rendering prestador:', prestador.id, 'empresa data:', prestador.empresas);
+            console.log('Rendering prestador:', prestador.id, 'empresa data:', prestador.empresa);
             return (
               <TableRow key={prestador.id}>
                 <TableCell>
                   <div className="flex flex-col">
                     <span className="font-medium">
-                      {prestador.empresas?.razao_social || 'Empresa não encontrada'}
+                      {prestador.empresa?.razao_social || 'Empresa não encontrada'}
                     </span>
-                    {prestador.empresas?.nome_fantasia && (
+                    {prestador.empresa?.nome_fantasia && (
                       <span className="text-sm text-muted-foreground">
-                        {prestador.empresas.nome_fantasia}
+                        {prestador.empresa.nome_fantasia}
                       </span>
                     )}
-                    {prestador.empresas && (
+                    {prestador.empresa && (
                       <span className="text-xs text-muted-foreground">
-                        {prestador.empresas.cidade} - {prestador.empresas.estado}
+                        {prestador.empresa.cidade} - {prestador.empresa.estado}
                       </span>
                     )}
                   </div>
