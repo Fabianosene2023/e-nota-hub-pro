@@ -74,7 +74,16 @@ export function CadastroServicos() {
       preco_unitario: "",
       unidade: "UN",
       aliquota_iss: "",
-      codigo_servico_municipal: ""
+      codigo_servico_municipal: "",
+      local_prestacao: "",
+      municipio_prestacao: "",
+      codigo_tributacao_nacional: "",
+      isencao_issqn: false,
+      descricao_servico: "",
+      item_nbs: "",
+      numero_documento_responsabilidade_tecnica: "",
+      documento_referencia: "",
+      informacoes_complementares: ""
     });
   };
 
@@ -113,7 +122,16 @@ export function CadastroServicos() {
       preco_unitario: servico.preco_unitario?.toString() || "",
       unidade: servico.unidade || "UN",
       aliquota_iss: servico.aliquota_iss?.toString() || "",
-      codigo_servico_municipal: servico.codigo_servico_municipal || ""
+      codigo_servico_municipal: servico.codigo_servico_municipal || "",
+      local_prestacao: servico.local_prestacao || "",
+      municipio_prestacao: servico.municipio_prestacao || "",
+      codigo_tributacao_nacional: servico.codigo_tributacao_nacional || "",
+      isencao_issqn: servico.isencao_issqn || false,
+      descricao_servico: servico.descricao_servico || "",
+      item_nbs: servico.item_nbs || "",
+      numero_documento_responsabilidade_tecnica: servico.numero_documento_responsabilidade_tecnica || "",
+      documento_referencia: servico.documento_referencia || "",
+      informacoes_complementares: servico.informacoes_complementares || ""
     });
     setIsEditDialogOpen(true);
   };
