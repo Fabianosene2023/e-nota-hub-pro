@@ -1776,7 +1776,11 @@ export type Database = {
           mensagem_retorno: string | null
           numero_nfse: string | null
           numero_rps: number
+          opcao_tributos: number | null
           pdf_url: string | null
+          percentual_tributos_estaduais: number | null
+          percentual_tributos_federais: number | null
+          percentual_tributos_municipais: number | null
           prestador_id: string
           protocolo: string | null
           serie_rps: string
@@ -1789,7 +1793,11 @@ export type Database = {
           updated_at: string
           valor_iss: number
           valor_liquido: number
+          valor_servico_prestado: number | null
           valor_servicos: number
+          valor_tributos_estaduais: number | null
+          valor_tributos_federais: number | null
+          valor_tributos_municipais: number | null
           xml_nfse: string | null
           xml_rps: string | null
         }
@@ -1806,7 +1814,11 @@ export type Database = {
           mensagem_retorno?: string | null
           numero_nfse?: string | null
           numero_rps: number
+          opcao_tributos?: number | null
           pdf_url?: string | null
+          percentual_tributos_estaduais?: number | null
+          percentual_tributos_federais?: number | null
+          percentual_tributos_municipais?: number | null
           prestador_id: string
           protocolo?: string | null
           serie_rps?: string
@@ -1819,7 +1831,11 @@ export type Database = {
           updated_at?: string
           valor_iss?: number
           valor_liquido?: number
+          valor_servico_prestado?: number | null
           valor_servicos?: number
+          valor_tributos_estaduais?: number | null
+          valor_tributos_federais?: number | null
+          valor_tributos_municipais?: number | null
           xml_nfse?: string | null
           xml_rps?: string | null
         }
@@ -1836,7 +1852,11 @@ export type Database = {
           mensagem_retorno?: string | null
           numero_nfse?: string | null
           numero_rps?: number
+          opcao_tributos?: number | null
           pdf_url?: string | null
+          percentual_tributos_estaduais?: number | null
+          percentual_tributos_federais?: number | null
+          percentual_tributos_municipais?: number | null
           prestador_id?: string
           protocolo?: string | null
           serie_rps?: string
@@ -1849,7 +1869,11 @@ export type Database = {
           updated_at?: string
           valor_iss?: number
           valor_liquido?: number
+          valor_servico_prestado?: number | null
           valor_servicos?: number
+          valor_tributos_estaduais?: number | null
+          valor_tributos_federais?: number | null
+          valor_tributos_municipais?: number | null
           xml_nfse?: string | null
           xml_rps?: string | null
         }
@@ -1883,9 +1907,17 @@ export type Database = {
           municipio_prestacao: string | null
           nome: string
           numero_documento_responsabilidade_tecnica: string | null
+          opcao_tributos: number | null
+          percentual_tributos_estaduais: number | null
+          percentual_tributos_federais: number | null
+          percentual_tributos_municipais: number | null
           preco_unitario: number
           unidade: string
           updated_at: string
+          valor_servico_prestado: number | null
+          valor_tributos_estaduais: number | null
+          valor_tributos_federais: number | null
+          valor_tributos_municipais: number | null
         }
         Insert: {
           aliquota_iss?: number | null
@@ -1906,9 +1938,17 @@ export type Database = {
           municipio_prestacao?: string | null
           nome: string
           numero_documento_responsabilidade_tecnica?: string | null
+          opcao_tributos?: number | null
+          percentual_tributos_estaduais?: number | null
+          percentual_tributos_federais?: number | null
+          percentual_tributos_municipais?: number | null
           preco_unitario?: number
           unidade?: string
           updated_at?: string
+          valor_servico_prestado?: number | null
+          valor_tributos_estaduais?: number | null
+          valor_tributos_federais?: number | null
+          valor_tributos_municipais?: number | null
         }
         Update: {
           aliquota_iss?: number | null
@@ -1929,9 +1969,17 @@ export type Database = {
           municipio_prestacao?: string | null
           nome?: string
           numero_documento_responsabilidade_tecnica?: string | null
+          opcao_tributos?: number | null
+          percentual_tributos_estaduais?: number | null
+          percentual_tributos_federais?: number | null
+          percentual_tributos_municipais?: number | null
           preco_unitario?: number
           unidade?: string
           updated_at?: string
+          valor_servico_prestado?: number | null
+          valor_tributos_estaduais?: number | null
+          valor_tributos_federais?: number | null
+          valor_tributos_municipais?: number | null
         }
         Relationships: []
       }

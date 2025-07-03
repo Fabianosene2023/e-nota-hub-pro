@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { 
   Plus, 
   Search, 
@@ -49,7 +50,15 @@ export function CadastroServicos() {
     item_nbs: "",
     numero_documento_responsabilidade_tecnica: "",
     documento_referencia: "",
-    informacoes_complementares: ""
+    informacoes_complementares: "",
+    valor_servico_prestado: "",
+    opcao_tributos: "3",
+    valor_tributos_federais: "",
+    valor_tributos_estaduais: "",
+    valor_tributos_municipais: "",
+    percentual_tributos_federais: "",
+    percentual_tributos_estaduais: "",
+    percentual_tributos_municipais: ""
   });
 
   const { data: servicos = [], isLoading } = useServicosManager();
@@ -83,7 +92,15 @@ export function CadastroServicos() {
       item_nbs: "",
       numero_documento_responsabilidade_tecnica: "",
       documento_referencia: "",
-      informacoes_complementares: ""
+      informacoes_complementares: "",
+      valor_servico_prestado: "",
+      opcao_tributos: "3",
+      valor_tributos_federais: "",
+      valor_tributos_estaduais: "",
+      valor_tributos_municipais: "",
+      percentual_tributos_federais: "",
+      percentual_tributos_estaduais: "",
+      percentual_tributos_municipais: ""
     });
   };
 
@@ -101,6 +118,14 @@ export function CadastroServicos() {
       ...formData,
       preco_unitario: parseFloat(formData.preco_unitario),
       aliquota_iss: formData.aliquota_iss ? parseFloat(formData.aliquota_iss) : 0,
+      valor_servico_prestado: formData.valor_servico_prestado ? parseFloat(formData.valor_servico_prestado) : 0,
+      opcao_tributos: parseInt(formData.opcao_tributos),
+      valor_tributos_federais: formData.valor_tributos_federais ? parseFloat(formData.valor_tributos_federais) : 0,
+      valor_tributos_estaduais: formData.valor_tributos_estaduais ? parseFloat(formData.valor_tributos_estaduais) : 0,
+      valor_tributos_municipais: formData.valor_tributos_municipais ? parseFloat(formData.valor_tributos_municipais) : 0,
+      percentual_tributos_federais: formData.percentual_tributos_federais ? parseFloat(formData.percentual_tributos_federais) : 0,
+      percentual_tributos_estaduais: formData.percentual_tributos_estaduais ? parseFloat(formData.percentual_tributos_estaduais) : 0,
+      percentual_tributos_municipais: formData.percentual_tributos_municipais ? parseFloat(formData.percentual_tributos_municipais) : 0,
       ativo: true
     };
 
@@ -131,7 +156,15 @@ export function CadastroServicos() {
       item_nbs: servico.item_nbs || "",
       numero_documento_responsabilidade_tecnica: servico.numero_documento_responsabilidade_tecnica || "",
       documento_referencia: servico.documento_referencia || "",
-      informacoes_complementares: servico.informacoes_complementares || ""
+      informacoes_complementares: servico.informacoes_complementares || "",
+      valor_servico_prestado: servico.valor_servico_prestado?.toString() || "",
+      opcao_tributos: servico.opcao_tributos?.toString() || "3",
+      valor_tributos_federais: servico.valor_tributos_federais?.toString() || "",
+      valor_tributos_estaduais: servico.valor_tributos_estaduais?.toString() || "",
+      valor_tributos_municipais: servico.valor_tributos_municipais?.toString() || "",
+      percentual_tributos_federais: servico.percentual_tributos_federais?.toString() || "",
+      percentual_tributos_estaduais: servico.percentual_tributos_estaduais?.toString() || "",
+      percentual_tributos_municipais: servico.percentual_tributos_municipais?.toString() || ""
     });
     setIsEditDialogOpen(true);
   };
@@ -149,7 +182,15 @@ export function CadastroServicos() {
     const servicoData = {
       ...formData,
       preco_unitario: parseFloat(formData.preco_unitario),
-      aliquota_iss: formData.aliquota_iss ? parseFloat(formData.aliquota_iss) : 0
+      aliquota_iss: formData.aliquota_iss ? parseFloat(formData.aliquota_iss) : 0,
+      valor_servico_prestado: formData.valor_servico_prestado ? parseFloat(formData.valor_servico_prestado) : 0,
+      opcao_tributos: parseInt(formData.opcao_tributos),
+      valor_tributos_federais: formData.valor_tributos_federais ? parseFloat(formData.valor_tributos_federais) : 0,
+      valor_tributos_estaduais: formData.valor_tributos_estaduais ? parseFloat(formData.valor_tributos_estaduais) : 0,
+      valor_tributos_municipais: formData.valor_tributos_municipais ? parseFloat(formData.valor_tributos_municipais) : 0,
+      percentual_tributos_federais: formData.percentual_tributos_federais ? parseFloat(formData.percentual_tributos_federais) : 0,
+      percentual_tributos_estaduais: formData.percentual_tributos_estaduais ? parseFloat(formData.percentual_tributos_estaduais) : 0,
+      percentual_tributos_municipais: formData.percentual_tributos_municipais ? parseFloat(formData.percentual_tributos_municipais) : 0
     };
 
     updateServico.mutate({
@@ -206,7 +247,7 @@ export function CadastroServicos() {
               Novo Serviço
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Cadastrar Novo Serviço</DialogTitle>
               <DialogDescription>
@@ -263,6 +304,161 @@ export function CadastroServicos() {
                 </div>
               </div>
 
+              {/* Valores do Serviço */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Valores do Serviço</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="preco">Preço Unitário *</Label>
+                    <Input 
+                      id="preco" 
+                      placeholder="0,00"
+                      type="number"
+                      step="0.01"
+                      value={formData.preco_unitario}
+                      onChange={(e) => setFormData({...formData, preco_unitario: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="valor_servico_prestado">Valor do Serviço Prestado</Label>
+                    <Input 
+                      id="valor_servico_prestado" 
+                      placeholder="0,00"
+                      type="number"
+                      step="0.01"
+                      value={formData.valor_servico_prestado}
+                      onChange={(e) => setFormData({...formData, valor_servico_prestado: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="unidade">Unidade</Label>
+                    <Select value={formData.unidade} onValueChange={(value) => setFormData({...formData, unidade: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a unidade" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="UN">Unidade</SelectItem>
+                        <SelectItem value="HR">Hora</SelectItem>
+                        <SelectItem value="DIA">Dia</SelectItem>
+                        <SelectItem value="MES">Mês</SelectItem>
+                        <SelectItem value="ANO">Ano</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="aliquota">Alíquota ISS (%)</Label>
+                  <Input 
+                    id="aliquota" 
+                    placeholder="0,00"
+                    type="number"
+                    step="0.01"
+                    value={formData.aliquota_iss}
+                    onChange={(e) => setFormData({...formData, aliquota_iss: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              {/* Valores Aproximados dos Tributos */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Valor Aproximado dos Tributos</h3>
+                <div className="space-y-4">
+                  <RadioGroup
+                    value={formData.opcao_tributos}
+                    onValueChange={(value) => setFormData({...formData, opcao_tributos: value})}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="1" id="opcao1" />
+                      <Label htmlFor="opcao1">Preencher os valores monetários em cada NFS-e emitida</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="2" id="opcao2" />
+                      <Label htmlFor="opcao2">Configurar os valores percentuais correspondentes</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="3" id="opcao3" />
+                      <Label htmlFor="opcao3">Não informar nenhum valor estimado para os Tributos (Decreto 8.264/2014)</Label>
+                    </div>
+                  </RadioGroup>
+
+                  {formData.opcao_tributos === "1" && (
+                    <div className="grid grid-cols-3 gap-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="valor_tributos_federais">Valor Tributos Federais (R$)</Label>
+                        <Input 
+                          id="valor_tributos_federais" 
+                          placeholder="0,00"
+                          type="number"
+                          step="0.01"
+                          value={formData.valor_tributos_federais}
+                          onChange={(e) => setFormData({...formData, valor_tributos_federais: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="valor_tributos_estaduais">Valor Tributos Estaduais (R$)</Label>
+                        <Input 
+                          id="valor_tributos_estaduais" 
+                          placeholder="0,00"
+                          type="number"
+                          step="0.01"
+                          value={formData.valor_tributos_estaduais}
+                          onChange={(e) => setFormData({...formData, valor_tributos_estaduais: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="valor_tributos_municipais">Valor Tributos Municipais (R$)</Label>
+                        <Input 
+                          id="valor_tributos_municipais" 
+                          placeholder="0,00"
+                          type="number"
+                          step="0.01"
+                          value={formData.valor_tributos_municipais}
+                          onChange={(e) => setFormData({...formData, valor_tributos_municipais: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.opcao_tributos === "2" && (
+                    <div className="grid grid-cols-3 gap-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="percentual_tributos_federais">Federal (%)</Label>
+                        <Input 
+                          id="percentual_tributos_federais" 
+                          placeholder="0,00"
+                          type="number"
+                          step="0.01"
+                          value={formData.percentual_tributos_federais}
+                          onChange={(e) => setFormData({...formData, percentual_tributos_federais: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="percentual_tributos_estaduais">Estadual (%)</Label>
+                        <Input 
+                          id="percentual_tributos_estaduais" 
+                          placeholder="0,00"
+                          type="number"
+                          step="0.01"
+                          value={formData.percentual_tributos_estaduais}
+                          onChange={(e) => setFormData({...formData, percentual_tributos_estaduais: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="percentual_tributos_municipais">Municipal (%)</Label>
+                        <Input 
+                          id="percentual_tributos_municipais" 
+                          placeholder="0,00"
+                          type="number"
+                          step="0.01"
+                          value={formData.percentual_tributos_municipais}
+                          onChange={(e) => setFormData({...formData, percentual_tributos_municipais: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Localização */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Localização do Serviço</h3>
@@ -299,10 +495,10 @@ export function CadastroServicos() {
                         {formData.codigo_tributacao_nacional || "Selecione o código NBS"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[400px] p-0">
+                    <PopoverContent className="w-[500px] p-0" align="start">
                       <Command>
                         <CommandInput placeholder="Buscar código NBS..." />
-                        <CommandList>
+                        <CommandList className="max-h-[300px] overflow-y-auto">
                           <CommandEmpty>Nenhum código encontrado.</CommandEmpty>
                           <CommandGroup>
                             {codigosNbs.map((codigo) => (
@@ -313,6 +509,7 @@ export function CadastroServicos() {
                                   setFormData({...formData, codigo_tributacao_nacional: codigo.codigo, item_nbs: codigo.descricao});
                                   setOpenCodigoNbs(false);
                                 }}
+                                className="cursor-pointer"
                               >
                                 <div className="flex flex-col">
                                   <span className="font-medium">{codigo.codigo}</span>
@@ -348,45 +545,6 @@ export function CadastroServicos() {
                   </Label>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="preco">Preço Unitário *</Label>
-                    <Input 
-                      id="preco" 
-                      placeholder="0,00"
-                      type="number"
-                      step="0.01"
-                      value={formData.preco_unitario}
-                      onChange={(e) => setFormData({...formData, preco_unitario: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="unidade">Unidade</Label>
-                    <Select value={formData.unidade} onValueChange={(value) => setFormData({...formData, unidade: value})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a unidade" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="UN">Unidade</SelectItem>
-                        <SelectItem value="HR">Hora</SelectItem>
-                        <SelectItem value="DIA">Dia</SelectItem>
-                        <SelectItem value="MES">Mês</SelectItem>
-                        <SelectItem value="ANO">Ano</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="aliquota">Alíquota ISS (%)</Label>
-                    <Input 
-                      id="aliquota" 
-                      placeholder="0,00"
-                      type="number"
-                      step="0.01"
-                      value={formData.aliquota_iss}
-                      onChange={(e) => setFormData({...formData, aliquota_iss: e.target.value})}
-                    />
-                  </div>
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="codigoMunicipal">Código Serviço Municipal</Label>
                   <Input 
