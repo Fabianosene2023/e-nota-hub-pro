@@ -1869,11 +1869,20 @@ export type Database = {
           ativo: boolean
           codigo: string
           codigo_servico_municipal: string | null
+          codigo_tributacao_nacional: string | null
           created_at: string
           descricao: string | null
+          descricao_servico: string | null
+          documento_referencia: string | null
           empresa_id: string
           id: string
+          informacoes_complementares: string | null
+          isencao_issqn: boolean | null
+          item_nbs: string | null
+          local_prestacao: string | null
+          municipio_prestacao: string | null
           nome: string
+          numero_documento_responsabilidade_tecnica: string | null
           preco_unitario: number
           unidade: string
           updated_at: string
@@ -1883,11 +1892,20 @@ export type Database = {
           ativo?: boolean
           codigo: string
           codigo_servico_municipal?: string | null
+          codigo_tributacao_nacional?: string | null
           created_at?: string
           descricao?: string | null
+          descricao_servico?: string | null
+          documento_referencia?: string | null
           empresa_id: string
           id?: string
+          informacoes_complementares?: string | null
+          isencao_issqn?: boolean | null
+          item_nbs?: string | null
+          local_prestacao?: string | null
+          municipio_prestacao?: string | null
           nome: string
+          numero_documento_responsabilidade_tecnica?: string | null
           preco_unitario?: number
           unidade?: string
           updated_at?: string
@@ -1897,11 +1915,20 @@ export type Database = {
           ativo?: boolean
           codigo?: string
           codigo_servico_municipal?: string | null
+          codigo_tributacao_nacional?: string | null
           created_at?: string
           descricao?: string | null
+          descricao_servico?: string | null
+          documento_referencia?: string | null
           empresa_id?: string
           id?: string
+          informacoes_complementares?: string | null
+          isencao_issqn?: boolean | null
+          item_nbs?: string | null
+          local_prestacao?: string | null
+          municipio_prestacao?: string | null
           nome?: string
+          numero_documento_responsabilidade_tecnica?: string | null
           preco_unitario?: number
           unidade?: string
           updated_at?: string

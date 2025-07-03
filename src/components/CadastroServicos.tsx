@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { 
   Plus, 
   Search, 
@@ -14,8 +16,11 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useServicosManager, useCreateServicoManager, useUpdateServicoManager, useDeleteServicoManager } from "@/hooks/useServicosManager";
 import { useEmpresasManager } from "@/hooks/useEmpresasManager";
+import { useCodigosNbs } from "@/hooks/useCodigosNbs";
 import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
 import { toast } from "@/hooks/use-toast";
 
@@ -26,6 +31,7 @@ export function CadastroServicos() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingServico, setEditingServico] = useState<any>(null);
   const [deletingServicoId, setDeletingServicoId] = useState<string | null>(null);
+  const [openCodigoNbs, setOpenCodigoNbs] = useState(false);
   const [formData, setFormData] = useState({
     empresa_id: "",
     codigo: "",
@@ -34,11 +40,21 @@ export function CadastroServicos() {
     preco_unitario: "",
     unidade: "UN",
     aliquota_iss: "",
-    codigo_servico_municipal: ""
+    codigo_servico_municipal: "",
+    local_prestacao: "",
+    municipio_prestacao: "",
+    codigo_tributacao_nacional: "",
+    isencao_issqn: false,
+    descricao_servico: "",
+    item_nbs: "",
+    numero_documento_responsabilidade_tecnica: "",
+    documento_referencia: "",
+    informacoes_complementares: ""
   });
 
   const { data: servicos = [], isLoading } = useServicosManager();
   const { data: empresas = [] } = useEmpresasManager();
+  const { codigosNbs, buscarCodigoPorDescricao } = useCodigosNbs();
   const createServico = useCreateServicoManager();
   const updateServico = useUpdateServicoManager();
   const deleteServico = useDeleteServicoManager();
@@ -172,105 +188,237 @@ export function CadastroServicos() {
               Novo Serviço
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Cadastrar Novo Serviço</DialogTitle>
               <DialogDescription>
                 Preencha os dados do serviço
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="empresa">Empresa *</Label>
-                <Select value={formData.empresa_id} onValueChange={(value) => setFormData({...formData, empresa_id: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a empresa" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {empresas.map((empresa) => (
-                      <SelectItem key={empresa.id} value={empresa.id}>
-                        {empresa.razao_social}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-6 py-4">
+              {/* Dados Básicos */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Dados Básicos</h3>
                 <div className="space-y-2">
-                  <Label htmlFor="codigo">Código *</Label>
-                  <Input 
-                    id="codigo" 
-                    placeholder="Digite o código"
-                    value={formData.codigo}
-                    onChange={(e) => setFormData({...formData, codigo: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="nome">Nome *</Label>
-                  <Input 
-                    id="nome" 
-                    placeholder="Digite o nome"
-                    value={formData.nome}
-                    onChange={(e) => setFormData({...formData, nome: e.target.value})}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="descricao">Descrição</Label>
-                <Textarea 
-                  id="descricao" 
-                  placeholder="Digite a descrição"
-                  value={formData.descricao}
-                  onChange={(e) => setFormData({...formData, descricao: e.target.value})}
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="preco">Preço Unitário *</Label>
-                  <Input 
-                    id="preco" 
-                    placeholder="0,00"
-                    type="number"
-                    step="0.01"
-                    value={formData.preco_unitario}
-                    onChange={(e) => setFormData({...formData, preco_unitario: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="unidade">Unidade</Label>
-                  <Select value={formData.unidade} onValueChange={(value) => setFormData({...formData, unidade: value})}>
+                  <Label htmlFor="empresa">Empresa *</Label>
+                  <Select value={formData.empresa_id} onValueChange={(value) => setFormData({...formData, empresa_id: value})}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione a unidade" />
+                      <SelectValue placeholder="Selecione a empresa" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="UN">Unidade</SelectItem>
-                      <SelectItem value="HR">Hora</SelectItem>
-                      <SelectItem value="DIA">Dia</SelectItem>
-                      <SelectItem value="MES">Mês</SelectItem>
-                      <SelectItem value="ANO">Ano</SelectItem>
+                      {empresas.map((empresa) => (
+                        <SelectItem key={empresa.id} value={empresa.id}>
+                          {empresa.razao_social}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="codigo">Código *</Label>
+                    <Input 
+                      id="codigo" 
+                      placeholder="Digite o código"
+                      value={formData.codigo}
+                      onChange={(e) => setFormData({...formData, codigo: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="nome">Nome *</Label>
+                    <Input 
+                      id="nome" 
+                      placeholder="Digite o nome"
+                      value={formData.nome}
+                      onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="aliquota">Alíquota ISS (%)</Label>
-                  <Input 
-                    id="aliquota" 
-                    placeholder="0,00"
-                    type="number"
-                    step="0.01"
-                    value={formData.aliquota_iss}
-                    onChange={(e) => setFormData({...formData, aliquota_iss: e.target.value})}
+                  <Label htmlFor="descricao">Descrição</Label>
+                  <Textarea 
+                    id="descricao" 
+                    placeholder="Digite a descrição"
+                    value={formData.descricao}
+                    onChange={(e) => setFormData({...formData, descricao: e.target.value})}
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="codigoMunicipal">Código Serviço Municipal</Label>
-                <Input 
-                  id="codigoMunicipal" 
-                  placeholder="Digite o código municipal"
-                  value={formData.codigo_servico_municipal}
-                  onChange={(e) => setFormData({...formData, codigo_servico_municipal: e.target.value})}
-                />
+
+              {/* Localização */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Localização do Serviço</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="local_prestacao">Local da Prestação</Label>
+                    <Input 
+                      id="local_prestacao" 
+                      placeholder="Local onde será prestado"
+                      value={formData.local_prestacao}
+                      onChange={(e) => setFormData({...formData, local_prestacao: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="municipio_prestacao">Município</Label>
+                    <Input 
+                      id="municipio_prestacao" 
+                      placeholder="Município da prestação"
+                      value={formData.municipio_prestacao}
+                      onChange={(e) => setFormData({...formData, municipio_prestacao: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Tributação */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Informações Tributárias</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="codigo_tributacao_nacional">Código de Tributação Nacional (NBS)</Label>
+                  <Popover open={openCodigoNbs} onOpenChange={setOpenCodigoNbs}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start">
+                        {formData.codigo_tributacao_nacional || "Selecione o código NBS"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Buscar código NBS..." />
+                        <CommandList>
+                          <CommandEmpty>Nenhum código encontrado.</CommandEmpty>
+                          <CommandGroup>
+                            {codigosNbs.map((codigo) => (
+                              <CommandItem
+                                key={codigo.codigo}
+                                value={`${codigo.codigo} - ${codigo.descricao}`}
+                                onSelect={() => {
+                                  setFormData({...formData, codigo_tributacao_nacional: codigo.codigo, item_nbs: codigo.descricao});
+                                  setOpenCodigoNbs(false);
+                                }}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{codigo.codigo}</span>
+                                  <span className="text-sm text-muted-foreground">{codigo.descricao}</span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="item_nbs">Item da NBS</Label>
+                  <Input 
+                    id="item_nbs" 
+                    placeholder="Descrição do item NBS"
+                    value={formData.item_nbs}
+                    onChange={(e) => setFormData({...formData, item_nbs: e.target.value})}
+                  />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="isencao_issqn"
+                    checked={formData.isencao_issqn}
+                    onCheckedChange={(checked) => setFormData({...formData, isencao_issqn: checked})}
+                  />
+                  <Label htmlFor="isencao_issqn">
+                    O serviço é caso de imunidade, exportação ou não incidência do ISSQN?
+                  </Label>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="preco">Preço Unitário *</Label>
+                    <Input 
+                      id="preco" 
+                      placeholder="0,00"
+                      type="number"
+                      step="0.01"
+                      value={formData.preco_unitario}
+                      onChange={(e) => setFormData({...formData, preco_unitario: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="unidade">Unidade</Label>
+                    <Select value={formData.unidade} onValueChange={(value) => setFormData({...formData, unidade: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a unidade" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="UN">Unidade</SelectItem>
+                        <SelectItem value="HR">Hora</SelectItem>
+                        <SelectItem value="DIA">Dia</SelectItem>
+                        <SelectItem value="MES">Mês</SelectItem>
+                        <SelectItem value="ANO">Ano</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="aliquota">Alíquota ISS (%)</Label>
+                    <Input 
+                      id="aliquota" 
+                      placeholder="0,00"
+                      type="number"
+                      step="0.01"
+                      value={formData.aliquota_iss}
+                      onChange={(e) => setFormData({...formData, aliquota_iss: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="codigoMunicipal">Código Serviço Municipal</Label>
+                  <Input 
+                    id="codigoMunicipal" 
+                    placeholder="Digite o código municipal"
+                    value={formData.codigo_servico_municipal}
+                    onChange={(e) => setFormData({...formData, codigo_servico_municipal: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              {/* Detalhes do Serviço */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Detalhes do Serviço</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="descricao_servico">Descrição do Serviço</Label>
+                  <Textarea 
+                    id="descricao_servico" 
+                    placeholder="Descrição detalhada do serviço prestado"
+                    value={formData.descricao_servico}
+                    onChange={(e) => setFormData({...formData, descricao_servico: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="numero_documento_responsabilidade_tecnica">Número do Documento de Responsabilidade Técnica</Label>
+                  <Input 
+                    id="numero_documento_responsabilidade_tecnica" 
+                    placeholder="Número do documento"
+                    value={formData.numero_documento_responsabilidade_tecnica}
+                    onChange={(e) => setFormData({...formData, numero_documento_responsabilidade_tecnica: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="documento_referencia">Documento de Referência</Label>
+                  <Input 
+                    id="documento_referencia" 
+                    placeholder="Documento de referência"
+                    value={formData.documento_referencia}
+                    onChange={(e) => setFormData({...formData, documento_referencia: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="informacoes_complementares">Informações Complementares</Label>
+                  <Textarea 
+                    id="informacoes_complementares" 
+                    placeholder="Informações adicionais sobre o serviço"
+                    value={formData.informacoes_complementares}
+                    onChange={(e) => setFormData({...formData, informacoes_complementares: e.target.value})}
+                  />
+                </div>
               </div>
             </div>
             <DialogFooter>

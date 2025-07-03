@@ -16,6 +16,15 @@ interface Servico {
   ativo: boolean;
   created_at: string;
   updated_at: string;
+  local_prestacao?: string;
+  municipio_prestacao?: string;
+  codigo_tributacao_nacional?: string;
+  isencao_issqn?: boolean;
+  descricao_servico?: string;
+  item_nbs?: string;
+  numero_documento_responsabilidade_tecnica?: string;
+  documento_referencia?: string;
+  informacoes_complementares?: string;
 }
 
 export const useServicosManager = (empresaId?: string) => {
