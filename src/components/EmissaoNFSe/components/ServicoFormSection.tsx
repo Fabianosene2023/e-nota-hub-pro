@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useServicosManager } from '@/hooks/useServicosManager';
 import { useEmpresasManager } from '@/hooks/useEmpresasManager';
 import { toast } from '@/hooks/use-toast';
@@ -21,20 +21,21 @@ interface ItemNFSe {
 
 interface ServicoFormSectionProps {
   onAddItem: (item: ItemNFSe) => void;
+  onCancel: () => void;
+  empresaId: string;
+  editingItem?: ItemNFSe;
 }
 
-export const ServicoFormSection = ({ onAddItem }: ServicoFormSectionProps) => {
-  const { data: empresas } = useEmpresasManager();
-  const empresaId = empresas?.[0]?.id || '';
+export const ServicoFormSection = ({ onAddItem, onCancel, empresaId, editingItem }: ServicoFormSectionProps) => {
   const { data: servicos } = useServicosManager(empresaId);
   
   const [itemForm, setItemForm] = useState({
-    servico_id: '',
-    descricao: '',
-    quantidade: 1,
-    valor_unitario: 0,
-    codigo_servico: '',
-    aliquota_iss: 5
+    servico_id: editingItem?.servico_id || '',
+    descricao: editingItem?.descricao || '',
+    quantidade: editingItem?.quantidade || 1,
+    valor_unitario: editingItem?.valor_unitario || 0,
+    codigo_servico: editingItem?.codigo_servico || '',
+    aliquota_iss: editingItem?.aliquota_iss || 5
   });
 
   const handleServicoChange = (servicoId: string) => {
@@ -80,7 +81,12 @@ export const ServicoFormSection = ({ onAddItem }: ServicoFormSectionProps) => {
 
   return (
     <div className="border rounded-lg p-4 space-y-4">
-      <h4 className="font-medium">Adicionar Serviço</h4>
+      <div className="flex items-center justify-between">
+        <h4 className="font-medium">{editingItem ? 'Editar Serviço' : 'Adicionar Serviço'}</h4>
+        <Button variant="ghost" size="sm" onClick={onCancel}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
@@ -170,10 +176,15 @@ export const ServicoFormSection = ({ onAddItem }: ServicoFormSectionProps) => {
         </div>
       </div>
 
-      <Button type="button" onClick={handleAddItem} className="w-full">
-        <Plus className="mr-2 h-4 w-4" />
-        Adicionar Serviço
-      </Button>
+      <div className="flex gap-2">
+        <Button type="button" onClick={handleAddItem} className="flex-1">
+          <Plus className="mr-2 h-4 w-4" />
+          {editingItem ? 'Salvar Alterações' : 'Adicionar Serviço'}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
     </div>
   );
 };

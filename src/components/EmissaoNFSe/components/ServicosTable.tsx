@@ -1,7 +1,7 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Edit } from "lucide-react";
 
 interface ItemNFSe {
   servico_id?: string;
@@ -15,11 +15,11 @@ interface ItemNFSe {
 
 interface ServicosTableProps {
   itens: ItemNFSe[];
-  valorTotalNota: number;
-  onRemoveItem: (index: number) => void;
+  onEdit: (index: number) => void;
+  onRemove: (index: number) => void;
 }
 
-export const ServicosTable = ({ itens, valorTotalNota, onRemoveItem }: ServicosTableProps) => {
+export const ServicosTable = ({ itens, onEdit, onRemove }: ServicosTableProps) => {
   if (itens.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -27,6 +27,8 @@ export const ServicosTable = ({ itens, valorTotalNota, onRemoveItem }: ServicosT
       </div>
     );
   }
+
+  const valorTotalNota = itens.reduce((total, item) => total + item.valor_total, 0);
 
   return (
     <div className="space-y-4">
@@ -40,7 +42,7 @@ export const ServicosTable = ({ itens, valorTotalNota, onRemoveItem }: ServicosT
               <TableHead className="w-32">Valor Unit.</TableHead>
               <TableHead className="w-32">Valor Total</TableHead>
               <TableHead className="w-24">ISS %</TableHead>
-              <TableHead className="w-16">Ações</TableHead>
+              <TableHead className="w-24">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -53,13 +55,22 @@ export const ServicosTable = ({ itens, valorTotalNota, onRemoveItem }: ServicosT
                 <TableCell>R$ {item.valor_total.toFixed(2)}</TableCell>
                 <TableCell>{item.aliquota_iss}%</TableCell>
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onRemoveItem(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(index)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onRemove(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
