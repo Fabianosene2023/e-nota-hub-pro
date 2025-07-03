@@ -28,6 +28,7 @@ export function ServicoFormDialog({
 }: ServicoFormDialogProps) {
   const [formData, setFormData] = useState(() => {
     if (isEdit && editingServico) {
+      console.log('Editando serviço:', editingServico);
       return {
         empresa_id: editingServico.empresa_id || "",
         codigo: editingServico.codigo || "",
@@ -89,6 +90,8 @@ export function ServicoFormDialog({
   const updateServico = useUpdateServicoManager();
 
   const handleSubmit = () => {
+    console.log('Dados do formulário antes da validação:', formData);
+    
     if (!formData.empresa_id || !formData.codigo || !formData.nome || !formData.preco_unitario) {
       toast({
         title: "Erro",
@@ -113,19 +116,29 @@ export function ServicoFormDialog({
       ativo: true
     };
 
+    console.log('Dados do serviço processados para salvar:', servicoData);
+
     if (isEdit && editingServico) {
       updateServico.mutate({
         id: editingServico.id,
         updates: servicoData
       }, {
         onSuccess: () => {
+          console.log('Serviço atualizado com sucesso');
           onSuccess();
+        },
+        onError: (error) => {
+          console.error('Erro ao atualizar serviço:', error);
         }
       });
     } else {
       createServico.mutate(servicoData, {
         onSuccess: () => {
+          console.log('Serviço criado com sucesso');
           onSuccess();
+        },
+        onError: (error) => {
+          console.error('Erro ao criar serviço:', error);
         }
       });
     }

@@ -38,6 +38,8 @@ export const useServicosManager = (empresaId?: string) => {
   return useQuery({
     queryKey: ['servicos', empresaId],
     queryFn: async () => {
+      console.log('Buscando serviços...', { empresaId });
+      
       if (!empresaId) {
         const { data, error } = await supabase
           .from('servicos')
@@ -45,7 +47,12 @@ export const useServicosManager = (empresaId?: string) => {
           .eq('ativo', true)
           .order('nome');
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao buscar serviços:', error);
+          throw error;
+        }
+        
+        console.log('Serviços encontrados:', data);
         return data as Servico[];
       }
       
@@ -56,7 +63,12 @@ export const useServicosManager = (empresaId?: string) => {
         .eq('ativo', true)
         .order('nome');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar serviços da empresa:', error);
+        throw error;
+      }
+      
+      console.log('Serviços da empresa encontrados:', data);
       return data as Servico[];
     },
   });
@@ -67,13 +79,20 @@ export const useCreateServicoManager = () => {
   
   return useMutation({
     mutationFn: async (servicoData: Omit<Servico, 'id' | 'created_at' | 'updated_at'>) => {
+      console.log('Criando serviço com dados:', servicoData);
+      
       const { data, error } = await supabase
         .from('servicos')
         .insert([servicoData])
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao criar serviço:', error);
+        throw error;
+      }
+      
+      console.log('Serviço criado com sucesso:', data);
       return data;
     },
     onSuccess: () => {
@@ -99,6 +118,8 @@ export const useUpdateServicoManager = () => {
   
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Servico> }) => {
+      console.log('Atualizando serviço:', id, 'com dados:', updates);
+      
       const { data, error } = await supabase
         .from('servicos')
         .update(updates)
@@ -106,7 +127,12 @@ export const useUpdateServicoManager = () => {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao atualizar serviço:', error);
+        throw error;
+      }
+      
+      console.log('Serviço atualizado com sucesso:', data);
       return data;
     },
     onSuccess: () => {
