@@ -91,6 +91,8 @@ export function ServicoFormDialog({
 
   const handleSubmit = () => {
     console.log('Dados do formulário antes da validação:', formData);
+    console.log('Código NBS selecionado:', formData.codigo_tributacao_nacional);
+    console.log('Item NBS:', formData.item_nbs);
     
     if (!formData.empresa_id || !formData.codigo || !formData.nome || !formData.preco_unitario) {
       toast({
@@ -113,10 +115,13 @@ export function ServicoFormDialog({
       percentual_tributos_federais: formData.percentual_tributos_federais ? parseFloat(formData.percentual_tributos_federais) : 0,
       percentual_tributos_estaduais: formData.percentual_tributos_estaduais ? parseFloat(formData.percentual_tributos_estaduais) : 0,
       percentual_tributos_municipais: formData.percentual_tributos_municipais ? parseFloat(formData.percentual_tributos_municipais) : 0,
+      // Garantir que os campos NBS sejam salvos
+      codigo_tributacao_nacional: formData.codigo_tributacao_nacional || null,
+      item_nbs: formData.item_nbs || null,
       ativo: true
     };
 
-    console.log('Dados do serviço processados para salvar:', servicoData);
+    console.log('Dados do serviço processados para salvar (incluindo NBS):', servicoData);
 
     if (isEdit && editingServico) {
       updateServico.mutate({

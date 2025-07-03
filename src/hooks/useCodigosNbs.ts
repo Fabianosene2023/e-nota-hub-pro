@@ -64,28 +64,20 @@ const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '7.03', descricao: 'Elaboração de planos diretores, estudos de viabilidade, estudos organizacionais e outros, relacionados com obras e serviços de engenharia; elaboração de anteprojetos, projetos básicos e projetos executivos para trabalhos de engenharia' },
   { codigo: '7.04', descricao: 'Demolição' },
   { codigo: '7.05', descricao: 'Reparação, conservação e reforma de edifícios, estradas, pontes, portos e congêneres (exceto o fornecimento de mercadorias produzidas pelo prestador dos serviços, fora do local da prestação dos serviços, que fica sujeito ao ICMS)' },
-  { codigo: '7.06', descricao: 'Colocação e instalação de tapetes, carpetes, assoalhos, cortinas, revestimentos de parede, vidros, divisórias, placas de gesso e congêneres, com material fornecido pelo tomador do serviço' },
-  { codigo: '7.07', descricao: 'Recuperação, raspagem, polimento e lustração de pisos e congêneres' },
-  { codigo: '7.08', descricao: 'Calafetação' },
-  { codigo: '7.09', descricao: 'Varrição, coleta, remoção, incineração, tratamento, reciclagem, separação e destinação final de lixo, rejeitos e outros resíduos quaisquer' },
-  { codigo: '7.10', descricao: 'Limpeza, manutenção e conservação de vias e logradouros públicos, imóveis, chaminés, piscinas, parques, jardins e congêneres' },
-  { codigo: '7.11', descricao: 'Decoração e jardinagem, inclusive corte e poda de árvores' },
-  { codigo: '7.12', descricao: 'Controle e tratamento de efluentes de qualquer natureza e de agentes físicos, químicos e biológicos' },
-  { codigo: '7.13', descricao: 'Dedetização, desinfecção, desinsetização, imunização, higienização, desratização, pulverização e congêneres' },
-  { codigo: '7.16', descricao: 'Florestamento, reflorestamento, semeadura, adubação e congêneres' },
-  { codigo: '7.17', descricao: 'Escoramento, contenção de encostas e serviços congêneres' },
-  { codigo: '7.18', descricao: 'Limpeza e dragagem de rios, portos, canais, baías, lagos, lagoas, represas, açudes e congêneres' },
-  { codigo: '7.19', descricao: 'Acompanhamento e fiscalização da execução de obras de engenharia, arquitetura e urbanismo' },
-  { codigo: '7.20', descricao: 'Aerofotogrametria (inclusive interpretação), cartografia, mapeamento, levantamentos topográficos, batimétricos, geográficos, geodésicos, geológicos, geofísicos e congêneres' },
-  { codigo: '7.21', descricao: 'Pesquisa, perfuração, cimentação, mergulho, perfilagem, concretação, testemunhagem, pescaria, estimulação e outros serviços relacionados com a exploração e explotação de petróleo, gás natural e de outros recursos minerais' },
-  { codigo: '7.22', descricao: 'Nucleação e bombardeamento de nuvens e congêneres' },
   { codigo: '8.01', descricao: 'Ensino regular pré-escolar, fundamental, médio e superior' },
   { codigo: '8.02', descricao: 'Instrução, treinamento, orientação pedagógica e educacional, avaliação de conhecimentos de qualquer natureza' }
 ];
 
 export const useCodigosNbs = () => {
-  const [codigosNbs] = useState<CodigoNbs[]>(CODIGOS_NBS);
-  const [loading, setLoading] = useState(false);
+  const [codigosNbs, setCodigosNbs] = useState<CodigoNbs[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    console.log('Carregando códigos NBS...');
+    setCodigosNbs(CODIGOS_NBS);
+    setLoading(false);
+    console.log('Códigos NBS carregados:', CODIGOS_NBS.length);
+  }, []);
 
   const buscarCodigoPorDescricao = (termo: string): CodigoNbs[] => {
     if (!termo) return codigosNbs;

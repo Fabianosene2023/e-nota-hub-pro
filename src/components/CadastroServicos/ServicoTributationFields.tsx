@@ -20,7 +20,20 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
   const [openCodigoNbs, setOpenCodigoNbs] = useState(false);
   const { codigosNbs } = useCodigosNbs();
 
+  console.log('Códigos NBS disponíveis:', codigosNbs.length);
+  console.log('Código atual selecionado:', formData.codigo_tributacao_nacional);
+
   const selectedCodigo = codigosNbs.find((codigo) => codigo.codigo === formData.codigo_tributacao_nacional);
+
+  const handleCodigoSelect = (codigo: any) => {
+    console.log('Selecionando código NBS:', codigo);
+    setFormData({
+      ...formData, 
+      codigo_tributacao_nacional: codigo.codigo, 
+      item_nbs: codigo.descricao
+    });
+    setOpenCodigoNbs(false);
+  };
 
   return (
     <div className="space-y-4">
@@ -42,42 +55,33 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full p-0" align="start">
-            <Command>
-              <CommandInput placeholder="Buscar código NBS..." />
+          <PopoverContent className="w-[600px] p-0" align="start">
+            <Command className="w-full">
+              <CommandInput placeholder="Buscar código NBS..." className="h-9" />
               <CommandEmpty>Nenhum código encontrado.</CommandEmpty>
-              <CommandGroup>
-                <ScrollArea className="h-[300px]">
-                  <CommandList>
-                    {codigosNbs.map((codigo) => (
-                      <CommandItem
-                        key={codigo.codigo}
-                        value={`${codigo.codigo} - ${codigo.descricao}`}
-                        onSelect={() => {
-                          setFormData({
-                            ...formData, 
-                            codigo_tributacao_nacional: codigo.codigo, 
-                            item_nbs: codigo.descricao
-                          });
-                          setOpenCodigoNbs(false);
-                        }}
-                        className="cursor-pointer"
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            formData.codigo_tributacao_nacional === codigo.codigo ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        <div className="flex flex-col w-full">
-                          <span className="font-medium">{codigo.codigo}</span>
-                          <span className="text-sm text-muted-foreground">{codigo.descricao}</span>
-                        </div>
-                      </CommandItem>
-                    ))}
-                  </CommandList>
-                </ScrollArea>
-              </CommandGroup>
+              <CommandList className="max-h-[300px] overflow-y-auto">
+                <CommandGroup>
+                  {codigosNbs.map((codigo) => (
+                    <CommandItem
+                      key={codigo.codigo}
+                      value={`${codigo.codigo} ${codigo.descricao}`}
+                      onSelect={() => handleCodigoSelect(codigo)}
+                      className="cursor-pointer"
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          formData.codigo_tributacao_nacional === codigo.codigo ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      <div className="flex flex-col w-full">
+                        <span className="font-medium">{codigo.codigo}</span>
+                        <span className="text-sm text-muted-foreground truncate">{codigo.descricao}</span>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
             </Command>
           </PopoverContent>
         </Popover>
@@ -91,6 +95,7 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
           value={formData.item_nbs || ""}
           onChange={(e) => setFormData({...formData, item_nbs: e.target.value})}
           readOnly
+          className="bg-gray-50"
         />
       </div>
 
