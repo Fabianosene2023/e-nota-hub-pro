@@ -38,7 +38,9 @@ export function Empresas() {
     estado: "",
     cep: "",
     telefone: "",
-    email: ""
+    email: "",
+    municipio_codigo: "",
+    municipio_nome: ""
   });
 
   const { data: empresas = [], isLoading } = useEmpresasManager();
@@ -64,7 +66,9 @@ export function Empresas() {
       estado: "",
       cep: "",
       telefone: "",
-      email: ""
+      email: "",
+      municipio_codigo: "",
+      municipio_nome: ""
     });
   };
 
@@ -99,7 +103,9 @@ export function Empresas() {
       estado: empresa.estado || "",
       cep: empresa.cep || "",
       telefone: empresa.telefone || "",
-      email: empresa.email || ""
+      email: empresa.email || "",
+      municipio_codigo: empresa.municipio_codigo || "",
+      municipio_nome: empresa.municipio_nome || ""
     });
     setIsEditDialogOpen(true);
   };
@@ -273,6 +279,26 @@ export function Empresas() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
+                  <Label htmlFor="municipio_nome">Município</Label>
+                  <Input 
+                    id="municipio_nome" 
+                    placeholder="Nome do município"
+                    value={formData.municipio_nome}
+                    onChange={(e) => setFormData({...formData, municipio_nome: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="municipio_codigo">Código IBGE</Label>
+                  <Input 
+                    id="municipio_codigo" 
+                    placeholder="Código IBGE do município"
+                    value={formData.municipio_codigo}
+                    onChange={(e) => setFormData({...formData, municipio_codigo: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
                   <Label htmlFor="email">E-mail</Label>
                   <Input 
                     id="email" 
@@ -359,6 +385,99 @@ export function Empresas() {
                   value={formData.inscricao_estadual}
                   onChange={(e) => setFormData({...formData, inscricao_estadual: e.target.value})}
                 />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="editEndereco">Endereço *</Label>
+                <Input 
+                  id="editEndereco" 
+                  placeholder="Rua, número, bairro"
+                  value={formData.endereco}
+                  onChange={(e) => setFormData({...formData, endereco: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editCidade">Cidade *</Label>
+                <Input 
+                  id="editCidade" 
+                  placeholder="Nome da cidade"
+                  value={formData.cidade}
+                  onChange={(e) => setFormData({...formData, cidade: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="editEstado">Estado *</Label>
+                <Input 
+                  id="editEstado" 
+                  placeholder="UF"
+                  value={formData.estado}
+                  onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editCep">CEP *</Label>
+                <Input 
+                  id="editCep" 
+                  placeholder="00000-000"
+                  value={formData.cep}
+                  onChange={(e) => setFormData({...formData, cep: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editTelefone">Telefone</Label>
+                <Input 
+                  id="editTelefone" 
+                  placeholder="(00) 00000-0000"
+                  value={formData.telefone}
+                  onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="editMunicipioNome">Município</Label>
+                <Input 
+                  id="editMunicipioNome" 
+                  placeholder="Nome do município"
+                  value={formData.municipio_nome}
+                  onChange={(e) => setFormData({...formData, municipio_nome: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editMunicipioCodigo">Código IBGE</Label>
+                <Input 
+                  id="editMunicipioCodigo" 
+                  placeholder="Código IBGE do município"
+                  value={formData.municipio_codigo}
+                  onChange={(e) => setFormData({...formData, municipio_codigo: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="editEmail">E-mail</Label>
+                <Input 
+                  id="editEmail" 
+                  placeholder="empresa@exemplo.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editRegime">Regime Tributário</Label>
+                <Select value={formData.regime_tributario} onValueChange={(value) => setFormData({...formData, regime_tributario: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o regime tributário" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="simples_nacional">Simples Nacional</SelectItem>
+                    <SelectItem value="lucro_presumido">Lucro Presumido</SelectItem>
+                    <SelectItem value="lucro_real">Lucro Real</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
