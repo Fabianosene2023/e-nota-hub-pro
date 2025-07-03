@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -25,6 +24,14 @@ interface Servico {
   numero_documento_responsabilidade_tecnica?: string;
   documento_referencia?: string;
   informacoes_complementares?: string;
+  valor_servico_prestado?: number;
+  opcao_tributos?: number;
+  valor_tributos_federais?: number;
+  valor_tributos_estaduais?: number;
+  valor_tributos_municipais?: number;
+  percentual_tributos_federais?: number;
+  percentual_tributos_estaduais?: number;
+  percentual_tributos_municipais?: number;
 }
 
 export const useServicosManager = (empresaId?: string) => {
