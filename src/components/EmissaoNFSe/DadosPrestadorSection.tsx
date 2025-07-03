@@ -97,6 +97,7 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
                       <span className="text-sm text-muted-foreground">
                         CNPJ: {empresa.cnpj}
                         {empresa.inscricao_municipal && ` - IM: ${empresa.inscricao_municipal}`}
+                        {empresa.municipio_nome && ` - ${empresa.municipio_nome}`}
                       </span>
                     </div>
                   </SelectItem>
@@ -139,6 +140,15 @@ export const DadosPrestadorSection = ({ prestadorId, setPrestadorId }: DadosPres
                   <span className="font-medium">Regime Tributário:</span>
                   <p className="text-muted-foreground capitalize">{selectedEmpresa.regime_tributario?.replace('_', ' ')}</p>
                 </div>
+                {(selectedEmpresa.municipio_nome || selectedEmpresa.municipio_codigo) && (
+                  <div>
+                    <span className="font-medium">Município:</span>
+                    <p className="text-muted-foreground">
+                      {selectedEmpresa.municipio_nome}
+                      {selectedEmpresa.municipio_codigo && ` (${selectedEmpresa.municipio_codigo})`}
+                    </p>
+                  </div>
+                )}
                 <div className="col-span-full">
                   <span className="font-medium">Endereço Completo:</span>
                   <p className="text-muted-foreground">

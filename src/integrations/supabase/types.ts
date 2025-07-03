@@ -606,6 +606,8 @@ export type Database = {
           id: string
           inscricao_estadual: string | null
           inscricao_municipal: string | null
+          municipio_codigo: string | null
+          municipio_nome: string | null
           nome_fantasia: string | null
           proximo_numero_nfce: number | null
           proximo_numero_nfe: number | null
@@ -629,6 +631,8 @@ export type Database = {
           id?: string
           inscricao_estadual?: string | null
           inscricao_municipal?: string | null
+          municipio_codigo?: string | null
+          municipio_nome?: string | null
           nome_fantasia?: string | null
           proximo_numero_nfce?: number | null
           proximo_numero_nfe?: number | null
@@ -652,6 +656,8 @@ export type Database = {
           id?: string
           inscricao_estadual?: string | null
           inscricao_municipal?: string | null
+          municipio_codigo?: string | null
+          municipio_nome?: string | null
           nome_fantasia?: string | null
           proximo_numero_nfce?: number | null
           proximo_numero_nfe?: number | null

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useEmpresas, useEmpresaById } from '@/hooks/useEmpresas';
 import { useUpdateEmpresaManager } from '@/hooks/useEmpresasManager';
@@ -30,7 +29,9 @@ export const ConfiguracoesEmpresa = () => {
     telefone: '',
     email: '',
     regime_tributario: 'simples_nacional',
-    ambiente_sefaz: 'homologacao'
+    ambiente_sefaz: 'homologacao',
+    municipio_codigo: '',
+    municipio_nome: ''
   });
 
   // Atualizar form quando empresa carregar
@@ -49,7 +50,9 @@ export const ConfiguracoesEmpresa = () => {
         telefone: empresa.telefone || '',
         email: empresa.email || '',
         regime_tributario: empresa.regime_tributario || 'simples_nacional',
-        ambiente_sefaz: empresa.ambiente_sefaz || 'homologacao'
+        ambiente_sefaz: empresa.ambiente_sefaz || 'homologacao',
+        municipio_codigo: empresa.municipio_codigo || '',
+        municipio_nome: empresa.municipio_nome || ''
       });
     }
   }, [empresa]);
@@ -252,6 +255,30 @@ export const ConfiguracoesEmpresa = () => {
                     onChange={(e) => handleInputChange('cep', e.target.value)}
                     placeholder="00000-000"
                     required
+                    disabled={loadingEmpresa}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="municipio_nome">Nome do Município</Label>
+                  <Input
+                    id="municipio_nome"
+                    value={formData.municipio_nome}
+                    onChange={(e) => handleInputChange('municipio_nome', e.target.value)}
+                    placeholder="Ex: São Paulo"
+                    disabled={loadingEmpresa}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="municipio_codigo">Código IBGE do Município</Label>
+                  <Input
+                    id="municipio_codigo"
+                    value={formData.municipio_codigo}
+                    onChange={(e) => handleInputChange('municipio_codigo', e.target.value)}
+                    placeholder="Ex: 3550308"
                     disabled={loadingEmpresa}
                   />
                 </div>
