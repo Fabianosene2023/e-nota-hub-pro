@@ -113,8 +113,8 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[600px] p-0 z-50 bg-white" align="start" side="bottom">
-            <Command shouldFilter={false}>
+          <PopoverContent className="w-[600px] p-0 z-50 bg-white border border-gray-300 shadow-lg" align="start" side="bottom">
+            <Command shouldFilter={false} className="max-h-[400px]">
               <CommandInput 
                 placeholder="Buscar código NBS..." 
                 className="h-9"
