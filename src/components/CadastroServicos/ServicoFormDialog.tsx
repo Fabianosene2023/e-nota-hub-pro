@@ -28,7 +28,11 @@ export function ServicoFormDialog({
 }: ServicoFormDialogProps) {
   const [formData, setFormData] = useState(() => {
     if (isEdit && editingServico) {
-      console.log('Carregando dados do serviço para edição:', editingServico);
+      console.log('=== Carregando dados do serviço para edição ===');
+      console.log('Serviço completo:', editingServico);
+      console.log('Código NBS:', editingServico.codigo_tributacao_nacional);
+      console.log('Item NBS:', editingServico.item_nbs);
+      
       return {
         empresa_id: editingServico.empresa_id || "",
         codigo: editingServico.codigo || "",
@@ -57,6 +61,8 @@ export function ServicoFormDialog({
         percentual_tributos_municipais: editingServico.percentual_tributos_municipais?.toString() || ""
       };
     }
+    
+    console.log('=== Inicializando novo serviço ===');
     return {
       empresa_id: "",
       codigo: "",
@@ -92,27 +98,28 @@ export function ServicoFormDialog({
   const handleSubmit = () => {
     console.log('=== INÍCIO DO SUBMIT ===');
     console.log('Dados completos do formulário:', formData);
-    console.log('Código NBS selecionado:', formData.codigo_tributacao_nacional);
-    console.log('Item NBS:', formData.item_nbs);
+    console.log('NBS - Código:', formData.codigo_tributacao_nacional);
+    console.log('NBS - Item:', formData.item_nbs);
     
     // Validação básica
     if (!formData.empresa_id || !formData.codigo || !formData.nome || !formData.preco_unitario) {
-      console.log('Erro de validação - campos obrigatórios:', {
-        empresa_id: formData.empresa_id,
-        codigo: formData.codigo,
-        nome: formData.nome,
-        preco_unitario: formData.preco_unitario
+      console.log('=== ERRO DE VALIDAÇÃO ===');
+      console.log('Campos obrigatórios faltando:', {
+        empresa_id: !!formData.empresa_id,
+        codigo: !!formData.codigo,
+        nome: !!formData.nome,
+        preco_unitario: !!formData.preco_unitario
       });
       
       toast({
         title: "Erro",
-        description: "Preencha todos os campos obrigatórios",
+        description: "Preencha todos os campos obrigatórios: Empresa, Código, Nome e Preço Unitário",
         variant: "destructive",
       });
       return;
     }
 
-    // Preparar dados para salvar
+    // Preparar dados para salvar - garantindo que os campos NBS sejam preservados
     const servicoData = {
       ...formData,
       preco_unitario: parseFloat(formData.preco_unitario) || 0,
@@ -125,26 +132,30 @@ export function ServicoFormDialog({
       percentual_tributos_federais: formData.percentual_tributos_federais ? parseFloat(formData.percentual_tributos_federais) : 0,
       percentual_tributos_estaduais: formData.percentual_tributos_estaduais ? parseFloat(formData.percentual_tributos_estaduais) : 0,
       percentual_tributos_municipais: formData.percentual_tributos_municipais ? parseFloat(formData.percentual_tributos_municipais) : 0,
-      // Garantir que os campos NBS sejam enviados corretamente
+      // Campos NBS - garantir que sejam enviados corretamente
       codigo_tributacao_nacional: formData.codigo_tributacao_nacional || null,
       item_nbs: formData.item_nbs || null,
       ativo: true
     };
 
-    console.log('Dados processados para salvar:', servicoData);
+    console.log('=== DADOS PROCESSADOS PARA SALVAR ===');
+    console.log('Dados completos:', servicoData);
     console.log('Campos NBS específicos:', {
       codigo_tributacao_nacional: servicoData.codigo_tributacao_nacional,
       item_nbs: servicoData.item_nbs
     });
 
     if (isEdit && editingServico) {
-      console.log('Executando UPDATE do serviço ID:', editingServico.id);
+      console.log('=== EXECUTANDO UPDATE ===');
+      console.log('ID do serviço:', editingServico.id);
+      
       updateServico.mutate({
         id: editingServico.id,
         updates: servicoData
       }, {
         onSuccess: (data) => {
-          console.log('Serviço atualizado com sucesso:', data);
+          console.log('=== UPDATE SUCESSO ===');
+          console.log('Dados retornados:', data);
           toast({
             title: "Sucesso!",
             description: "Serviço atualizado com sucesso",
@@ -152,19 +163,22 @@ export function ServicoFormDialog({
           onSuccess();
         },
         onError: (error) => {
-          console.error('Erro ao atualizar serviço:', error);
+          console.error('=== ERRO NO UPDATE ===');
+          console.error('Erro completo:', error);
           toast({
             title: "Erro",
-            description: "Erro ao atualizar serviço",
+            description: "Erro ao atualizar serviço. Verifique os dados e tente novamente.",
             variant: "destructive",
           });
         }
       });
     } else {
-      console.log('Executando CREATE do serviço');
+      console.log('=== EXECUTANDO CREATE ===');
+      
       createServico.mutate(servicoData, {
         onSuccess: (data) => {
-          console.log('Serviço criado com sucesso:', data);
+          console.log('=== CREATE SUCESSO ===');
+          console.log('Dados retornados:', data);
           toast({
             title: "Sucesso!",
             description: "Serviço criado com sucesso",
@@ -172,10 +186,11 @@ export function ServicoFormDialog({
           onSuccess();
         },
         onError: (error) => {
-          console.error('Erro ao criar serviço:', error);
+          console.error('=== ERRO NO CREATE ===');
+          console.error('Erro completo:', error);
           toast({
             title: "Erro",
-            description: "Erro ao criar serviço",
+            description: "Erro ao criar serviço. Verifique os dados e tente novamente.",
             variant: "destructive",
           });
         }

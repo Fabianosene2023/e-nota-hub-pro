@@ -6,17 +6,17 @@ export interface CodigoNbs {
   descricao: string;
 }
 
-// Lista expandida e corrigida de códigos NBS
+// Lista completa e atualizada de códigos NBS
 const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '1.01', descricao: 'Análise e desenvolvimento de sistemas' },
   { codigo: '1.02', descricao: 'Programação' },
   { codigo: '1.03', descricao: 'Processamento de dados e congêneres' },
-  { codigo: '1.04', descricao: 'Elaboração de programas de computadores' },
+  { codigo: '1.04', descricao: 'Elaboração de programas de computadores, inclusive de jogos eletrônicos' },
   { codigo: '1.05', descricao: 'Licenciamento ou cessão de direito de uso de programas de computação' },
   { codigo: '1.06', descricao: 'Assessoria e consultoria em informática' },
   { codigo: '1.07', descricao: 'Suporte técnico em informática, inclusive instalação, configuração e manutenção de programas de computação e bancos de dados' },
   { codigo: '1.08', descricao: 'Planejamento, confecção, manutenção e atualização de páginas eletrônicas' },
-  { codigo: '1.09', descricao: 'Disponibilização, sem cessão definitiva, de conteúdos de áudio, vídeo, imagem e texto por meio da internet, respeitada a imunidade de livros, jornais e periódicos (exceto a distribuição de conteúdos pelas prestadoras de Serviço de Acesso Condicionado, de que trata a Lei no 12.485, de 12 de setembro de 2011, sujeita ao ICMS)' },
+  { codigo: '1.09', descricao: 'Disponibilização, sem cessão definitiva, de conteúdos de áudio, vídeo, imagem e texto por meio da internet' },
   { codigo: '2.01', descricao: 'Serviços de pesquisas e desenvolvimento de qualquer natureza' },
   { codigo: '3.01', descricao: 'Cessão de direito de uso de programa de computação' },
   { codigo: '3.02', descricao: 'Cessão de direito de uso de marcas e de sinais de propaganda' },
@@ -65,6 +65,14 @@ const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '7.03', descricao: 'Elaboração de planos diretores, estudos de viabilidade, estudos organizacionais e outros, relacionados com obras e serviços de engenharia' },
   { codigo: '7.04', descricao: 'Demolição' },
   { codigo: '7.05', descricao: 'Reparação, conservação e reforma de edifícios, estradas, pontes, portos e congêneres' },
+  { codigo: '7.06', descricao: 'Limpeza e dragagem de rios, portos, canais, baías, lagos, lagoas, represas, açudes e congêneres' },
+  { codigo: '7.07', descricao: 'Florestamento, reflorestamento, semeadura, adubação e congêneres' },
+  { codigo: '7.08', descricao: 'Escoramento, contenção de encostas e congêneres' },
+  { codigo: '7.09', descricao: 'Paisagismo, jardinagem e decoração' },
+  { codigo: '7.10', descricao: 'Iluminação em bens públicos' },
+  { codigo: '7.11', descricao: 'Vigilância e segurança' },
+  { codigo: '7.12', descricao: 'Limpeza, manutenção e conservação de vias e logradouros públicos' },
+  { codigo: '7.13', descricao: 'Varrição, coleta, remoção, incineração, tratamento, reciclagem, separação e destinação final de lixo, rejeitos e outros resíduos quaisquer' },
   { codigo: '8.01', descricao: 'Ensino regular pré-escolar, fundamental, médio e superior' },
   { codigo: '8.02', descricao: 'Instrução, treinamento, orientação pedagógica e educacional, avaliação de conhecimentos de qualquer natureza' },
   { codigo: '9.01', descricao: 'Hospedagem de qualquer natureza em hotéis, apart-service condominiais, flat, apart-hotéis, hotéis residência, residence-service, suite service, hotelaria marítima, motéis, pensões e congêneres' },
@@ -79,7 +87,11 @@ const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '10.07', descricao: 'Agenciamento de notícias' },
   { codigo: '10.08', descricao: 'Agenciamento de publicidade e propaganda, inclusive o agenciamento de veiculação por qualquer meio' },
   { codigo: '10.09', descricao: 'Representação de qualquer natureza, inclusive comercial' },
-  { codigo: '10.10', descricao: 'Distribuição de bens de terceiros' }
+  { codigo: '10.10', descricao: 'Distribuição de bens de terceiros' },
+  { codigo: '11.01', descricao: 'Guarda e estacionamento de veículos terrestres automotores, de aeronaves e de embarcações' },
+  { codigo: '11.02', descricao: 'Vigilância, segurança ou monitoramento de bens e pessoas' },
+  { codigo: '11.03', descricao: 'Escolta, inclusive de veículos e cargas' },
+  { codigo: '11.04', descricao: 'Armazenamento, depósito, carga, descarga, arrumação e guarda de bens de qualquer espécie' }
 ];
 
 export const useCodigosNbs = () => {
@@ -87,6 +99,7 @@ export const useCodigosNbs = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('=== useCodigosNbs Hook ===');
     console.log('Iniciando carregamento dos códigos NBS...');
     
     // Simular um pequeno delay para mostrar o loading
@@ -100,17 +113,32 @@ export const useCodigosNbs = () => {
   }, []);
 
   const buscarCodigoPorDescricao = (termo: string): CodigoNbs[] => {
-    if (!termo) return codigosNbs;
+    console.log('=== Busca NBS ===');
+    console.log('Termo de busca:', termo);
     
-    const termoLower = termo.toLowerCase();
-    return codigosNbs.filter(codigo => 
-      codigo.descricao.toLowerCase().includes(termoLower) ||
-      codigo.codigo.includes(termo)
-    );
+    if (!termo || termo.trim() === '') {
+      console.log('Retornando todos os códigos (termo vazio)');
+      return codigosNbs;
+    }
+    
+    const termoLower = termo.toLowerCase().trim();
+    const resultados = codigosNbs.filter(codigo => {
+      const codigoMatch = codigo.codigo.toLowerCase().includes(termoLower);
+      const descricaoMatch = codigo.descricao.toLowerCase().includes(termoLower);
+      return codigoMatch || descricaoMatch;
+    });
+    
+    console.log('Resultados encontrados:', resultados.length);
+    console.log('Primeiros 3 resultados:', resultados.slice(0, 3));
+    
+    return resultados;
   };
 
   const buscarCodigoPorCodigo = (codigo: string): CodigoNbs | undefined => {
-    return codigosNbs.find(item => item.codigo === codigo);
+    console.log('Buscando código específico:', codigo);
+    const resultado = codigosNbs.find(item => item.codigo === codigo);
+    console.log('Código encontrado:', resultado);
+    return resultado;
   };
 
   return {

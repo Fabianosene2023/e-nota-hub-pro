@@ -17,16 +17,26 @@ interface ServicoTributationFieldsProps {
 
 export function ServicoTributationFields({ formData, setFormData }: ServicoTributationFieldsProps) {
   const [openCodigoNbs, setOpenCodigoNbs] = useState(false);
-  const { codigosNbs, loading } = useCodigosNbs();
+  const [searchTerm, setSearchTerm] = useState("");
+  const { codigosNbs, loading, buscarCodigoPorDescricao } = useCodigosNbs();
 
+  console.log('=== NBS Component Debug ===');
   console.log('Códigos NBS carregados:', codigosNbs?.length || 0);
   console.log('Loading state:', loading);
+  console.log('Search term:', searchTerm);
   console.log('Código selecionado atual:', formData.codigo_tributacao_nacional);
+  console.log('Item NBS atual:', formData.item_nbs);
+
+  // Filtrar códigos com base no termo de busca
+  const codigosFiltrados = searchTerm ? buscarCodigoPorDescricao(searchTerm) : codigosNbs;
+  console.log('Códigos filtrados:', codigosFiltrados?.length || 0);
 
   const selectedCodigo = codigosNbs?.find((codigo) => codigo.codigo === formData.codigo_tributacao_nacional);
+  console.log('Código selecionado encontrado:', selectedCodigo);
 
   const handleCodigoSelect = (codigo: any) => {
-    console.log('Selecionando código NBS:', codigo);
+    console.log('=== Selecionando código NBS ===');
+    console.log('Código selecionado:', codigo);
     
     setFormData({
       ...formData, 
@@ -35,11 +45,27 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
     });
     
     setOpenCodigoNbs(false);
-    console.log('Estado após seleção - Código:', codigo.codigo, 'Descrição:', codigo.descricao);
+    setSearchTerm(""); // Limpar busca após seleção
+    
+    console.log('Estado após seleção:', {
+      codigo: codigo.codigo,
+      descricao: codigo.descricao
+    });
+  };
+
+  const handleSearchChange = (value: string) => {
+    console.log('Termo de busca alterado:', value);
+    setSearchTerm(value);
   };
 
   if (loading) {
-    return <div>Carregando códigos NBS...</div>;
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-center py-4">
+          <div className="text-sm text-muted-foreground">Carregando códigos NBS...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -54,44 +80,58 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
               variant="outline" 
               role="combobox" 
               aria-expanded={openCodigoNbs}
-              className="w-full justify-between text-left"
+              className="w-full justify-between text-left font-normal"
               type="button"
             >
-              {selectedCodigo 
-                ? `${selectedCodigo.codigo} - ${selectedCodigo.descricao}`
-                : "Selecione o código NBS"
-              }
+              <span className="truncate">
+                {selectedCodigo 
+                  ? `${selectedCodigo.codigo} - ${selectedCodigo.descricao}`
+                  : "Selecione o código NBS"
+                }
+              </span>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[600px] p-0" align="start">
+          <PopoverContent className="w-[600px] p-0" align="start" side="bottom">
             <Command shouldFilter={false}>
               <CommandInput 
                 placeholder="Buscar código NBS..." 
                 className="h-9"
+                value={searchTerm}
+                onValueChange={handleSearchChange}
               />
-              <CommandEmpty>Nenhum código encontrado.</CommandEmpty>
-              <CommandList className="max-h-[200px] overflow-y-auto">
+              <CommandEmpty>
+                {searchTerm ? "Nenhum código encontrado para esta busca." : "Nenhum código encontrado."}
+              </CommandEmpty>
+              <CommandList className="max-h-[300px] overflow-y-auto">
                 <CommandGroup>
-                  {codigosNbs && codigosNbs.map((codigo) => (
-                    <CommandItem
-                      key={codigo.codigo}
-                      value={`${codigo.codigo} ${codigo.descricao}`}
-                      onSelect={() => handleCodigoSelect(codigo)}
-                      className="cursor-pointer flex items-start gap-2 p-2"
-                    >
-                      <Check
-                        className={cn(
-                          "mt-1 h-4 w-4 flex-shrink-0",
-                          formData.codigo_tributacao_nacional === codigo.codigo ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      <div className="flex flex-col w-full min-w-0">
-                        <span className="font-medium text-sm">{codigo.codigo}</span>
-                        <span className="text-xs text-muted-foreground break-words">{codigo.descricao}</span>
-                      </div>
-                    </CommandItem>
-                  ))}
+                  {codigosFiltrados && codigosFiltrados.length > 0 ? (
+                    codigosFiltrados.map((codigo) => (
+                      <CommandItem
+                        key={codigo.codigo}
+                        value={codigo.codigo}
+                        onSelect={() => handleCodigoSelect(codigo)}
+                        className="cursor-pointer flex items-start gap-2 p-3 hover:bg-accent"
+                      >
+                        <Check
+                          className={cn(
+                            "mt-1 h-4 w-4 flex-shrink-0",
+                            formData.codigo_tributacao_nacional === codigo.codigo ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <div className="flex flex-col w-full min-w-0">
+                          <span className="font-medium text-sm">{codigo.codigo}</span>
+                          <span className="text-xs text-muted-foreground break-words leading-relaxed">
+                            {codigo.descricao}
+                          </span>
+                        </div>
+                      </CommandItem>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      {searchTerm ? "Nenhum resultado encontrado" : "Carregando códigos..."}
+                    </div>
+                  )}
                 </CommandGroup>
               </CommandList>
             </Command>
@@ -103,7 +143,7 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
         <Label htmlFor="item_nbs">Item da NBS</Label>
         <Input 
           id="item_nbs" 
-          placeholder="Descrição do item NBS"
+          placeholder="Descrição do item NBS (preenchido automaticamente)"
           value={formData.item_nbs || ""}
           onChange={(e) => setFormData({...formData, item_nbs: e.target.value})}
           readOnly
