@@ -21,52 +21,72 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
   const { codigosNbs, loading, buscarCodigoPorDescricao, buscarCodigoPorCodigo } = useCodigosNbs();
 
   console.log('=== ServicoTributationFields Render ===');
-  console.log('FormData atual:', formData);
-  console.log('Código NBS no formData:', formData.codigo_tributacao_nacional);
-  console.log('Item NBS no formData:', formData.item_nbs);
-  console.log('Search term:', searchTerm);
-  console.log('Popover aberto:', openCodigoNbs);
+  console.log('FormData códigos NBS:', {
+    codigo_tributacao_nacional: formData.codigo_tributacao_nacional,
+    item_nbs: formData.item_nbs
+  });
+  console.log('Estado da busca:', {
+    searchTerm,
+    openCodigoNbs,
+    totalCodigos: codigosNbs.length
+  });
 
-  // Buscar códigos com base no termo de busca
-  const codigosFiltrados = searchTerm.trim() ? buscarCodigoPorDescricao(searchTerm) : [];
+  // Buscar códigos com base no termo de busca - só busca se tiver termo
+  const codigosFiltrados = searchTerm.trim().length >= 2 ? buscarCodigoPorDescricao(searchTerm) : [];
+  
+  console.log('=== Filtros e resultados ===');
+  console.log('Termo de busca atual:', searchTerm);
+  console.log('Comprimento do termo:', searchTerm.trim().length);
   console.log('Códigos filtrados:', codigosFiltrados.length);
-
+  
   // Obter informações do código selecionado
   const codigoSelecionado = formData.codigo_tributacao_nacional 
     ? buscarCodigoPorCodigo(formData.codigo_tributacao_nacional)
     : null;
 
-  console.log('Código selecionado:', codigoSelecionado);
+  console.log('Código selecionado no formData:', codigoSelecionado);
 
   const handleCodigoSelect = (codigo: any) => {
     console.log('=== Selecionando código NBS ===');
     console.log('Código selecionado:', codigo);
     
-    // Atualizar dados do formulário
+    // Atualizar dados do formulário com os novos valores
     const updatedFormData = {
       ...formData,
       codigo_tributacao_nacional: codigo.codigo,
       item_nbs: codigo.descricao
     };
     
-    console.log('Dados atualizados:', updatedFormData);
+    console.log('Dados atualizados para salvar:', {
+      codigo_tributacao_nacional: updatedFormData.codigo_tributacao_nacional,
+      item_nbs: updatedFormData.item_nbs
+    });
+    
     setFormData(updatedFormData);
     
     // Fechar popover e limpar busca
     setOpenCodigoNbs(false);
     setSearchTerm("");
+    
+    console.log('Seleção concluída - popover fechado');
   };
 
   const handleSearchChange = (value: string) => {
-    console.log('Termo de busca alterado para:', value);
+    console.log('=== Alteração no termo de busca ===');
+    console.log('Valor anterior:', searchTerm);
+    console.log('Novo valor:', value);
     setSearchTerm(value);
   };
 
   const handleOpenChange = (open: boolean) => {
-    console.log('Popover mudou para:', open);
+    console.log('=== Mudança no estado do popover ===');
+    console.log('Estado anterior:', openCodigoNbs);
+    console.log('Novo estado:', open);
+    
     setOpenCodigoNbs(open);
     
     if (!open) {
+      console.log('Popover fechado - limpando termo de busca');
       setSearchTerm("");
     }
   };
@@ -81,14 +101,24 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
     );
   }
 
-  // Texto para exibir no botão
+  // Texto para exibir no botão - melhorado
   const getDisplayText = () => {
     if (codigoSelecionado) {
-      return `${codigoSelecionado.codigo} - ${codigoSelecionado.descricao}`;
+      const descricaoTruncada = codigoSelecionado.descricao.length > 60 
+        ? codigoSelecionado.descricao.substring(0, 60) + '...' 
+        : codigoSelecionado.descricao;
+      return `${codigoSelecionado.codigo} - ${descricaoTruncada}`;
+    }
+    
+    if (formData.codigo_tributacao_nacional && formData.item_nbs) {
+      const descricaoTruncada = formData.item_nbs.length > 60 
+        ? formData.item_nbs.substring(0, 60) + '...' 
+        : formData.item_nbs;
+      return `${formData.codigo_tributacao_nacional} - ${descricaoTruncada}`;
     }
     
     if (formData.codigo_tributacao_nacional) {
-      return `${formData.codigo_tributacao_nacional} - ${formData.item_nbs || 'Descrição não encontrada'}`;
+      return `${formData.codigo_tributacao_nacional} - Descrição não encontrada`;
     }
     
     return "Selecione o código NBS";
@@ -106,29 +136,32 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
               variant="outline" 
               role="combobox" 
               aria-expanded={openCodigoNbs}
-              className="w-full justify-between text-left font-normal"
+              className="w-full justify-between text-left font-normal h-auto min-h-[40px] py-2"
               type="button"
             >
-              <span className="truncate">
+              <span className="truncate text-sm">
                 {getDisplayText()}
               </span>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[600px] p-0 z-50 bg-white border border-gray-300 shadow-lg" align="start" side="bottom">
+          <PopoverContent className="w-[700px] p-0 z-50" align="start" side="bottom">
             <Command shouldFilter={false} className="max-h-[400px]">
               <CommandInput 
-                placeholder="Buscar código NBS (ex: medicina, 1.01, consultoria)..." 
+                placeholder="Digite para buscar (mín. 2 caracteres): medicina, 1.01, consultoria..." 
                 className="h-9"
                 value={searchTerm}
                 onValueChange={handleSearchChange}
               />
               <CommandEmpty>
-                {searchTerm ? `Nenhum código encontrado para "${searchTerm}".` : "Digite para buscar códigos NBS."}
+                {searchTerm.length < 2 
+                  ? "Digite pelo menos 2 caracteres para buscar códigos NBS" 
+                  : `Nenhum código encontrado para "${searchTerm}".`
+                }
               </CommandEmpty>
               <CommandList className="max-h-[300px] overflow-y-auto">
                 <CommandGroup>
-                  {searchTerm && codigosFiltrados.length > 0 ? (
+                  {searchTerm.trim().length >= 2 && codigosFiltrados.length > 0 ? (
                     codigosFiltrados.map((codigo) => (
                       <CommandItem
                         key={codigo.codigo}
@@ -143,20 +176,24 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
                           )}
                         />
                         <div className="flex flex-col w-full min-w-0">
-                          <span className="font-medium text-sm">{codigo.codigo}</span>
+                          <span className="font-medium text-sm text-blue-600">{codigo.codigo}</span>
                           <span className="text-xs text-muted-foreground break-words leading-relaxed">
                             {codigo.descricao}
                           </span>
                         </div>
                       </CommandItem>
                     ))
-                  ) : searchTerm ? (
+                  ) : searchTerm.trim().length >= 2 ? (
                     <div className="p-4 text-center text-sm text-muted-foreground">
                       Nenhum resultado encontrado para "{searchTerm}"
                     </div>
                   ) : (
                     <div className="p-4 text-center text-sm text-muted-foreground">
-                      Digite para buscar códigos NBS (ex: medicina, 1.01, consultoria)
+                      <div className="space-y-2">
+                        <p className="font-medium">Digite para buscar códigos NBS</p>
+                        <p className="text-xs">Exemplos: medicina, 1.01, consultoria, engenharia</p>
+                        <p className="text-xs text-gray-400">({codigosNbs.length} códigos disponíveis)</p>
+                      </div>
                     </div>
                   )}
                 </CommandGroup>

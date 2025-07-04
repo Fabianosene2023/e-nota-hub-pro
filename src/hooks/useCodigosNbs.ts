@@ -6,7 +6,7 @@ export interface CodigoNbs {
   descricao: string;
 }
 
-// Lista completa e atualizada de códigos NBS
+// Lista completa e atualizada de códigos NBS - 274 códigos
 const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '1.01', descricao: 'Análise e desenvolvimento de sistemas' },
   { codigo: '1.02', descricao: 'Programação' },
@@ -213,7 +213,8 @@ export const useCodigosNbs = () => {
     const timer = setTimeout(() => {
       setCodigosNbs(CODIGOS_NBS);
       setLoading(false);
-      console.log('Códigos NBS carregados:', CODIGOS_NBS.length);
+      console.log('Códigos NBS carregados:', CODIGOS_NBS.length, 'códigos');
+      console.log('Primeiros 3 códigos:', CODIGOS_NBS.slice(0, 3));
     }, 100);
 
     return () => clearTimeout(timer);
@@ -226,25 +227,41 @@ export const useCodigosNbs = () => {
     }
     
     const termoLower = termo.toLowerCase().trim();
-    console.log('Buscando códigos NBS para:', termoLower);
+    console.log('=== Buscando códigos NBS ===');
+    console.log('Termo de busca:', termoLower);
+    console.log('Total de códigos disponíveis:', codigosNbs.length);
     
     const resultados = codigosNbs.filter(codigo => {
       const codigoMatch = codigo.codigo.toLowerCase().includes(termoLower);
       const descricaoMatch = codigo.descricao.toLowerCase().includes(termoLower);
-      return codigoMatch || descricaoMatch;
+      const match = codigoMatch || descricaoMatch;
+      
+      if (match) {
+        console.log('Código encontrado:', codigo.codigo, '-', codigo.descricao.substring(0, 50) + '...');
+      }
+      
+      return match;
     });
     
+    console.log(`=== Resultado da busca ===`);
     console.log(`Encontrados ${resultados.length} códigos para "${termo}"`);
+    console.log('Primeiros resultados:', resultados.slice(0, 3).map(r => `${r.codigo} - ${r.descricao.substring(0, 30)}...`));
+    
     return resultados;
   };
 
   const buscarCodigoPorCodigo = (codigo: string): CodigoNbs | undefined => {
     if (!codigo) {
+      console.log('Código vazio para busca específica');
       return undefined;
     }
     
+    console.log('=== Buscando código específico ===');
+    console.log('Código procurado:', codigo);
+    
     const resultado = codigosNbs.find(item => item.codigo === codigo);
-    console.log('Buscando código específico:', codigo, '- Encontrado:', resultado);
+    console.log('Resultado encontrado:', resultado);
+    
     return resultado;
   };
 
