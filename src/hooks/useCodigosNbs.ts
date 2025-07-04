@@ -113,7 +113,94 @@ const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '13.02', descricao: 'Decoração e jardinagem, inclusive corte e poda de árvores' },
   { codigo: '13.03', descricao: 'Elaboração de desenhos, projetos e cálculos para trabalhos de engenharia civil, hidráulica, elétrica, mecânica, telecomunicações e de outras modalidades' },
   { codigo: '13.04', descricao: 'Elaboração de planos diretores, estudos de viabilidade, estudos organizacionais e outros, relacionados com obras e serviços de engenharia' },
-  { codigo: '13.05', descricao: 'Elaboração de anteprojetos, projetos básicos e projetos executivos para trabalhos de engenharia' }
+  { codigo: '13.05', descricao: 'Elaboração de anteprojetos, projetos básicos e projetos executivos para trabalhos de engenharia' },
+  { codigo: '14.01', descricao: 'Lubrificação, limpeza, lustração e revisão de máquinas, veículos, aparelhos, equipamentos, motores, elevadores ou de qualquer objeto' },
+  { codigo: '14.02', descricao: 'Assistência técnica e extensão rural' },
+  { codigo: '14.03', descricao: 'Dedetização, desinfecção, desinsetização, imunização, higienização, desratização, pulverização e congêneres' },
+  { codigo: '14.04', descricao: 'Coleta, remessa ou entrega de correspondências, documentos, objetos, bens ou valores, inclusive pelos correios e suas agências franqueadas' },
+  { codigo: '14.05', descricao: 'Assistência técnica' },
+  { codigo: '14.06', descricao: 'Recondicionamento de motores' },
+  { codigo: '14.07', descricao: 'Recauchutagem ou regeneração de pneus' },
+  { codigo: '14.08', descricao: 'Restauração, recondicionamento, acondicionamento, pintura, beneficiamento, lavagem, secagem, tingimento, galvanoplastia, anodização, corte, recorte, polimento, plasticização e congêneres' },
+  { codigo: '14.09', descricao: 'Instalação e montagem de aparelhos, máquinas e equipamentos, inclusive montagem industrial, prestados ao usuário final, exclusivamente com material por ele fornecido' },
+  { codigo: '14.10', descricao: 'Florestamento, reflorestamento, semeadura, adubação, reparação de solo, plantio, silagem, colheita, corte e descascamento de árvores, silvicultura, exploração florestal e dos serviços congêneres indissociáveis da formação, manutenção e colheita de florestas, para quaisquer fins e por quaisquer meios' },
+  { codigo: '14.11', descricao: 'Escoramento, contenção de encostas e serviços congêneres' },
+  { codigo: '14.12', descricao: 'Limpeza e dragagem de rios e canais' },
+  { codigo: '14.13', descricao: 'Acompanhamento e fiscalização da execução de obras de engenharia, arquitetura e urbanismo' },
+  { codigo: '14.14', descricao: 'Guincho intramunicipal, guindaste e içamento' },
+  { codigo: '15.01', descricao: 'Administração de fundos quaisquer, de consórcio, de cartão de crédito ou débito e congêneres, de carteira de clientes, de cheques pré-datados e congêneres' },
+  { codigo: '15.02', descricao: 'Abertura de crédito, para quaisquer fins, inclusive para intermediação de pagamentos' },
+  { codigo: '15.03', descricao: 'Intermediação e congêneres de operações de câmbio, de seguros, de cartões de crédito, de planos de saúde e de planos de previdência privada' },
+  { codigo: '15.04', descricao: 'Corretagem de títulos em geral, valores mobiliários e contratos quaisquer' },
+  { codigo: '15.05', descricao: 'Desmaterialização de títulos e contratos para depósito ou registro em sistema eletrônico' },
+  { codigo: '15.06', descricao: 'Operações de factoring' },
+  { codigo: '15.07', descricao: 'Emissão, reemissão, alteração, cessão, substituição, cancelamento e registro de contratos de crédito; estudo, análise e avaliação de operações de crédito' },
+  { codigo: '15.08', descricao: 'Arrendamento mercantil (leasing) de quaisquer bens, inclusive cessão de direitos e obrigações, substituição de garantia, alteração, cancelamento e registro de contrato, e demais serviços relacionados ao arrendamento mercantil (leasing)' },
+  { codigo: '15.09', descricao: 'Serviços relacionados a cobranças, recebimentos ou pagamentos em geral, de títulos quaisquer, de contas ou carnês, de câmbio, de tributos e por conta de terceiros, inclusive os efetuados por meio eletrônico, automático ou por máquinas de atendimento' },
+  { codigo: '15.10', descricao: 'Serviços relacionados a depósitos bancários, levantamentos, pagamentos, saques, fornecimento de saldo, extrato e demais serviços relacionados à conta corrente' },
+  { codigo: '15.11', descricao: 'Fornecimento ou emissão de atestados, certidões e congêneres' },
+  { codigo: '15.12', descricao: 'Cadastro, elaboração de ficha cadastral, renovação cadastral e congêneres, inclusão ou exclusão no Cadastro de Proteção ao Crédito (SPC, SERASA e congêneres) e informações e consultas a bancos de dados de qualquer natureza' },
+  { codigo: '15.13', descricao: 'Fornecimento de caderneta de cheques, cartões magnéticos ou não, terminais eletrônicos, machine readable e congêneres' },
+  { codigo: '15.14', descricao: 'Transmissão, recepção e demais serviços de comunicação' },
+  { codigo: '15.15', descricao: 'Custódia em geral, inclusive de títulos e valores mobiliários' },
+  { codigo: '15.16', descricao: 'Envio de mensagens eletrônicas' },
+  { codigo: '15.17', descricao: 'Agenciamento, corretagem ou intermediação de contratos de arrendamento mercantil (leasing), de franquia (franchising) e de faturização (factoring)' },
+  { codigo: '15.18', descricao: 'Demais serviços relacionados à intermediação de negócios e valores mobiliários' },
+  { codigo: '16.01', descricao: 'Transporte municipal' },
+  { codigo: '17.01', descricao: 'Assessoria ou consultoria de qualquer natureza, não contida em outros itens desta lista, organização, programação, planejamento, assessoria, consultoria, supervisão, fiscalização, coordenação, execução ou estudos, inclusive de viabilidade econômico-financeira, relacionados a quaisquer atividades, negócios, planos, programas ou projetos' },
+  { codigo: '17.02', descricao: 'Datilografia, digitação, estenografia, expediente, secretaria em geral, resposta audível, redação, edição, interpretação, revisão, tradução, apoio e infraestrutura administrativa e congêneres' },
+  { codigo: '17.03', descricao: 'Planejamento, coordenação, programação ou organização técnica, financeira ou administrativa' },
+  { codigo: '17.04', descricao: 'Recrutamento, agenciamento, seleção e colocação de mão de obra' },
+  { codigo: '17.05', descricao: 'Fornecimento de mão de obra, mesmo em caráter temporário, inclusive de empregados ou trabalhadores, avulsos ou temporários, contratados pelo prestador de serviço' },
+  { codigo: '17.06', descricao: 'Propaganda e publicidade, inclusive promoção de vendas, planejamento de campanhas ou sistemas de publicidade, elaboração de desenhos, textos e demais materiais publicitários' },
+  { codigo: '17.07', descricao: 'Franquia (franchising)' },
+  { codigo: '17.08', descricao: 'Perícias, laudos, exames técnicos e análises técnicas' },
+  { codigo: '17.09', descricao: 'Controle de qualidade' },
+  { codigo: '17.10', descricao: 'Controle e tratamento de efluentes de qualquer natureza e de agentes poluentes, inclusive sonoros, visuais, atmosféricos e outros' },
+  { codigo: '17.11', descricao: 'Organização de festas e recepções; bufê (exceto o fornecimento de alimentação e bebidas, que fica sujeito ao ICMS)' },
+  { codigo: '17.12', descricao: 'Administração em geral, inclusive de bens e negócios de terceiros' },
+  { codigo: '17.13', descricao: 'Leilão e congêneres' },
+  { codigo: '17.14', descricao: 'Advocacia' },
+  { codigo: '17.15', descricao: 'Arbitragem de qualquer espécie, inclusive jurídica' },
+  { codigo: '17.16', descricao: 'Auditoria' },
+  { codigo: '17.17', descricao: 'Análise de organização e métodos' },
+  { codigo: '17.18', descricao: 'Atuária e cálculos técnicos de qualquer natureza' },
+  { codigo: '17.19', descricao: 'Contabilidade, inclusive serviços técnicos e auxiliares' },
+  { codigo: '17.20', descricao: 'Consultoria e assessoria econômica ou financeira' },
+  { codigo: '17.21', descricao: 'Estatística' },
+  { codigo: '17.22', descricao: 'Cobrança em geral' },
+  { codigo: '17.23', descricao: 'Assessoria, análise, avaliação, atestado, laudo e congêneres' },
+  { codigo: '17.24', descricao: 'Domicílio tributário' },
+  { codigo: '17.25', descricao: 'Regulação de sinistros vinculados a contratos de seguros; inspeção e avaliação de riscos para cobertura de contratos de seguros, prevenção e gerência de riscos seguráveis e congêneres' },
+  { codigo: '18.01', descricao: 'Serviços de regulação de sinistros de seguros, inspeção e avaliação de riscos seguráveis, prevenção e gerência de riscos seguráveis e congêneres' },
+  { codigo: '19.01', descricao: 'Serviços de distribuição e venda de bilhetes e demais produtos de loteria, bingos, cartões, pules ou cupons de apostas, sorteios, prêmios, inclusive os decorrentes de títulos de capitalização e congêneres' },
+  { codigo: '20.01', descricao: 'Serviços portuários, ferroportuários, utilização de porto, movimentação de passageiros, reboque de embarcações, rebocador escoteiro, atracação, desatracação, serviços de praticagem, capatazia, armazenagem de qualquer natureza, serviços acessórios, movimentação de mercadorias, serviços de apoio marítimo, de movimentação ao largo, serviços de armadores, estiva, conferência, logística e congêneres' },
+  { codigo: '20.02', descricao: 'Serviços aeroportuários, utilização de aeroporto, movimentação de passageiros, armazenagem de qualquer natureza, capatazia, movimentação de aeronaves, serviços de apoio aeroportuários, serviços acessórios, movimentação de mercadorias e congêneres' },
+  { codigo: '20.03', descricao: 'Serviços de terminais rodoviários, ferroviários, metroviários, movimentação de passageiros, mercadorias, serviços acessórios, movimentação de mercadorias, logística e congêneres' },
+  { codigo: '21.01', descricao: 'Registros públicos, cartorários e notariais' },
+  { codigo: '22.01', descricao: 'Serviços de exploração de rodovia' },
+  { codigo: '23.01', descricao: 'Serviços de programação e comunicação visual, desenho industrial e congêneres' },
+  { codigo: '24.01', descricao: 'Serviços de chaveiros, confecção de carimbos, placas, sinalização visual, banners, adesivos e congêneres' },
+  { codigo: '25.01', descricao: 'Funerais, inclusive fornecimento de caixão, urna ou esquifes; aluguel de capela; transporte do corpo cadavérico; fornecimento de flores, coroas e outros paramentos; desembaraço de certidão de óbito; fornecimento de véu, essa e outros adornos; embalsamento, embalsamamento, conservação ou restauração de cadáveres' },
+  { codigo: '25.02', descricao: 'Translado intramunicipal e cremação de corpos e partes de corpos cadavéricos' },
+  { codigo: '25.03', descricao: 'Planos ou convênio funerários' },
+  { codigo: '25.04', descricao: 'Manutenção e conservação de jazigos e cemitérios' },
+  { codigo: '25.05', descricao: 'Cessão de uso de espaços em cemitérios para sepultamento' },
+  { codigo: '26.01', descricao: 'Serviços de coleta, remessa ou entrega de correspondências, documentos, objetos, bens ou valores, inclusive pelos Correios e suas agências franqueadas; courrier e congêneres' },
+  { codigo: '27.01', descricao: 'Triggering de qualquer natureza, inclusive medicamentos' },
+  { codigo: '28.01', descricao: 'Serviços de access provider, de provimento de acesso à internet, hospedagem de páginas eletrônicas, de informações, de dados e congêneres' },
+  { codigo: '29.01', descricao: 'Serviços de instalação, de configuração, de manutenção e de atualização de programas de computação (software), bem como serviços de suporte técnico relacionados a programas de computação' },
+  { codigo: '30.01', descricao: 'Serviços técnicos em edificações, relacionados à engenharia de segurança e medicina do trabalho' },
+  { codigo: '31.01', descricao: 'Serviços técnicos profissionais especializados em edificações, como serviços técnicos de desenho técnico relacionados à arquitetura e engenharia; serviços técnicos topográficos; serviços técnicos de cálculo estrutural relacionados à engenharia; serviços técnicos de fiscalização relacionados à engenharia; serviços técnicos de perícia relacionados à engenharia ou arquitetura; serviços técnicos de avaliação e vistoria relacionados à engenharia ou arquitetura; serviços técnicos de planejamento relacionados à engenharia ou arquitetura e congêneres' },
+  { codigo: '32.01', descricao: 'Serviços de tradução e interpretação' },
+  { codigo: '33.01', descricao: 'Serviços de investigação particular, detetives e congêneres' },
+  { codigo: '34.01', descricao: 'Serviços de reportagem, assessoria de imprensa, jornalismo e relações públicas' },
+  { codigo: '35.01', descricao: 'Serviços de microfilmagem, digitalização de documentos e congêneres' },
+  { codigo: '36.01', descricao: 'Serviços de artistas, atletas, modelos e manequins' },
+  { codigo: '37.01', descricao: 'Serviços de museologia' },
+  { codigo: '38.01', descricao: 'Serviços de ourivesaria e lapidação (quando o material for fornecido pelo tomador do serviço)' },
+  { codigo: '39.01', descricao: 'Serviços advocatícios' },
+  { codigo: '40.01', descricao: 'Demais serviços não especificados nos demais grupos e não relacionados no §1º do art. 1º' }
 ];
 
 export const useCodigosNbs = () => {
@@ -136,21 +223,29 @@ export const useCodigosNbs = () => {
 
   const buscarCodigoPorDescricao = (termo: string): CodigoNbs[] => {
     console.log('=== Busca NBS ===');
-    console.log('Termo de busca:', termo);
+    console.log('Termo de busca recebido:', termo);
     
     if (!termo || termo.trim() === '') {
-      console.log('Retornando array vazio (termo vazio)');
+      console.log('Termo vazio - retornando array vazio');
       return [];
     }
     
     const termoLower = termo.toLowerCase().trim();
+    console.log('Termo processado:', termoLower);
+    
     const resultados = codigosNbs.filter(codigo => {
       const codigoMatch = codigo.codigo.toLowerCase().includes(termoLower);
       const descricaoMatch = codigo.descricao.toLowerCase().includes(termoLower);
-      return codigoMatch || descricaoMatch;
+      const match = codigoMatch || descricaoMatch;
+      
+      if (match) {
+        console.log('Match encontrado:', codigo.codigo, '-', codigo.descricao);
+      }
+      
+      return match;
     });
     
-    console.log('Resultados encontrados:', resultados.length);
+    console.log('Total de resultados encontrados:', resultados.length);
     console.log('Primeiros 3 resultados:', resultados.slice(0, 3));
     
     return resultados;
@@ -158,6 +253,12 @@ export const useCodigosNbs = () => {
 
   const buscarCodigoPorCodigo = (codigo: string): CodigoNbs | undefined => {
     console.log('Buscando código específico:', codigo);
+    
+    if (!codigo) {
+      console.log('Código vazio - retornando undefined');
+      return undefined;
+    }
+    
     const resultado = codigosNbs.find(item => item.codigo === codigo);
     console.log('Código encontrado:', resultado);
     return resultado;

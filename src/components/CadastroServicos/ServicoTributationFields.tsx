@@ -18,23 +18,23 @@ interface ServicoTributationFieldsProps {
 export function ServicoTributationFields({ formData, setFormData }: ServicoTributationFieldsProps) {
   const [openCodigoNbs, setOpenCodigoNbs] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const { codigosNbs, loading, buscarCodigoPorDescricao } = useCodigosNbs();
+  const { codigosNbs, loading, buscarCodigoPorDescricao, buscarCodigoPorCodigo } = useCodigosNbs();
 
   console.log('=== NBS Component Debug ===');
   console.log('Códigos NBS carregados:', codigosNbs?.length || 0);
   console.log('Loading state:', loading);
-  console.log('Search term:', searchTerm);
+  console.log('Search term atual:', searchTerm);
   console.log('Código selecionado atual:', formData.codigo_tributacao_nacional);
   console.log('Item NBS atual:', formData.item_nbs);
 
-  // Filtrar códigos com base no termo de busca
-  const codigosFiltrados = searchTerm.trim() ? buscarCodigoPorDescricao(searchTerm) : codigosNbs || [];
+  // Buscar códigos filtrados com base no termo de busca
+  const codigosFiltrados = searchTerm.trim() ? buscarCodigoPorDescricao(searchTerm) : [];
   console.log('Códigos filtrados:', codigosFiltrados?.length || 0);
 
-  // Buscar o código selecionado de forma mais robusta
-  const selectedCodigo = codigosNbs?.find((codigo) => {
-    return codigo.codigo === formData.codigo_tributacao_nacional;
-  }) || null;
+  // Buscar o código selecionado atual
+  const selectedCodigo = formData.codigo_tributacao_nacional 
+    ? buscarCodigoPorCodigo(formData.codigo_tributacao_nacional)
+    : null;
   
   console.log('Código selecionado encontrado:', selectedCodigo);
 
@@ -61,8 +61,20 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
   };
 
   const handleSearchChange = (value: string) => {
-    console.log('Termo de busca alterado:', value);
+    console.log('=== Termo de busca alterado ===');
+    console.log('Novo valor:', value);
     setSearchTerm(value);
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    console.log('=== Popover Open Change ===');
+    console.log('Novo estado:', open);
+    setOpenCodigoNbs(open);
+    
+    // Limpar busca quando fechar
+    if (!open) {
+      setSearchTerm("");
+    }
   };
 
   if (loading) {
@@ -81,7 +93,7 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
       
       <div className="space-y-2">
         <Label htmlFor="codigo_tributacao_nacional">Código de Tributação Nacional (NBS)</Label>
-        <Popover open={openCodigoNbs} onOpenChange={setOpenCodigoNbs}>
+        <Popover open={openCodigoNbs} onOpenChange={handleOpenChange}>
           <PopoverTrigger asChild>
             <Button 
               variant="outline" 
@@ -101,7 +113,7 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[600px] p-0" align="start" side="bottom">
+          <PopoverContent className="w-[600px] p-0 z-50 bg-white" align="start" side="bottom">
             <Command shouldFilter={false}>
               <CommandInput 
                 placeholder="Buscar código NBS..." 
@@ -114,7 +126,7 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
               </CommandEmpty>
               <CommandList className="max-h-[300px] overflow-y-auto">
                 <CommandGroup>
-                  {codigosFiltrados && codigosFiltrados.length > 0 ? (
+                  {searchTerm && codigosFiltrados && codigosFiltrados.length > 0 ? (
                     codigosFiltrados.map((codigo) => (
                       <CommandItem
                         key={codigo.codigo}
@@ -136,11 +148,15 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
                         </div>
                       </CommandItem>
                     ))
-                  ) : !loading ? (
+                  ) : searchTerm ? (
                     <div className="p-4 text-center text-sm text-muted-foreground">
-                      {searchTerm ? "Nenhum resultado encontrado" : "Digite para buscar códigos NBS"}
+                      Nenhum resultado encontrado para "{searchTerm}"
                     </div>
-                  ) : null}
+                  ) : (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      Digite para buscar códigos NBS
+                    </div>
+                  )}
                 </CommandGroup>
               </CommandList>
             </Command>
