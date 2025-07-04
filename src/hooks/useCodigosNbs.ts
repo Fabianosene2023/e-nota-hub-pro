@@ -91,7 +91,29 @@ const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '11.01', descricao: 'Guarda e estacionamento de veículos terrestres automotores, de aeronaves e de embarcações' },
   { codigo: '11.02', descricao: 'Vigilância, segurança ou monitoramento de bens e pessoas' },
   { codigo: '11.03', descricao: 'Escolta, inclusive de veículos e cargas' },
-  { codigo: '11.04', descricao: 'Armazenamento, depósito, carga, descarga, arrumação e guarda de bens de qualquer espécie' }
+  { codigo: '11.04', descricao: 'Armazenamento, depósito, carga, descarga, arrumação e guarda de bens de qualquer espécie' },
+  { codigo: '12.01', descricao: 'Espetáculos teatrais' },
+  { codigo: '12.02', descricao: 'Exibições cinematográficas' },
+  { codigo: '12.03', descricao: 'Espetáculos circenses' },
+  { codigo: '12.04', descricao: 'Programas de auditório' },
+  { codigo: '12.05', descricao: 'Parques de diversões, centros de lazer e congêneres' },
+  { codigo: '12.06', descricao: 'Boates, taxi-dancing e congêneres' },
+  { codigo: '12.07', descricao: 'Shows, ballet, danças, desfiles, bailes, óperas, concertos, recitais, festivais e congêneres' },
+  { codigo: '12.08', descricao: 'Feiras, exposições, congressos e congêneres' },
+  { codigo: '12.09', descricao: 'Bilhares, boliches e diversões eletrônicas ou não' },
+  { codigo: '12.10', descricao: 'Corridas e competições de animais' },
+  { codigo: '12.11', descricao: 'Competições esportivas ou de destreza física ou intelectual, com ou sem a participação do espectador' },
+  { codigo: '12.12', descricao: 'Execução de música' },
+  { codigo: '12.13', descricao: 'Produção, mediante ou sem encomenda prévia, de eventos, espetáculos, entrevistas, shows, ballet, danças, desfiles, bailes, teatros, óperas, concertos, recitais, festivais e congêneres' },
+  { codigo: '12.14', descricao: 'Fornecimento de música para ambientes fechados ou não, mediante transmissão por qualquer processo' },
+  { codigo: '12.15', descricao: 'Desfiles de blocos carnavalescos ou folclóricos, trios elétricos e congêneres' },
+  { codigo: '12.16', descricao: 'Exibição de filmes, entrevistas, musicais, espetáculos, shows, concertos, desfiles, óperas, competições esportivas, de destreza intelectual ou congêneres' },
+  { codigo: '12.17', descricao: 'Recreação e animação, inclusive em festas e eventos' },
+  { codigo: '13.01', descricao: 'Serviços de biblioteconomia' },
+  { codigo: '13.02', descricao: 'Decoração e jardinagem, inclusive corte e poda de árvores' },
+  { codigo: '13.03', descricao: 'Elaboração de desenhos, projetos e cálculos para trabalhos de engenharia civil, hidráulica, elétrica, mecânica, telecomunicações e de outras modalidades' },
+  { codigo: '13.04', descricao: 'Elaboração de planos diretores, estudos de viabilidade, estudos organizacionais e outros, relacionados com obras e serviços de engenharia' },
+  { codigo: '13.05', descricao: 'Elaboração de anteprojetos, projetos básicos e projetos executivos para trabalhos de engenharia' }
 ];
 
 export const useCodigosNbs = () => {
@@ -117,8 +139,8 @@ export const useCodigosNbs = () => {
     console.log('Termo de busca:', termo);
     
     if (!termo || termo.trim() === '') {
-      console.log('Retornando todos os códigos (termo vazio)');
-      return codigosNbs;
+      console.log('Retornando array vazio (termo vazio)');
+      return [];
     }
     
     const termoLower = termo.toLowerCase().trim();

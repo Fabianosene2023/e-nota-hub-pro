@@ -28,28 +28,35 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
   console.log('Item NBS atual:', formData.item_nbs);
 
   // Filtrar códigos com base no termo de busca
-  const codigosFiltrados = searchTerm ? buscarCodigoPorDescricao(searchTerm) : codigosNbs;
+  const codigosFiltrados = searchTerm.trim() ? buscarCodigoPorDescricao(searchTerm) : codigosNbs || [];
   console.log('Códigos filtrados:', codigosFiltrados?.length || 0);
 
-  const selectedCodigo = codigosNbs?.find((codigo) => codigo.codigo === formData.codigo_tributacao_nacional);
+  // Buscar o código selecionado de forma mais robusta
+  const selectedCodigo = codigosNbs?.find((codigo) => {
+    return codigo.codigo === formData.codigo_tributacao_nacional;
+  }) || null;
+  
   console.log('Código selecionado encontrado:', selectedCodigo);
 
   const handleCodigoSelect = (codigo: any) => {
     console.log('=== Selecionando código NBS ===');
     console.log('Código selecionado:', codigo);
     
-    setFormData({
+    // Atualizar formData com os dados corretos
+    const updatedFormData = {
       ...formData, 
       codigo_tributacao_nacional: codigo.codigo, 
       item_nbs: codigo.descricao
-    });
+    };
     
+    setFormData(updatedFormData);
     setOpenCodigoNbs(false);
     setSearchTerm(""); // Limpar busca após seleção
     
     console.log('Estado após seleção:', {
       codigo: codigo.codigo,
-      descricao: codigo.descricao
+      descricao: codigo.descricao,
+      formDataAtualizado: updatedFormData
     });
   };
 
@@ -86,7 +93,9 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
               <span className="truncate">
                 {selectedCodigo 
                   ? `${selectedCodigo.codigo} - ${selectedCodigo.descricao}`
-                  : "Selecione o código NBS"
+                  : formData.codigo_tributacao_nacional 
+                    ? `${formData.codigo_tributacao_nacional} - ${formData.item_nbs || 'Descrição não encontrada'}`
+                    : "Selecione o código NBS"
                 }
               </span>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -101,7 +110,7 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
                 onValueChange={handleSearchChange}
               />
               <CommandEmpty>
-                {searchTerm ? "Nenhum código encontrado para esta busca." : "Nenhum código encontrado."}
+                {searchTerm ? "Nenhum código encontrado para esta busca." : "Digite para buscar códigos NBS."}
               </CommandEmpty>
               <CommandList className="max-h-[300px] overflow-y-auto">
                 <CommandGroup>
@@ -109,7 +118,7 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
                     codigosFiltrados.map((codigo) => (
                       <CommandItem
                         key={codigo.codigo}
-                        value={codigo.codigo}
+                        value={`${codigo.codigo}-${codigo.descricao}`}
                         onSelect={() => handleCodigoSelect(codigo)}
                         className="cursor-pointer flex items-start gap-2 p-3 hover:bg-accent"
                       >
@@ -127,11 +136,11 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
                         </div>
                       </CommandItem>
                     ))
-                  ) : (
+                  ) : !loading ? (
                     <div className="p-4 text-center text-sm text-muted-foreground">
-                      {searchTerm ? "Nenhum resultado encontrado" : "Carregando códigos..."}
+                      {searchTerm ? "Nenhum resultado encontrado" : "Digite para buscar códigos NBS"}
                     </div>
-                  )}
+                  ) : null}
                 </CommandGroup>
               </CommandList>
             </Command>
