@@ -208,59 +208,43 @@ export const useCodigosNbs = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('=== useCodigosNbs Hook ===');
-    console.log('Iniciando carregamento dos códigos NBS...');
+    console.log('=== useCodigosNbs Hook - Inicializando ===');
     
-    // Simular um pequeno delay para mostrar o loading
     const timer = setTimeout(() => {
       setCodigosNbs(CODIGOS_NBS);
       setLoading(false);
-      console.log('Códigos NBS carregados com sucesso:', CODIGOS_NBS.length, 'códigos');
+      console.log('Códigos NBS carregados:', CODIGOS_NBS.length);
     }, 100);
 
     return () => clearTimeout(timer);
   }, []);
 
   const buscarCodigoPorDescricao = (termo: string): CodigoNbs[] => {
-    console.log('=== Busca NBS ===');
-    console.log('Termo de busca recebido:', termo);
-    
     if (!termo || termo.trim() === '') {
       console.log('Termo vazio - retornando array vazio');
       return [];
     }
     
     const termoLower = termo.toLowerCase().trim();
-    console.log('Termo processado:', termoLower);
+    console.log('Buscando códigos NBS para:', termoLower);
     
     const resultados = codigosNbs.filter(codigo => {
       const codigoMatch = codigo.codigo.toLowerCase().includes(termoLower);
       const descricaoMatch = codigo.descricao.toLowerCase().includes(termoLower);
-      const match = codigoMatch || descricaoMatch;
-      
-      if (match) {
-        console.log('Match encontrado:', codigo.codigo, '-', codigo.descricao);
-      }
-      
-      return match;
+      return codigoMatch || descricaoMatch;
     });
     
-    console.log('Total de resultados encontrados:', resultados.length);
-    console.log('Primeiros 3 resultados:', resultados.slice(0, 3));
-    
+    console.log(`Encontrados ${resultados.length} códigos para "${termo}"`);
     return resultados;
   };
 
   const buscarCodigoPorCodigo = (codigo: string): CodigoNbs | undefined => {
-    console.log('Buscando código específico:', codigo);
-    
     if (!codigo) {
-      console.log('Código vazio - retornando undefined');
       return undefined;
     }
     
     const resultado = codigosNbs.find(item => item.codigo === codigo);
-    console.log('Código encontrado:', resultado);
+    console.log('Buscando código específico:', codigo, '- Encontrado:', resultado);
     return resultado;
   };
 
