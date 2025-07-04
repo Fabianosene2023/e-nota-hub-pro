@@ -350,27 +350,38 @@ export const useCodigosNbs = () => {
 
   useEffect(() => {
     console.log('=== useCodigosNbs Hook - Inicializando ===');
+    console.log('Total de códigos na constante CODIGOS_NBS:', CODIGOS_NBS.length);
+    console.log('Primeiros 3 códigos da constante:', CODIGOS_NBS.slice(0, 3));
     
     const timer = setTimeout(() => {
+      console.log('=== Carregando códigos NBS ===');
       setCodigosNbs(CODIGOS_NBS);
       setLoading(false);
-      console.log('Códigos NBS carregados:', CODIGOS_NBS.length, 'códigos');
-      console.log('Primeiros 3 códigos:', CODIGOS_NBS.slice(0, 3));
+      console.log('✅ Códigos NBS carregados:', CODIGOS_NBS.length, 'códigos');
+      console.log('Códigos carregados no estado:', CODIGOS_NBS.length);
+      console.log('Primeiros 3 códigos carregados:', CODIGOS_NBS.slice(0, 3));
     }, 100);
 
     return () => clearTimeout(timer);
   }, []);
 
   const buscarCodigoPorDescricao = (termo: string): CodigoNbs[] => {
+    console.log('=== Buscando códigos NBS ===');
+    console.log('Termo de busca:', termo);
+    console.log('Total de códigos disponíveis:', codigosNbs.length);
+    
     if (!termo || termo.trim() === '') {
       console.log('Termo vazio - retornando array vazio');
       return [];
     }
     
+    if (codigosNbs.length === 0) {
+      console.error('❌ Nenhum código disponível para busca!');
+      return [];
+    }
+    
     const termoLower = termo.toLowerCase().trim();
-    console.log('=== Buscando códigos NBS ===');
-    console.log('Termo de busca:', termoLower);
-    console.log('Total de códigos disponíveis:', codigosNbs.length);
+    console.log('Termo processado:', termoLower);
     
     const resultados = codigosNbs.filter(codigo => {
       const codigoMatch = codigo.codigo.toLowerCase().includes(termoLower);
@@ -378,15 +389,16 @@ export const useCodigosNbs = () => {
       const match = codigoMatch || descricaoMatch;
       
       if (match) {
-        console.log('Código encontrado:', codigo.codigo, '-', codigo.descricao.substring(0, 50) + '...');
+        console.log('✅ Código encontrado:', codigo.codigo, '-', codigo.descricao.substring(0, 50) + '...');
       }
       
       return match;
     });
     
-    console.log(`=== Resultado da busca ===`);
-    console.log(`Encontrados ${resultados.length} códigos para "${termo}"`);
-    console.log('Primeiros resultados:', resultados.slice(0, 3).map(r => `${r.codigo} - ${r.descricao.substring(0, 30)}...`));
+    console.log(`✅ Resultado da busca: ${resultados.length} códigos encontrados para "${termo}"`);
+    if (resultados.length > 0) {
+      console.log('Primeiros resultados:', resultados.slice(0, 3).map(r => `${r.codigo} - ${r.descricao.substring(0, 30)}...`));
+    }
     
     return resultados;
   };

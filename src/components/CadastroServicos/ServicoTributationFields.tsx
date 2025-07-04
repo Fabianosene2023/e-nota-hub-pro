@@ -20,7 +20,9 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
   const [searchTerm, setSearchTerm] = useState("");
   const { codigosNbs, loading, buscarCodigoPorDescricao, buscarCodigoPorCodigo } = useCodigosNbs();
 
+  // Log detalhado de renderização
   console.log('=== ServicoTributationFields Render ===');
+  console.log('FormData completo:', formData);
   console.log('FormData códigos NBS:', {
     codigo_tributacao_nacional: formData.codigo_tributacao_nacional,
     item_nbs: formData.item_nbs
@@ -28,8 +30,16 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
   console.log('Estado da busca:', {
     searchTerm,
     openCodigoNbs,
-    totalCodigos: codigosNbs.length
+    totalCodigos: codigosNbs.length,
+    loading
   });
+  
+  // Debug adicional para verificar se o hook está funcionando
+  if (codigosNbs.length === 0 && !loading) {
+    console.error('❌ Hook useCodigosNbs não carregou códigos!');
+  } else if (codigosNbs.length > 0) {
+    console.log('✅ Hook useCodigosNbs carregou', codigosNbs.length, 'códigos');
+  }
 
   // Buscar códigos com base no termo de busca - só busca se tiver termo
   const codigosFiltrados = searchTerm.trim().length >= 2 ? buscarCodigoPorDescricao(searchTerm) : [];
@@ -49,8 +59,9 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
   const handleCodigoSelect = (codigo: any) => {
     console.log('=== Selecionando código NBS ===');
     console.log('Código selecionado:', codigo);
+    console.log('FormData antes da atualização:', formData);
     
-    // Atualizar dados do formulário com os novos valores
+    // Criar novos dados atualizados
     const updatedFormData = {
       ...formData,
       codigo_tributacao_nacional: codigo.codigo,
@@ -58,17 +69,36 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
     };
     
     console.log('Dados atualizados para salvar:', {
-      codigo_tributacao_nacional: updatedFormData.codigo_tributacao_nacional,
-      item_nbs: updatedFormData.item_nbs
+      antes: {
+        codigo_tributacao_nacional: formData.codigo_tributacao_nacional,
+        item_nbs: formData.item_nbs
+      },
+      depois: {
+        codigo_tributacao_nacional: updatedFormData.codigo_tributacao_nacional,
+        item_nbs: updatedFormData.item_nbs
+      }
     });
     
+    // Atualizar estado
     setFormData(updatedFormData);
+    
+    // Log imediato para verificar se a função setFormData foi chamada
+    console.log('✅ setFormData chamado com sucesso');
     
     // Fechar popover e limpar busca
     setOpenCodigoNbs(false);
     setSearchTerm("");
     
-    console.log('Seleção concluída - popover fechado');
+    console.log('✅ Seleção concluída - popover fechado');
+    
+    // Verificação adicional após um timeout para ver se o estado foi atualizado
+    setTimeout(() => {
+      console.log('=== Verificação pós-seleção (após 100ms) ===');
+      console.log('Estado do formData após seleção:', {
+        codigo_tributacao_nacional: formData.codigo_tributacao_nacional,
+        item_nbs: formData.item_nbs
+      });
+    }, 100);
   };
 
   const handleSearchChange = (value: string) => {
@@ -101,26 +131,38 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
     );
   }
 
-  // Texto para exibir no botão - melhorado
+  // Texto para exibir no botão - melhorado com logs
   const getDisplayText = () => {
+    console.log('=== getDisplayText ===');
+    console.log('codigoSelecionado:', codigoSelecionado);
+    console.log('formData.codigo_tributacao_nacional:', formData.codigo_tributacao_nacional);
+    console.log('formData.item_nbs:', formData.item_nbs);
+    
     if (codigoSelecionado) {
       const descricaoTruncada = codigoSelecionado.descricao.length > 60 
         ? codigoSelecionado.descricao.substring(0, 60) + '...' 
         : codigoSelecionado.descricao;
-      return `${codigoSelecionado.codigo} - ${descricaoTruncada}`;
+      const result = `${codigoSelecionado.codigo} - ${descricaoTruncada}`;
+      console.log('Usando codigoSelecionado:', result);
+      return result;
     }
     
     if (formData.codigo_tributacao_nacional && formData.item_nbs) {
       const descricaoTruncada = formData.item_nbs.length > 60 
         ? formData.item_nbs.substring(0, 60) + '...' 
         : formData.item_nbs;
-      return `${formData.codigo_tributacao_nacional} - ${descricaoTruncada}`;
+      const result = `${formData.codigo_tributacao_nacional} - ${descricaoTruncada}`;
+      console.log('Usando formData completo:', result);
+      return result;
     }
     
     if (formData.codigo_tributacao_nacional) {
-      return `${formData.codigo_tributacao_nacional} - Descrição não encontrada`;
+      const result = `${formData.codigo_tributacao_nacional} - Descrição não encontrada`;
+      console.log('Usando apenas código:', result);
+      return result;
     }
     
+    console.log('Usando texto padrão');
     return "Selecione o código NBS";
   };
 
