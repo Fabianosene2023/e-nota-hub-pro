@@ -6,7 +6,7 @@ export interface CodigoNbs {
   descricao: string;
 }
 
-// Lista expandida de códigos NBS mais comuns
+// Lista expandida e corrigida de códigos NBS
 const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '1.01', descricao: 'Análise e desenvolvimento de sistemas' },
   { codigo: '1.02', descricao: 'Programação' },
@@ -16,10 +16,11 @@ const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '1.06', descricao: 'Assessoria e consultoria em informática' },
   { codigo: '1.07', descricao: 'Suporte técnico em informática, inclusive instalação, configuração e manutenção de programas de computação e bancos de dados' },
   { codigo: '1.08', descricao: 'Planejamento, confecção, manutenção e atualização de páginas eletrônicas' },
+  { codigo: '1.09', descricao: 'Disponibilização, sem cessão definitiva, de conteúdos de áudio, vídeo, imagem e texto por meio da internet, respeitada a imunidade de livros, jornais e periódicos (exceto a distribuição de conteúdos pelas prestadoras de Serviço de Acesso Condicionado, de que trata a Lei no 12.485, de 12 de setembro de 2011, sujeita ao ICMS)' },
   { codigo: '2.01', descricao: 'Serviços de pesquisas e desenvolvimento de qualquer natureza' },
   { codigo: '3.01', descricao: 'Cessão de direito de uso de programa de computação' },
   { codigo: '3.02', descricao: 'Cessão de direito de uso de marcas e de sinais de propaganda' },
-  { codigo: '3.03', descricao: 'Cessão de direito de exploração de salões de festas, centro de convenções, escritórios virtuais, stands, quadras esportivas, estádios, ginásios, auditórios, casa de espetáculos, parques de diversões, canchas e congêneres, para realização de eventos ou negócios de qualquer natureza' },
+  { codigo: '3.03', descricao: 'Cessão de direito de exploração de salões de festas, centro de convenções, escritórios virtuais, stands, quadras esportivas, estádios, ginásios, auditórios, casa de espetáculos, parques de diversões, canchas e congêneres' },
   { codigo: '3.04', descricao: 'Cessão de direito de uso de andaimes, palcos, coberturas e outras estruturas de uso temporário' },
   { codigo: '4.01', descricao: 'Medicina e biomedicina' },
   { codigo: '4.02', descricao: 'Análises clínicas, patologia, eletricidade médica, radioterapia, quimioterapia, ultra-sonografia, ressonância magnética, radiologia, tomografia e congêneres' },
@@ -60,12 +61,25 @@ const CODIGOS_NBS: CodigoNbs[] = [
   { codigo: '6.05', descricao: 'Centros de emagrecimento, spa e congêneres' },
   { codigo: '6.06', descricao: 'Aplicação de tatuagens, piercings e congêneres' },
   { codigo: '7.01', descricao: 'Engenharia, agronomia, agrimensura, arquitetura, geologia, urbanismo, paisagismo e congêneres' },
-  { codigo: '7.02', descricao: 'Execução, por administração, empreitada ou subempreitada, de obras de construção civil, hidráulica ou elétrica e de outras obras semelhantes, inclusive sondagem, perfuração de poços, escavação, drenagem e irrigação, terraplanagem, pavimentação, concretagem e a instalação e montagem de produtos, peças e equipamentos (exceto o fornecimento de mercadorias produzidas pelo prestador de serviços fora do local da prestação dos serviços, que fica sujeito ao ICMS)' },
-  { codigo: '7.03', descricao: 'Elaboração de planos diretores, estudos de viabilidade, estudos organizacionais e outros, relacionados com obras e serviços de engenharia; elaboração de anteprojetos, projetos básicos e projetos executivos para trabalhos de engenharia' },
+  { codigo: '7.02', descricao: 'Execução, por administração, empreitada ou subempreitada, de obras de construção civil, hidráulica ou elétrica e de outras obras semelhantes' },
+  { codigo: '7.03', descricao: 'Elaboração de planos diretores, estudos de viabilidade, estudos organizacionais e outros, relacionados com obras e serviços de engenharia' },
   { codigo: '7.04', descricao: 'Demolição' },
-  { codigo: '7.05', descricao: 'Reparação, conservação e reforma de edifícios, estradas, pontes, portos e congêneres (exceto o fornecimento de mercadorias produzidas pelo prestador dos serviços, fora do local da prestação dos serviços, que fica sujeito ao ICMS)' },
+  { codigo: '7.05', descricao: 'Reparação, conservação e reforma de edifícios, estradas, pontes, portos e congêneres' },
   { codigo: '8.01', descricao: 'Ensino regular pré-escolar, fundamental, médio e superior' },
-  { codigo: '8.02', descricao: 'Instrução, treinamento, orientação pedagógica e educacional, avaliação de conhecimentos de qualquer natureza' }
+  { codigo: '8.02', descricao: 'Instrução, treinamento, orientação pedagógica e educacional, avaliação de conhecimentos de qualquer natureza' },
+  { codigo: '9.01', descricao: 'Hospedagem de qualquer natureza em hotéis, apart-service condominiais, flat, apart-hotéis, hotéis residência, residence-service, suite service, hotelaria marítima, motéis, pensões e congêneres' },
+  { codigo: '9.02', descricao: 'Agenciamento, organização, promoção, intermediação e execução de programas de turismo, passeios, viagens, excursões, hospedagens e congêneres' },
+  { codigo: '9.03', descricao: 'Guias de turismo' },
+  { codigo: '10.01', descricao: 'Agenciamento, corretagem ou intermediação de câmbio, de seguros, de cartões de crédito, de planos de saúde e de planos de previdência privada' },
+  { codigo: '10.02', descricao: 'Agenciamento, corretagem ou intermediação de títulos em geral, valores mobiliários e contratos quaisquer' },
+  { codigo: '10.03', descricao: 'Agenciamento, corretagem ou intermediação de direitos de propriedade industrial, artística ou literária' },
+  { codigo: '10.04', descricao: 'Agenciamento, corretagem ou intermediação de contratos de arrendamento mercantil (leasing), de franquia (franchising) e de faturização (factoring)' },
+  { codigo: '10.05', descricao: 'Agenciamento, corretagem ou intermediação de bens móveis ou imóveis, não abrangidos em outros itens ou subitens' },
+  { codigo: '10.06', descricao: 'Agenciamento marítimo' },
+  { codigo: '10.07', descricao: 'Agenciamento de notícias' },
+  { codigo: '10.08', descricao: 'Agenciamento de publicidade e propaganda, inclusive o agenciamento de veiculação por qualquer meio' },
+  { codigo: '10.09', descricao: 'Representação de qualquer natureza, inclusive comercial' },
+  { codigo: '10.10', descricao: 'Distribuição de bens de terceiros' }
 ];
 
 export const useCodigosNbs = () => {
@@ -73,10 +87,16 @@ export const useCodigosNbs = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('Carregando códigos NBS...');
-    setCodigosNbs(CODIGOS_NBS);
-    setLoading(false);
-    console.log('Códigos NBS carregados:', CODIGOS_NBS.length);
+    console.log('Iniciando carregamento dos códigos NBS...');
+    
+    // Simular um pequeno delay para mostrar o loading
+    const timer = setTimeout(() => {
+      setCodigosNbs(CODIGOS_NBS);
+      setLoading(false);
+      console.log('Códigos NBS carregados com sucesso:', CODIGOS_NBS.length, 'códigos');
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const buscarCodigoPorDescricao = (termo: string): CodigoNbs[] => {

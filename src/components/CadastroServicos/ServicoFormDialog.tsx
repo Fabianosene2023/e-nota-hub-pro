@@ -28,7 +28,7 @@ export function ServicoFormDialog({
 }: ServicoFormDialogProps) {
   const [formData, setFormData] = useState(() => {
     if (isEdit && editingServico) {
-      console.log('Editando serviço:', editingServico);
+      console.log('Carregando dados do serviço para edição:', editingServico);
       return {
         empresa_id: editingServico.empresa_id || "",
         codigo: editingServico.codigo || "",
@@ -90,11 +90,20 @@ export function ServicoFormDialog({
   const updateServico = useUpdateServicoManager();
 
   const handleSubmit = () => {
-    console.log('Dados do formulário antes da validação:', formData);
+    console.log('=== INÍCIO DO SUBMIT ===');
+    console.log('Dados completos do formulário:', formData);
     console.log('Código NBS selecionado:', formData.codigo_tributacao_nacional);
     console.log('Item NBS:', formData.item_nbs);
     
+    // Validação básica
     if (!formData.empresa_id || !formData.codigo || !formData.nome || !formData.preco_unitario) {
+      console.log('Erro de validação - campos obrigatórios:', {
+        empresa_id: formData.empresa_id,
+        codigo: formData.codigo,
+        nome: formData.nome,
+        preco_unitario: formData.preco_unitario
+      });
+      
       toast({
         title: "Erro",
         description: "Preencha todos os campos obrigatórios",
@@ -103,50 +112,76 @@ export function ServicoFormDialog({
       return;
     }
 
+    // Preparar dados para salvar
     const servicoData = {
       ...formData,
-      preco_unitario: parseFloat(formData.preco_unitario),
+      preco_unitario: parseFloat(formData.preco_unitario) || 0,
       aliquota_iss: formData.aliquota_iss ? parseFloat(formData.aliquota_iss) : 0,
       valor_servico_prestado: formData.valor_servico_prestado ? parseFloat(formData.valor_servico_prestado) : 0,
-      opcao_tributos: parseInt(formData.opcao_tributos),
+      opcao_tributos: parseInt(formData.opcao_tributos) || 3,
       valor_tributos_federais: formData.valor_tributos_federais ? parseFloat(formData.valor_tributos_federais) : 0,
       valor_tributos_estaduais: formData.valor_tributos_estaduais ? parseFloat(formData.valor_tributos_estaduais) : 0,
       valor_tributos_municipais: formData.valor_tributos_municipais ? parseFloat(formData.valor_tributos_municipais) : 0,
       percentual_tributos_federais: formData.percentual_tributos_federais ? parseFloat(formData.percentual_tributos_federais) : 0,
       percentual_tributos_estaduais: formData.percentual_tributos_estaduais ? parseFloat(formData.percentual_tributos_estaduais) : 0,
       percentual_tributos_municipais: formData.percentual_tributos_municipais ? parseFloat(formData.percentual_tributos_municipais) : 0,
-      // Garantir que os campos NBS sejam salvos
+      // Garantir que os campos NBS sejam enviados corretamente
       codigo_tributacao_nacional: formData.codigo_tributacao_nacional || null,
       item_nbs: formData.item_nbs || null,
       ativo: true
     };
 
-    console.log('Dados do serviço processados para salvar (incluindo NBS):', servicoData);
+    console.log('Dados processados para salvar:', servicoData);
+    console.log('Campos NBS específicos:', {
+      codigo_tributacao_nacional: servicoData.codigo_tributacao_nacional,
+      item_nbs: servicoData.item_nbs
+    });
 
     if (isEdit && editingServico) {
+      console.log('Executando UPDATE do serviço ID:', editingServico.id);
       updateServico.mutate({
         id: editingServico.id,
         updates: servicoData
       }, {
-        onSuccess: () => {
-          console.log('Serviço atualizado com sucesso');
+        onSuccess: (data) => {
+          console.log('Serviço atualizado com sucesso:', data);
+          toast({
+            title: "Sucesso!",
+            description: "Serviço atualizado com sucesso",
+          });
           onSuccess();
         },
         onError: (error) => {
           console.error('Erro ao atualizar serviço:', error);
+          toast({
+            title: "Erro",
+            description: "Erro ao atualizar serviço",
+            variant: "destructive",
+          });
         }
       });
     } else {
+      console.log('Executando CREATE do serviço');
       createServico.mutate(servicoData, {
-        onSuccess: () => {
-          console.log('Serviço criado com sucesso');
+        onSuccess: (data) => {
+          console.log('Serviço criado com sucesso:', data);
+          toast({
+            title: "Sucesso!",
+            description: "Serviço criado com sucesso",
+          });
           onSuccess();
         },
         onError: (error) => {
           console.error('Erro ao criar serviço:', error);
+          toast({
+            title: "Erro",
+            description: "Erro ao criar serviço",
+            variant: "destructive",
+          });
         }
       });
     }
+    console.log('=== FIM DO SUBMIT ===');
   };
 
   return (

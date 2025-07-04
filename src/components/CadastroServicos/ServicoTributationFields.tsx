@@ -6,7 +6,6 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCodigosNbs } from "@/hooks/useCodigosNbs";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,26 +17,35 @@ interface ServicoTributationFieldsProps {
 
 export function ServicoTributationFields({ formData, setFormData }: ServicoTributationFieldsProps) {
   const [openCodigoNbs, setOpenCodigoNbs] = useState(false);
-  const { codigosNbs } = useCodigosNbs();
+  const { codigosNbs, loading } = useCodigosNbs();
 
-  console.log('Códigos NBS disponíveis:', codigosNbs.length);
-  console.log('Código atual selecionado:', formData.codigo_tributacao_nacional);
+  console.log('Códigos NBS carregados:', codigosNbs?.length || 0);
+  console.log('Loading state:', loading);
+  console.log('Código selecionado atual:', formData.codigo_tributacao_nacional);
 
-  const selectedCodigo = codigosNbs.find((codigo) => codigo.codigo === formData.codigo_tributacao_nacional);
+  const selectedCodigo = codigosNbs?.find((codigo) => codigo.codigo === formData.codigo_tributacao_nacional);
 
   const handleCodigoSelect = (codigo: any) => {
     console.log('Selecionando código NBS:', codigo);
+    
     setFormData({
       ...formData, 
       codigo_tributacao_nacional: codigo.codigo, 
       item_nbs: codigo.descricao
     });
+    
     setOpenCodigoNbs(false);
+    console.log('Estado após seleção - Código:', codigo.codigo, 'Descrição:', codigo.descricao);
   };
+
+  if (loading) {
+    return <div>Carregando códigos NBS...</div>;
+  }
 
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Informações Tributárias</h3>
+      
       <div className="space-y-2">
         <Label htmlFor="codigo_tributacao_nacional">Código de Tributação Nacional (NBS)</Label>
         <Popover open={openCodigoNbs} onOpenChange={setOpenCodigoNbs}>
@@ -46,7 +54,8 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
               variant="outline" 
               role="combobox" 
               aria-expanded={openCodigoNbs}
-              className="w-full justify-between"
+              className="w-full justify-between text-left"
+              type="button"
             >
               {selectedCodigo 
                 ? `${selectedCodigo.codigo} - ${selectedCodigo.descricao}`
@@ -56,27 +65,30 @@ export function ServicoTributationFields({ formData, setFormData }: ServicoTribu
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[600px] p-0" align="start">
-            <Command className="w-full">
-              <CommandInput placeholder="Buscar código NBS..." className="h-9" />
+            <Command shouldFilter={false}>
+              <CommandInput 
+                placeholder="Buscar código NBS..." 
+                className="h-9"
+              />
               <CommandEmpty>Nenhum código encontrado.</CommandEmpty>
-              <CommandList className="max-h-[300px] overflow-y-auto">
+              <CommandList className="max-h-[200px] overflow-y-auto">
                 <CommandGroup>
-                  {codigosNbs.map((codigo) => (
+                  {codigosNbs && codigosNbs.map((codigo) => (
                     <CommandItem
                       key={codigo.codigo}
                       value={`${codigo.codigo} ${codigo.descricao}`}
                       onSelect={() => handleCodigoSelect(codigo)}
-                      className="cursor-pointer"
+                      className="cursor-pointer flex items-start gap-2 p-2"
                     >
                       <Check
                         className={cn(
-                          "mr-2 h-4 w-4",
+                          "mt-1 h-4 w-4 flex-shrink-0",
                           formData.codigo_tributacao_nacional === codigo.codigo ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      <div className="flex flex-col w-full">
-                        <span className="font-medium">{codigo.codigo}</span>
-                        <span className="text-sm text-muted-foreground truncate">{codigo.descricao}</span>
+                      <div className="flex flex-col w-full min-w-0">
+                        <span className="font-medium text-sm">{codigo.codigo}</span>
+                        <span className="text-xs text-muted-foreground break-words">{codigo.descricao}</span>
                       </div>
                     </CommandItem>
                   ))}
